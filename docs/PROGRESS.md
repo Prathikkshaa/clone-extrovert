@@ -3,20 +3,22 @@
 > Updated at the end of every build session. New sessions read this + 00-master-context.md to know where things stand.
 
 ## Current status
-- Last completed file: 03
-- Next file: 04 (Mailbox OAuth — Gmail + Outlook: connect a sending mailbox, store tokens encrypted with TOKEN_ENCRYPTION_KEY, record in `mailboxes`)
+- Last completed file: 04
+- Next file: 05 (Onboarding + website-to-profile: crawl user's site, LLM-extract company profile, logo/accent theming, "no website" path)
 - Branch: main
 - App boots: api ✅ / worker ✅ / web ✅
 - DB: schema + RLS live on Supabase project `ywdrznybrxyskvyccwxb`; generated types in `@extrovertai/shared`.
 - Auth: Supabase Auth live — web signup/login + guards; API JWT guard + `GET /me`; `users` profile row auto-created on first authed request.
+- Mailbox OAuth: Gmail + Outlook connect flow, encrypted token storage, `mailboxes` CRUD + UI all built. **Live OAuth UNVERIFIED — no Google/Microsoft credentials yet (see blocker).**
+
+## In progress / deferred / blockers
+- **File 04 credential gap:** `GOOGLE_OAUTH_CLIENT_ID/SECRET` and `MS_OAUTH_CLIENT_ID/SECRET` are not in `.env`. Both providers are **fully implemented** (not stubbed) behind the interface, but the live connect handshake and token refresh are **unverified**. To verify once creds are added: fill the Google and/or Microsoft OAuth values in `.env` (redirect URIs already set to `http://localhost:3000/auth/google|microsoft/callback`), restart the API, open `/mailboxes`, click Connect, complete consent → expect a `mailboxes` row with encrypted tokens and a green "Connected" row. Google stays in "testing" mode with test users until verified (fine for dev).
 
 ## Completed files
 - [x] 01 — Monorepo scaffold (npm workspaces; web/api/worker skeletons; @extrovertai/shared package; Tailwind + design tokens; .env.example; docs). Commit: c5bea53
 - [x] 02 — Supabase data layer: `@extrovertai/server` package with `SupabaseService` (admin client, backend-only); full schema migration (17 tables, 10 enums, FKs, updated_at triggers, indexes, RLS); generated DB types in `@extrovertai/shared`; `GET /health/db` readiness check; `docs/DB.md`. **No UI changes** (visual verification N/A). Commit: 9ddd272
 - [x] 03 — Authentication: Supabase Auth. Web `AuthService` (anon client), login/signup screens, `authGuard`/`guestGuard`, Bearer HTTP interceptor, protected Home; API `SupabaseAuthGuard` (validates JWT via `auth.getUser`), `@CurrentUser()`, `GET /me`, idempotent `users` profile creation. Verified end-to-end (login → /me 200, no token → 401, RLS own-row only, profile created exactly once) + visual (login/signup). Commit: 793d15a
-
-## In progress / deferred / blockers
-- (none)
+- [x] 04 — Mailbox OAuth: `CryptoService` (AES-256-GCM) + Gmail/Outlook providers + `MailboxOAuthService` in `@extrovertai/server`; API `MailboxesService` (signed-state CSRF, encrypted token storage), `/mailboxes` connect/list/disconnect/providers + unguarded `/auth/:provider/callback`; web Connect-mailbox screen. Verified: build, lint, AES-GCM round-trip, not-configured 400, CRUD + RLS + metadata-only (no token leak), encrypted-at-rest, 401, visual (login e2e + /mailboxes). **Live OAuth + token refresh unverified — credential gap above.** Commit: &lt;set on commit&gt;
 
 ## Decisions & notes (append-only)
 - **Toolchain versions:** Node v24.16.0, npm 11.13.0. Angular **22.0.0** (generated via Angular CLI), TypeScript **~6.0.2** (monorepo-wide), NestJS **11**, `@nestjs/config` **4** (independently versioned — not 11), BullMQ **5**.
@@ -45,6 +47,17 @@
 - **CORS** enabled on the API (`origin: true` for dev; tighten for prod) so the browser can call `/me` with the Bearer token.
 - **Email confirmation**: signup UI handles both modes — if the Supabase project requires email confirmation, it shows "check your inbox, then log in"; if disabled, it goes straight to /home. For a frictionless dev login flow, the project owner can turn off "Confirm email" in Supabase Auth settings. (Verification used an admin-created pre-confirmed user, so it passes regardless.)
 - **`@types/express`** added to `apps/api` devDeps (needed for the `Request` type in the guard/decorator under Express 5).
+
+### File 04 decisions & notes
+- **Both providers fully built (not stubbed).** Gmail and Outlook each implement `getAuthUrl`/`exchangeCode`/`refreshToken` (send/listReplies are interface signatures, thrown stubs until Files 10/11). Selected by `MailboxOAuthService`. They report `isConfigured()=false` when env creds are absent, so the UI shows "not set up yet" and `connect` returns a friendly 400.
+- **OAuth scopes chosen (documented in code):**
+  - Gmail: `gmail.send`, `gmail.readonly`, `openid`, `email` + `access_type=offline&prompt=consent` (for refresh token). gmail.* are *restricted* scopes — dev works with test users; prod needs Google verification.
+  - Outlook: `Mail.Send`, `Mail.Read`, `offline_access`, `openid`, `email` via the `/common` authority.
+- **URL provider keys** are `google`/`microsoft` (match the redirect URIs in `.env`); the DB `mailbox_provider` enum is `gmail`/`outlook`. Mapped in each provider.
+- **Token encryption:** `CryptoService` (AES-256-GCM, key = base64-decoded `TOKEN_ENCRYPTION_KEY`). Ciphertext format `v1:<base64(iv|tag|ct)>`. Tokens are encrypted before DB write; `GET /mailboxes` returns metadata only (verified no token fields in responses).
+- **Default mailbox `daily_cap` = 30** (conservative warm-up start; ramped in File 10). `warmup_state='new'`, `status='connected'` on connect.
+- **Callback security:** `GET /auth/:provider/callback` is intentionally **NOT** behind the JWT guard (the provider redirect carries no Bearer header). Instead an HMAC-signed `state` (signed with the `TOKEN_ENCRYPTION_KEY` bytes, 10-min TTL) ties the callback back to the user. The callback always redirects to `${WEB}/mailboxes?mailbox=connected|cancelled|failed`.
+- **CryptoService/Mailbox providers live in `@extrovertai/server`** (backend-only) so the worker can reuse them for send/refresh in File 10.
 
 ## Visual verification (File 01)
 - Performed via the **Claude Preview MCP** (Claude in Chrome was not connected this session). Landing route at `/` confirmed:

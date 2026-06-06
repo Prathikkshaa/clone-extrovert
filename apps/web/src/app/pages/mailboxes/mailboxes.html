@@ -1,0 +1,97 @@
+<main class="min-h-screen bg-canvas text-ink px-4 py-10">
+  <div class="mx-auto max-w-xl">
+    <header class="flex items-center justify-between">
+      <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
+      <a routerLink="/home" class="text-sm text-accent hover:text-accent-strong">Back to home</a>
+    </header>
+
+    <section class="mt-10">
+      <h1 class="text-heading-lg text-ink">Connect your mailbox</h1>
+      <p class="mt-2 text-body text-muted">
+        We send your campaigns from your own mailbox so they land in inboxes, not spam. We never
+        read or send anything until you set up a campaign.
+      </p>
+
+      @if (banner(); as b) {
+        <p
+          class="mt-4 text-sm"
+          [class.text-positive]="b.kind === 'ok'"
+          [class.text-danger]="b.kind === 'error'"
+          role="status"
+        >
+          {{ b.text }}
+        </p>
+      }
+
+      <!-- Provider options -->
+      <div class="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <button
+          type="button"
+          [disabled]="!providers().google || connecting()"
+          (click)="connect('google')"
+          class="rounded-md bg-accent px-4 py-3 text-heading-sm text-white transition-colors duration-200 hover:bg-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Connect Gmail
+        </button>
+        <button
+          type="button"
+          [disabled]="!providers().microsoft || connecting()"
+          (click)="connect('microsoft')"
+          class="rounded-md bg-accent px-4 py-3 text-heading-sm text-white transition-colors duration-200 hover:bg-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Connect Outlook
+        </button>
+      </div>
+      @if (!providers().google || !providers().microsoft) {
+        <p class="mt-2 text-xs text-muted">
+          @if (!providers().google && !providers().microsoft) {
+            Mailbox connections aren’t set up on this server yet.
+          } @else if (!providers().google) {
+            Gmail isn’t set up on this server yet.
+          } @else {
+            Outlook isn’t set up on this server yet.
+          }
+        </p>
+      }
+
+      @if (error()) {
+        <p class="mt-4 text-sm text-danger" role="alert">{{ error() }}</p>
+      }
+
+      <!-- Connected mailboxes -->
+      <div class="mt-10">
+        <h2 class="text-heading-sm text-ink">Connected mailboxes</h2>
+        @if (mailboxes().length === 0) {
+          <p class="mt-3 text-sm text-muted">No mailboxes connected yet.</p>
+        } @else {
+          <ul class="mt-3 space-y-3">
+            @for (m of mailboxes(); track m.id) {
+              <li class="flex items-center justify-between rounded-lg border border-line bg-surface p-4">
+                <div>
+                  <p class="text-body text-ink">{{ m.email }}</p>
+                  <p class="text-xs text-muted">{{ providerLabel(m.provider) }}</p>
+                </div>
+                <div class="flex items-center gap-4">
+                  @if (m.status === 'connected') {
+                    <span class="text-sm font-medium text-positive">Connected</span>
+                  } @else if (m.status === 'reauth_required') {
+                    <span class="text-sm font-medium text-warning">Reconnect needed</span>
+                  } @else {
+                    <span class="text-sm text-muted">{{ m.status }}</span>
+                  }
+                  <button
+                    type="button"
+                    (click)="disconnect(m)"
+                    class="text-sm text-muted hover:text-danger"
+                  >
+                    Disconnect
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </section>
+  </div>
+</main>

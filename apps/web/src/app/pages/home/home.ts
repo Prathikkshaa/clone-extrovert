@@ -4,14 +4,14 @@
 // API (with the Bearer token attached by the interceptor) to display the profile.
 import { Component, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { APP_NAME, type Tables } from '@extrovertai/shared';
 import { AuthService } from '../../core/auth.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-home',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './home.html',
 })
 export class Home {
