@@ -13,7 +13,7 @@
 ## Completed files
 - [x] 01 — Monorepo scaffold (npm workspaces; web/api/worker skeletons; @extrovertai/shared package; Tailwind + design tokens; .env.example; docs). Commit: c5bea53
 - [x] 02 — Supabase data layer: `@extrovertai/server` package with `SupabaseService` (admin client, backend-only); full schema migration (17 tables, 10 enums, FKs, updated_at triggers, indexes, RLS); generated DB types in `@extrovertai/shared`; `GET /health/db` readiness check; `docs/DB.md`. **No UI changes** (visual verification N/A). Commit: 9ddd272
-- [x] 03 — Authentication: Supabase Auth. Web `AuthService` (anon client), login/signup screens, `authGuard`/`guestGuard`, Bearer HTTP interceptor, protected Home; API `SupabaseAuthGuard` (validates JWT via `auth.getUser`), `@CurrentUser()`, `GET /me`, idempotent `users` profile creation. Verified end-to-end (login → /me 200, no token → 401, RLS own-row only, profile created exactly once) + visual (login/signup). Commit: &lt;set on commit&gt;
+- [x] 03 — Authentication: Supabase Auth. Web `AuthService` (anon client), login/signup screens, `authGuard`/`guestGuard`, Bearer HTTP interceptor, protected Home; API `SupabaseAuthGuard` (validates JWT via `auth.getUser`), `@CurrentUser()`, `GET /me`, idempotent `users` profile creation. Verified end-to-end (login → /me 200, no token → 401, RLS own-row only, profile created exactly once) + visual (login/signup). Commit: 793d15a
 
 ## In progress / deferred / blockers
 - (none)
