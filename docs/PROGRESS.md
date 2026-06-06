@@ -9,7 +9,7 @@
 - App boots: api ✅ / worker ✅ / web ✅
 
 ## Completed files
-- [x] 01 — Monorepo scaffold (npm workspaces; web/api/worker skeletons; @extrovertai/shared package; Tailwind + design tokens; .env.example; docs). Commit: <set on commit>
+- [x] 01 — Monorepo scaffold (npm workspaces; web/api/worker skeletons; @extrovertai/shared package; Tailwind + design tokens; .env.example; docs). Commit: c5bea53
 
 ## In progress / deferred / blockers
 - (none)
