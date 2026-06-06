@@ -10,6 +10,14 @@ import { AppModule } from './app.module';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
+  // Allow the Angular dev app (and other local origins) to call the API with the
+  // Supabase Bearer token. Tighten the allowed origins for production later.
+  app.enableCors({
+    origin: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Authorization', 'Content-Type'],
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

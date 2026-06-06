@@ -29,6 +29,10 @@
 - `main.ts` — bootstrap: creates the HTTP app, global ValidationPipe, reads `API_PORT` from `.env`.
 - `app.module.ts` — root module: global `ConfigModule` (loads repo-root `.env`) + feature modules.
 - `health/health.module.ts`, `health/health.controller.ts` — `GET /health` → `{ status: 'ok', app: APP_NAME }`; `GET /health/db` → live admin-client count of `users` (DB readiness; 503 if unreachable).
+- `auth/supabase-auth.guard.ts` — `SupabaseAuthGuard`: validates `Bearer` JWT via `auth.getUser`, attaches `request.user`. **Reuse on every protected route.**
+- `auth/current-user.decorator.ts` — `@CurrentUser()` param decorator (reads `request.user`).
+- `auth/auth-user.interface.ts` — `AuthUser { id, email }`; `auth/auth.module.ts` — provides/exports the guard.
+- `users/users.service.ts` — `getOrCreateProfile()` (idempotent `users` row creation, admin client); `users/users.controller.ts` — `GET /me` (protected); `users/users.module.ts`.
 - Config: `nest-cli.json`, `tsconfig.json`, `tsconfig.build.json`.
 
 ## apps/worker (`src/`)
@@ -41,8 +45,13 @@
 - `main.ts` — `bootstrapApplication(App, appConfig)`.
 - `app/app.ts` — root shell (router-outlet only).
 - `app/app.config.ts` — providers (router, etc.).
-- `app/app.routes.ts` — routes; all screens lazy-loaded via `loadComponent`.
-- `app/pages/landing/landing.ts` + `landing.html` — landing route; proves design tokens + `APP_NAME` are wired.
+- `app/app.routes.ts` — routes; all screens lazy-loaded via `loadComponent`. `/login` + `/signup` are `guestGuard`-only; `/home` is `authGuard`-only.
+- `app/app.config.ts` — providers: router + `provideHttpClient(withInterceptors([authInterceptor]))`.
+- `app/core/auth.service.ts` — `AuthService`: wraps the anon Supabase client, current `session` signal, signUp/signIn/signOut, access token.
+- `app/core/auth.guard.ts` — `authGuard` (require auth) + `guestGuard` (require signed-out); both await `AuthService.ready`.
+- `app/core/auth.interceptor.ts` — attaches `Authorization: Bearer <token>` to requests hitting `environment.apiUrl`.
+- `app/pages/landing/landing.*` — landing (CTA → /signup, /login). `app/pages/login/*`, `app/pages/signup/*` — auth screens. `app/pages/home/*` — protected home (shows email + fetches `GET /me`).
+- `environments/environment.ts` — **generated** (gitignored) public client config; `environment.example.ts` — committed template. Generator: `scripts/gen-web-env.mjs`.
 - `styles.css` — global styles + design tokens (CSS custom properties; dark-mode block).
 - `tailwind.config.js` — maps tokens to semantic Tailwind utilities (bg-canvas, text-ink, bg-accent, …).
 - `.postcssrc.json` — Tailwind + autoprefixer PostCSS plugins.
@@ -50,6 +59,7 @@
 
 ## Root
 - `package.json` — workspaces + delegating scripts (`build`, `lint`, `dev:web|api|worker`).
+- `scripts/gen-web-env.mjs` — writes `apps/web/src/environments/environment.ts` from `.env` (public client config only).
 - `eslint.config.mjs` — repo-wide ESLint flat config.
 - `.env.example` — every env var (committed; real `.env` is gitignored).
 - `.claude/launch.json` — dev-server launch config for the Preview tooling.

@@ -3,15 +3,17 @@
 > Updated at the end of every build session. New sessions read this + 00-master-context.md to know where things stand.
 
 ## Current status
-- Last completed file: 02
-- Next file: 03 (Auth: Supabase Auth in web + api, signup/login, create `users` profile row on first login, protected routes/guards)
+- Last completed file: 03
+- Next file: 04 (Mailbox OAuth — Gmail + Outlook: connect a sending mailbox, store tokens encrypted with TOKEN_ENCRYPTION_KEY, record in `mailboxes`)
 - Branch: main
 - App boots: api ✅ / worker ✅ / web ✅
 - DB: schema + RLS live on Supabase project `ywdrznybrxyskvyccwxb`; generated types in `@extrovertai/shared`.
+- Auth: Supabase Auth live — web signup/login + guards; API JWT guard + `GET /me`; `users` profile row auto-created on first authed request.
 
 ## Completed files
 - [x] 01 — Monorepo scaffold (npm workspaces; web/api/worker skeletons; @extrovertai/shared package; Tailwind + design tokens; .env.example; docs). Commit: c5bea53
 - [x] 02 — Supabase data layer: `@extrovertai/server` package with `SupabaseService` (admin client, backend-only); full schema migration (17 tables, 10 enums, FKs, updated_at triggers, indexes, RLS); generated DB types in `@extrovertai/shared`; `GET /health/db` readiness check; `docs/DB.md`. **No UI changes** (visual verification N/A). Commit: 9ddd272
+- [x] 03 — Authentication: Supabase Auth. Web `AuthService` (anon client), login/signup screens, `authGuard`/`guestGuard`, Bearer HTTP interceptor, protected Home; API `SupabaseAuthGuard` (validates JWT via `auth.getUser`), `@CurrentUser()`, `GET /me`, idempotent `users` profile creation. Verified end-to-end (login → /me 200, no token → 401, RLS own-row only, profile created exactly once) + visual (login/signup). Commit: &lt;set on commit&gt;
 
 ## In progress / deferred / blockers
 - (none)
@@ -34,6 +36,15 @@
 - **RLS:** owner policies `FOR ALL TO authenticated` using `user_id = auth.uid()` (derived from parent for `lead_list`/`sequence_steps`/`messages`). Verified: anon SELECT returns 0 rows, anon INSERT blocked with code 42501. service_role bypasses RLS (expected) — backend must still scope by `user_id`.
 - **Type generation:** `supabase gen types --db-url` requires Docker (runs a pg-meta container); Docker is not installed on this machine, and `--project-id` needs a Supabase access token. So `packages/shared/src/types/database.ts` was **hand-authored to mirror the migration** (supabase-generated shape: Row/Insert/Update/Relationships/Enums). `docs/DB.md` documents both regeneration routes. Keep this file in sync with the SQL on every schema change until generation tooling is available.
 - **Migrations applied via** `supabase db push --db-url "$DATABASE_URL"` (direct 5432 connection). DATABASE_URL is read from `.env`, never echoed.
+
+### File 03 decisions & notes
+- **Default `daily_send_cap` = 50** (the DB column default; insert omits it). Conservative account-level ceiling; per-mailbox warm-up/throttle is File 10. `mode` defaults to `draft`.
+- **JWT validation** uses `supabase.auth.getUser(token)` (network call to GoTrue) rather than verifying the JWT secret locally — works with any signing scheme and needs no extra secret (we were not given the JWT secret). Trade-off: one auth call per protected request; revisit with local JWKS/secret verification if latency matters.
+- **Profile creation** happens in `GET /me` (the web app calls it right after login). Idempotent via PK + re-read on race. If a future protected endpoint can be hit before `/me`, move `getOrCreateProfile` into the guard.
+- **Web public config**: `apps/web/src/environments/environment.ts` is **generated from `.env`** by `scripts/gen-web-env.mjs` (wired into web `start`/`build`/`watch`) and **gitignored** — keeps even the public anon key out of git. Committed template: `environment.example.ts`. A raw `ng build` without the gen step will fail (documented); use `npm run build`/`dev:web`.
+- **CORS** enabled on the API (`origin: true` for dev; tighten for prod) so the browser can call `/me` with the Bearer token.
+- **Email confirmation**: signup UI handles both modes — if the Supabase project requires email confirmation, it shows "check your inbox, then log in"; if disabled, it goes straight to /home. For a frictionless dev login flow, the project owner can turn off "Confirm email" in Supabase Auth settings. (Verification used an admin-created pre-confirmed user, so it passes regardless.)
+- **`@types/express`** added to `apps/api` devDeps (needed for the `Request` type in the guard/decorator under Express 5).
 
 ## Visual verification (File 01)
 - Performed via the **Claude Preview MCP** (Claude in Chrome was not connected this session). Landing route at `/` confirmed:

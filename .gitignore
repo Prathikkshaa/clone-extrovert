@@ -13,6 +13,9 @@ apps/web/.angular/
 .env.*
 !.env.example
 
+# Generated Angular env (public client config, sourced from .env at build time)
+apps/web/src/environments/environment.ts
+
 # Test / coverage
 coverage/
 *.lcov

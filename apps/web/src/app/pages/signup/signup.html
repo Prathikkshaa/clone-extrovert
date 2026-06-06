@@ -1,0 +1,55 @@
+<main class="min-h-screen bg-canvas text-ink flex items-center justify-center px-4">
+  <section class="w-full max-w-sm">
+    <div class="rounded-lg border border-line bg-surface p-8">
+      <h1 class="text-heading-md text-ink">Create your account</h1>
+      <p class="mt-1 text-sm text-muted">Start reaching the right people with {{ appName }}.</p>
+
+      <form (ngSubmit)="submit()" class="mt-6 space-y-4">
+        <div>
+          <label for="email" class="block text-sm font-medium text-ink">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            [(ngModel)]="email"
+            class="mt-1 w-full rounded-md border border-line bg-canvas px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          />
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-ink">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="new-password"
+            [(ngModel)]="password"
+            class="mt-1 w-full rounded-md border border-line bg-canvas px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          />
+          <p class="mt-1 text-xs text-muted">At least 6 characters.</p>
+        </div>
+
+        @if (error()) {
+          <p class="text-sm text-danger" role="alert">{{ error() }}</p>
+        }
+        @if (notice()) {
+          <p class="text-sm text-positive" role="status">{{ notice() }}</p>
+        }
+
+        <button
+          type="submit"
+          [disabled]="loading()"
+          class="w-full rounded-md bg-accent px-4 py-2.5 text-heading-sm text-white transition-colors duration-200 hover:bg-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:opacity-60"
+        >
+          {{ loading() ? 'Creating account…' : 'Create account' }}
+        </button>
+      </form>
+
+      <p class="mt-6 text-sm text-muted">
+        Already have an account?
+        <a routerLink="/login" class="font-medium text-accent hover:text-accent-strong">Log in</a>
+      </p>
+    </div>
+  </section>
+</main>

@@ -3,10 +3,12 @@
 // token system is wired end-to-end (canvas background, ink text, one accent
 // button) and that the product name comes from the shared APP_NAME constant.
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { APP_NAME } from '@extrovertai/shared';
 
 @Component({
   selector: 'app-landing',
+  imports: [RouterLink],
   templateUrl: './landing.html',
 })
 export class Landing {

@@ -1,0 +1,45 @@
+<main class="min-h-screen bg-canvas text-ink px-4 py-10">
+  <div class="mx-auto max-w-xl">
+    <header class="flex items-center justify-between">
+      <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
+      <button
+        type="button"
+        (click)="logout()"
+        class="rounded-md border border-line px-3 py-1.5 text-sm text-ink transition-colors duration-200 hover:bg-surface"
+      >
+        Log out
+      </button>
+    </header>
+
+    <section class="mt-10">
+      <h1 class="text-heading-lg text-ink">Welcome</h1>
+      @if (email) {
+        <p class="mt-2 text-body text-muted">You're signed in as {{ email }}.</p>
+      }
+
+      <div class="mt-8 rounded-lg border border-line bg-surface p-6">
+        <h2 class="text-heading-sm text-ink">Your profile</h2>
+        @if (profile(); as p) {
+          <dl class="mt-3 space-y-2 text-sm">
+            <div class="flex justify-between">
+              <dt class="text-muted">Plan</dt>
+              <dd class="text-ink">{{ p.plan }}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-muted">Mode</dt>
+              <dd class="text-ink">{{ p.mode }}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-muted">Daily send cap</dt>
+              <dd class="text-ink">{{ p.daily_send_cap }}</dd>
+            </div>
+          </dl>
+        } @else if (loadError()) {
+          <p class="mt-3 text-sm text-danger" role="alert">{{ loadError() }}</p>
+        } @else {
+          <p class="mt-3 text-sm text-muted">Loading your profile…</p>
+        }
+      </div>
+    </section>
+  </div>
+</main>
