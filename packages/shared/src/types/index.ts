@@ -1,5 +1,5 @@
 // Shared DTO/entity types.
 // WHY: a single home for cross-app data shapes so the API, worker, and web never
-// redefine the same structure. Intentionally empty for now — populated as later
-// build files (02+) introduce DB entities and request/response DTOs.
-export {};
+// redefine the same structure. The generated Supabase row/enum types are the
+// single source for DB shapes — hand-written DTOs should build on these.
+export * from './database';

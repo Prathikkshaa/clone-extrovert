@@ -6,7 +6,8 @@
 
 | Path | Name | Purpose |
 |---|---|---|
-| `packages/shared` | `@extrovertai/shared` | Shared TypeScript types, enums, and constants imported by every app. Built to `dist/` (CommonJS). |
+| `packages/shared` | `@extrovertai/shared` | Shared types, enums, constants, and generated DB types. Imported by every app (browser-safe — no secrets). Built to `dist/` (CommonJS). |
+| `packages/server` | `@extrovertai/server` | **Backend-only** shared NestJS providers (Supabase; later Places/LLM/Mailbox/Billing). May hold secrets — **never imported by `apps/web`**. Built to `dist/` (CommonJS). |
 | `apps/api` | `api` | NestJS HTTP API. |
 | `apps/worker` | `worker` | NestJS **standalone** background worker (BullMQ; processors added File 06+). |
 | `apps/web` | `web` | Angular + Tailwind frontend. |
@@ -15,13 +16,19 @@
 - `index.ts` — barrel re-exporting everything below.
 - `app.ts` — `APP_NAME` (single source of the product name; env-aware, browser-safe).
 - `enums/index.ts` — domain enums (LeadStatus, EnrichmentStatus, MessageState, UserMode, MailboxProvider, CampaignChannel, ThemeSource, CreditReason, UsageStatus, SuppressionReason).
-- `types/index.ts` — shared DTO/entity types (empty stub; filled File 02+).
+- `types/index.ts` — re-exports `./database` (generated DB types are the single source for DB shapes).
+- `types/database.ts` — Supabase `public` schema types: `Database`, `Json`, and helpers `Tables`/`TablesInsert`/`TablesUpdate`/`Enums`. Mirrors `supabase/migrations/*` (regen: see `/docs/DB.md`).
 - `constants/index.ts` — `CREDIT_COSTS` (placeholder values; finalized File 14).
+
+## packages/server (`src/`) — backend only
+- `index.ts` — barrel.
+- `supabase/supabase.service.ts` — `SupabaseService`: admin (service_role) Supabase client. **Never expose to the browser.**
+- `supabase/supabase.module.ts` — `SupabaseModule` (provides/exports `SupabaseService`).
 
 ## apps/api (`src/`)
 - `main.ts` — bootstrap: creates the HTTP app, global ValidationPipe, reads `API_PORT` from `.env`.
 - `app.module.ts` — root module: global `ConfigModule` (loads repo-root `.env`) + feature modules.
-- `health/health.module.ts`, `health/health.controller.ts` — `GET /health` → `{ status: 'ok', app: APP_NAME }`.
+- `health/health.module.ts`, `health/health.controller.ts` — `GET /health` → `{ status: 'ok', app: APP_NAME }`; `GET /health/db` → live admin-client count of `users` (DB readiness; 503 if unreachable).
 - Config: `nest-cli.json`, `tsconfig.json`, `tsconfig.build.json`.
 
 ## apps/worker (`src/`)
@@ -46,4 +53,5 @@
 - `eslint.config.mjs` — repo-wide ESLint flat config.
 - `.env.example` — every env var (committed; real `.env` is gitignored).
 - `.claude/launch.json` — dev-server launch config for the Preview tooling.
-- `docs/` — `00-master-context.md` (source of truth), `PROGRESS.md` (living state), `CODE-MAP.md` (this file), `setup-credentials-md.md` (external accounts/keys).
+- `supabase/` — Supabase CLI project: `config.toml` and `migrations/*.sql` (the schema; never edit a past migration).
+- `docs/` — `00-master-context.md` (source of truth), `PROGRESS.md` (living state), `CODE-MAP.md` (this file), `DB.md` (migrations + type-gen workflow), `setup-credentials-md.md` (external accounts/keys).

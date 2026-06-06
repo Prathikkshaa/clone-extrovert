@@ -8,8 +8,9 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "npm run build -w @extrovertai/shared && npm run build -w api && npm run build -w worker && npm run build -w web",
+    "build": "npm run build -w @extrovertai/shared && npm run build -w @extrovertai/server && npm run build -w api && npm run build -w worker && npm run build -w web",
     "build:shared": "npm run build -w @extrovertai/shared",
+    "build:server": "npm run build -w @extrovertai/server",
     "lint": "eslint .",
     "dev:web": "npm run start -w web",
     "dev:api": "npm run dev -w api",

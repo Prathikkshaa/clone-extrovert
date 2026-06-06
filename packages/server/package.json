@@ -1,0 +1,27 @@
+{
+  "name": "@extrovertai/server",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Backend-only shared NestJS providers (Supabase, and later Places/LLM/Mailbox/Billing). Never imported by apps/web — may hold service_role and other secrets.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@extrovertai/shared": "*",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.0",
+    "@supabase/supabase-js": "^2.107.0"
+  }
+}

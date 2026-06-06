@@ -3,13 +3,15 @@
 > Updated at the end of every build session. New sessions read this + 00-master-context.md to know where things stand.
 
 ## Current status
-- Last completed file: 01
-- Next file: 02 (Supabase: client setup, migrations, RLS, generated DB types into packages/shared)
+- Last completed file: 02
+- Next file: 03 (Auth: Supabase Auth in web + api, signup/login, create `users` profile row on first login, protected routes/guards)
 - Branch: main
 - App boots: api ✅ / worker ✅ / web ✅
+- DB: schema + RLS live on Supabase project `ywdrznybrxyskvyccwxb`; generated types in `@extrovertai/shared`.
 
 ## Completed files
 - [x] 01 — Monorepo scaffold (npm workspaces; web/api/worker skeletons; @extrovertai/shared package; Tailwind + design tokens; .env.example; docs). Commit: c5bea53
+- [x] 02 — Supabase data layer: `@extrovertai/server` package with `SupabaseService` (admin client, backend-only); full schema migration (17 tables, 10 enums, FKs, updated_at triggers, indexes, RLS); generated DB types in `@extrovertai/shared`; `GET /health/db` readiness check; `docs/DB.md`. **No UI changes** (visual verification N/A). Commit: &lt;set on commit&gt;
 
 ## In progress / deferred / blockers
 - (none)
@@ -24,6 +26,14 @@
 - **Worker keep-alive:** the standalone Nest context exits immediately once the event loop drains (an unresolved Promise does NOT hold it open). A `setInterval` heartbeat keeps the worker daemon alive until real BullMQ Workers (File 06+) hold the loop open via Redis sockets. Shuts down cleanly on SIGINT/SIGTERM.
 - **Lint:** single repo-wide ESLint flat config (`eslint.config.mjs`) using `@eslint/js` + `typescript-eslint` recommended over all `**/*.ts`; root `npm run lint` = `eslint .`. (Build/dev scripts delegate to workspaces; lint is intentionally a single root pass — still repo-wide.)
 - **Dev-server PATH note (this machine):** Node/npm are provided via nvm and are NOT on the default non-login-shell PATH. The committed `.claude/launch.json` uses plain `npm` (portable/correct for normal setups). Visual verification this session was done via the Claude Preview MCP after pointing the launch config at a temporary PATH-setting wrapper, which was then removed and the config restored.
+
+### File 02 decisions & additions
+- **New package `@extrovertai/server`** (`packages/server`) — backend-only shared NestJS providers (Supabase now; Places/LLM/Mailbox/Billing later). Goes beyond the §4 layout but is justified: api AND worker both need these providers, and they may hold secrets (service_role) so they must NOT live in the browser-safe `@extrovertai/shared`. **Never import `@extrovertai/server` from `apps/web`.** Build order: shared → server → apps.
+- **`GET /health/db`** added to api — readiness probe doing a `count(*)` on `users` via the admin client; verified live (count 0, HTTP 200).
+- **Schema columns beyond §5 (sensible concretions):** `users.plan` default `'free'`; `mailboxes`: `access_token_encrypted`, `refresh_token_encrypted`, `token_expires_at`, `daily_cap` (50), `warmup_state` ('new'), `status` ('connected'); `sequence_steps`: `template_ref` + `prompt` (the "template/prompt ref"); jsonb defaults (`proof_points '[]'`, `reviews/filters/payload '{}'`). `mailboxes.warmup_state`/`status` and `campaigns.status` are **text** (not enums) — values not yet locked; revisit if they need constraining.
+- **RLS:** owner policies `FOR ALL TO authenticated` using `user_id = auth.uid()` (derived from parent for `lead_list`/`sequence_steps`/`messages`). Verified: anon SELECT returns 0 rows, anon INSERT blocked with code 42501. service_role bypasses RLS (expected) — backend must still scope by `user_id`.
+- **Type generation:** `supabase gen types --db-url` requires Docker (runs a pg-meta container); Docker is not installed on this machine, and `--project-id` needs a Supabase access token. So `packages/shared/src/types/database.ts` was **hand-authored to mirror the migration** (supabase-generated shape: Row/Insert/Update/Relationships/Enums). `docs/DB.md` documents both regeneration routes. Keep this file in sync with the SQL on every schema change until generation tooling is available.
+- **Migrations applied via** `supabase db push --db-url "$DATABASE_URL"` (direct 5432 connection). DATABASE_URL is read from `.env`, never echoed.
 
 ## Visual verification (File 01)
 - Performed via the **Claude Preview MCP** (Claude in Chrome was not connected this session). Landing route at `/` confirmed:
