@@ -1,0 +1,81 @@
+/*
+ * Global styles + design tokens (master-context §7).
+ * WHY: tokens live here as CSS custom properties so the whole app re-themes by
+ * swapping these values (brand theming in File 05, plus dark mode) without any
+ * component edits. Tailwind maps semantic utility names to these variables.
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Core palette */
+  --color-ink: #1a1a18; /* warm near-black text */
+  --color-canvas: #fafaf8; /* warm off-white background */
+  --color-surface: #ffffff; /* raised cards/panels on canvas */
+  --color-muted: #6b6b66; /* secondary text */
+  --color-line: #e7e7e2; /* hairline borders */
+
+  /* Single accent — primary actions + positive states only (deep teal/green) */
+  --color-accent: #0f766e;
+  --color-accent-strong: #0b5d56; /* hover/active for accent */
+
+  /* Semantic states */
+  --color-positive: #15803d; /* replies / booked / healthy */
+  --color-warning: #b45309; /* pending / warning */
+  --color-danger: #b91c1c; /* bounce / error */
+
+  /* Radius */
+  --radius-md: 8px;
+  --radius-lg: 14px;
+
+  /* Spacing scale (rem) — available as CSS vars for non-utility contexts */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+}
+
+/* Dark mode is a token swap only (no component changes). Values are a calm
+ * starting point; tuned in a later polish pass. Activate with
+ * <html data-theme="dark"> or the `dark` class. */
+[data-theme='dark'],
+.dark {
+  --color-ink: #f4f4f0;
+  --color-canvas: #18181a;
+  --color-surface: #232325;
+  --color-muted: #a3a39c;
+  --color-line: #34343a;
+  --color-accent: #2dd4bf;
+  --color-accent-strong: #14b8a6;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

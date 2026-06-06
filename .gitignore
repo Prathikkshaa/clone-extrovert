@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+tmp/
+out-tsc/
+.angular/
+apps/web/.angular/
+
+# Environment files (NEVER commit secrets). .env.example IS committed.
+.env
+.env.*
+!.env.example
+
+# Test / coverage
+coverage/
+*.lcov
+
+# Logs
+*.log
+npm-debug.log*
+ngrok.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.idea/
+*.swp
+*.swo
+
+# Angular / Nest caches
+.nx/

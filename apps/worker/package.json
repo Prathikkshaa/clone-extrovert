@@ -1,0 +1,25 @@
+{
+  "name": "worker",
+  "version": "0.0.0",
+  "private": true,
+  "description": "ExtrovertAI background worker (NestJS standalone + BullMQ).",
+  "scripts": {
+    "build": "nest build",
+    "start": "node dist/main.js",
+    "dev": "nest start --watch"
+  },
+  "dependencies": {
+    "@extrovertai/shared": "*",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.0",
+    "@nestjs/core": "^11.0.0",
+    "bullmq": "^5.34.0",
+    "ioredis": "^5.4.2",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/schematics": "^11.0.0"
+  }
+}
