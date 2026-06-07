@@ -3,13 +3,14 @@
 > Updated at the end of every build session. New sessions read this + 00-master-context.md to know where things stand.
 
 ## Current status
-- Last completed file: 04
-- Next file: 05 (Onboarding + website-to-profile: crawl user's site, LLM-extract company profile, logo/accent theming, "no website" path)
+- Last completed file: 05
+- Next file: 06 (Credit ledger + metering core: ledger/usage services, atomic reserve→commit→refund, balance = sum(ledger), BullMQ gate scaffold)
 - Branch: main
 - App boots: api ✅ / worker ✅ / web ✅
 - DB: schema + RLS live on Supabase project `ywdrznybrxyskvyccwxb`; generated types in `@extrovertai/shared`.
 - Auth: Supabase Auth live — web signup/login + guards; API JWT guard + `GET /me`; `users` profile row auto-created on first authed request.
 - Mailbox OAuth: built for Gmail + Outlook. **Gmail live OAuth + token refresh VERIFIED** (connected `nuras1999@gmail.com`; access+refresh tokens encrypted at rest; live refresh returns a fresh token). Outlook deferred — Microsoft Azure app/creds pending.
+- Onboarding: `CrawlService` (Firecrawl + fetch fallback) + `LlmService` (OpenRouter) live; website-to-profile extraction, logo/accent theming (contrast-guarded), manual path, Settings theme reset. **Crawl + LLM extraction verified live** (stripe.com → grounded profile).
 
 ## In progress / deferred / blockers
 - **Outlook (Microsoft) credential gap:** `MS_OAUTH_CLIENT_ID/SECRET` are not in `.env` (user is setting up Azure later). `OutlookProvider` is fully implemented; live connect/refresh unverified until then. To verify later: create the Azure app (redirect URI `http://localhost:3000/auth/microsoft/callback`), fill `MS_OAUTH_*` in `.env`, restart the API, `/mailboxes` → Connect Outlook → consent → expect a connected row with encrypted tokens.
@@ -19,7 +20,8 @@
 - [x] 01 — Monorepo scaffold (npm workspaces; web/api/worker skeletons; @extrovertai/shared package; Tailwind + design tokens; .env.example; docs). Commit: c5bea53
 - [x] 02 — Supabase data layer: `@extrovertai/server` package with `SupabaseService` (admin client, backend-only); full schema migration (17 tables, 10 enums, FKs, updated_at triggers, indexes, RLS); generated DB types in `@extrovertai/shared`; `GET /health/db` readiness check; `docs/DB.md`. **No UI changes** (visual verification N/A). Commit: 9ddd272
 - [x] 03 — Authentication: Supabase Auth. Web `AuthService` (anon client), login/signup screens, `authGuard`/`guestGuard`, Bearer HTTP interceptor, protected Home; API `SupabaseAuthGuard` (validates JWT via `auth.getUser`), `@CurrentUser()`, `GET /me`, idempotent `users` profile creation. Verified end-to-end (login → /me 200, no token → 401, RLS own-row only, profile created exactly once) + visual (login/signup). Commit: 793d15a
-- [x] 04 — Mailbox OAuth: `CryptoService` (AES-256-GCM) + Gmail/Outlook providers + `MailboxOAuthService` in `@extrovertai/server`; API `MailboxesService` (signed-state CSRF, encrypted token storage), `/mailboxes` connect/list/disconnect/providers + unguarded `/auth/:provider/callback`; web Connect-mailbox screen. Verified: build, lint, AES-GCM round-trip, not-configured 400, CRUD + RLS + metadata-only (no token leak), encrypted-at-rest, 401, visual (login e2e + /mailboxes). **Live OAuth + token refresh unverified — credential gap above.** Commit: 480f0fb
+- [x] 04 — Mailbox OAuth: `CryptoService` (AES-256-GCM) + Gmail/Outlook providers + `MailboxOAuthService` in `@extrovertai/server`; API `MailboxesService` (signed-state CSRF, encrypted token storage), `/mailboxes` connect/list/disconnect/providers + unguarded `/auth/:provider/callback`; web Connect-mailbox screen. Verified: build, lint, AES-GCM round-trip, not-configured 400, CRUD + RLS + metadata-only (no token leak), encrypted-at-rest, 401, visual (login e2e + /mailboxes). **Gmail verified live (see status); Outlook pending creds.** Commit: 480f0fb
+- [x] 05 — Onboarding + website-to-profile + theming: `CrawlService` + `LlmService` (in `@extrovertai/server`, reused by 08/09); API `OnboardingService` + `POST /onboarding/crawl`, `GET`/`PUT /company-profile`; web onboarding flow (URL → skeleton → prefilled editable review), "no website" manual path, `ThemeService` (accent token swap), Settings reset. Verified: build, lint, **live crawl+extract (stripe.com → grounded profile, branding detected, raw_crawl cached)**, visual (URL step, manual review, theme applied on neutral base + reset to official). Commit: &lt;set on commit&gt;
 
 ## Decisions & notes (append-only)
 - **Toolchain versions:** Node v24.16.0, npm 11.13.0. Angular **22.0.0** (generated via Angular CLI), TypeScript **~6.0.2** (monorepo-wide), NestJS **11**, `@nestjs/config` **4** (independently versioned — not 11), BullMQ **5**.
@@ -59,6 +61,14 @@
 - **Default mailbox `daily_cap` = 30** (conservative warm-up start; ramped in File 10). `warmup_state='new'`, `status='connected'` on connect.
 - **Callback security:** `GET /auth/:provider/callback` is intentionally **NOT** behind the JWT guard (the provider redirect carries no Bearer header). Instead an HMAC-signed `state` (signed with the `TOKEN_ENCRYPTION_KEY` bytes, 10-min TTL) ties the callback back to the user. The callback always redirects to `${WEB}/mailboxes?mailbox=connected|cancelled|failed`.
 - **CryptoService/Mailbox providers live in `@extrovertai/server`** (backend-only) so the worker can reuse them for send/refresh in File 10.
+
+### File 05 decisions & notes
+- **CrawlService** (`@extrovertai/server`): primary = Firecrawl v1 `/scrape` (markdown, onlyMainContent); fallback = plain `fetch` + Cheerio text extraction (used when Firecrawl has no key / fails). A Playwright fallback for JS-rendered sites can slot in behind the same interface later. `fetchBranding` parses `og:image`/`<link rel=icon>` for logo + `<meta name=theme-color>` for accent (best-effort; no image color analysis). `raw_crawl` cached on `company_profiles` for re-extraction without re-crawling. Added `cheerio` dep.
+- **LlmService** (`@extrovertai/server`): OpenRouter chat completions via `LLM_MODEL`; one abstraction so swapping models is one env value. `extractJson` is hardened (strips code fences, scans for a balanced JSON block, retries once) because reasoning models wrap answers in prose.
+- **LLM model in use: `nvidia/nemotron-3-super-120b-a12b:free`.** Verified working live (crawled stripe.com → grounded services/about/value_prop/tone + 5 proof_points). ⚠️ It's a **reasoning** model: slow (~50–90s/extraction) and intermittently exceeds the token/time budget (one run returned null fields → handled by the manual-path fallback). **Recommendation:** switch `LLM_MODEL` to a fast free *instruct* model (e.g. a Llama/Gemini/Qwen `:free` instruct id from OpenRouter) for snappy, reliable extraction — it's a one-line `.env` change. Left as-is per user's choice.
+- **Theming (contrast guard):** `resolveAccent` applies the detected `brand_color` as the accent ONLY if its contrast vs white ≥ 3.0 (button text is white); otherwise it falls back to the official accent `#0F766E` and flags it. Theme is a pure token swap — web `ThemeService` sets `--color-accent`/`--color-accent-strong`; it never repaints canvas/text. `theme_source` toggles `fetched`/`official`; Settings has the one-click reset. Verified visually (orange brand accent applied on neutral base, then reset to teal).
+- **Crawl runs inline** in `POST /onboarding/crawl` (HTTP 201). Because the current model is slow, consider moving this behind the BullMQ queue (File 06) with polling if it stays slow; inline is acceptable for MVP per the build file.
+- **Failure handling:** unreachable/empty site → 400 with plain copy + manual path; LLM parse failure → profile saved with empty fields + a "couldn't auto-fill, add details" notice (never fabricated). `PUT /company-profile` sends the full profile (Settings included) so theme toggles never drop fields.
 
 ## Visual verification (File 01)
 - Performed via the **Claude Preview MCP** (Claude in Chrome was not connected this session). Landing route at `/` confirmed:

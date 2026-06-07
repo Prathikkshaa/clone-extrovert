@@ -1,14 +1,22 @@
 <main class="min-h-screen bg-canvas text-ink px-4 py-10">
   <div class="mx-auto max-w-xl">
     <header class="flex items-center justify-between">
-      <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
-      <button
-        type="button"
-        (click)="logout()"
-        class="rounded-md border border-line px-3 py-1.5 text-sm text-ink transition-colors duration-200 hover:bg-surface"
-      >
-        Log out
-      </button>
+      <div class="flex items-center gap-3">
+        @if (company()?.logo_url) {
+          <img [src]="company()!.logo_url" alt="Your logo" class="h-7 w-7 rounded object-contain" />
+        }
+        <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <a routerLink="/settings" class="text-sm text-accent hover:text-accent-strong">Settings</a>
+        <button
+          type="button"
+          (click)="logout()"
+          class="rounded-md border border-line px-3 py-1.5 text-sm text-ink transition-colors duration-200 hover:bg-surface"
+        >
+          Log out
+        </button>
+      </div>
     </header>
 
     <section class="mt-10">
@@ -41,12 +49,27 @@
         }
       </div>
 
-      <div class="mt-6">
+      @if (!company() || !company()?.services) {
+        <div class="mt-6 rounded-lg border border-line bg-surface p-4">
+          <p class="text-sm text-ink">Set up your company profile so we can write in your voice.</p>
+          <a routerLink="/onboarding" class="mt-2 inline-block text-sm font-medium text-accent hover:text-accent-strong">
+            Set up your profile →
+          </a>
+        </div>
+      }
+
+      <div class="mt-6 flex flex-wrap gap-3">
         <a
           routerLink="/mailboxes"
           class="inline-block rounded-md bg-accent px-4 py-2.5 text-heading-sm text-white transition-colors duration-200 hover:bg-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
         >
           Connect a mailbox
+        </a>
+        <a
+          routerLink="/onboarding"
+          class="inline-block rounded-md border border-line px-4 py-2.5 text-heading-sm text-ink transition-colors duration-200 hover:bg-surface"
+        >
+          Set up profile
         </a>
       </div>
     </section>

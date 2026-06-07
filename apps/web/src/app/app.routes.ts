@@ -30,5 +30,15 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./pages/mailboxes/mailboxes').then((m) => m.Mailboxes),
   },
+  {
+    path: 'onboarding',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/onboarding/onboarding').then((m) => m.Onboarding),
+  },
+  {
+    path: 'settings',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/settings/settings').then((m) => m.Settings),
+  },
   { path: '**', redirectTo: '' },
 ];

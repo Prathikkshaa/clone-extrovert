@@ -1,0 +1,144 @@
+<main class="min-h-screen bg-canvas text-ink px-4 py-12">
+  <div class="mx-auto max-w-xl">
+    <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
+
+    <!-- Step 1: URL -->
+    @if (step() === 'url') {
+      <section class="mt-8">
+        <h1 class="text-heading-lg text-ink">Let’s set up your profile</h1>
+        <p class="mt-2 text-body text-muted">
+          Paste your website and we’ll read it to pre-fill your details. You can edit everything
+          before saving.
+        </p>
+        <div class="mt-6">
+          <label for="url" class="block text-sm font-medium text-ink">Your website</label>
+          <input
+            id="url"
+            name="url"
+            type="url"
+            placeholder="yourcompany.com"
+            [(ngModel)]="url"
+            (keyup.enter)="readSite()"
+            class="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          />
+          @if (error()) {
+            <p class="mt-2 text-sm text-danger" role="alert">{{ error() }}</p>
+          }
+        </div>
+        <div class="mt-6 flex items-center gap-4">
+          <button
+            type="button"
+            (click)="readSite()"
+            class="rounded-md bg-accent px-5 py-3 text-heading-sm text-white transition-colors duration-200 hover:bg-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+          >
+            Read my site
+          </button>
+          <button
+            type="button"
+            (click)="startManual()"
+            class="text-sm font-medium text-accent hover:text-accent-strong"
+          >
+            I don’t have a website
+          </button>
+        </div>
+      </section>
+    }
+
+    <!-- Step 2: loading (skeleton, not spinner) -->
+    @if (step() === 'loading') {
+      <section class="mt-8" aria-live="polite">
+        <h1 class="text-heading-lg text-ink">Reading your site…</h1>
+        <p class="mt-2 text-body text-muted">This usually takes a few moments.</p>
+        <div class="mt-8 space-y-4">
+          <div class="h-4 w-1/3 animate-pulse rounded bg-line"></div>
+          <div class="h-20 w-full animate-pulse rounded bg-line"></div>
+          <div class="h-4 w-1/4 animate-pulse rounded bg-line"></div>
+          <div class="h-20 w-full animate-pulse rounded bg-line"></div>
+        </div>
+      </section>
+    }
+
+    <!-- Step 3: review (prefilled, editable) -->
+    @if (step() === 'review') {
+      <section class="mt-8">
+        <h1 class="text-heading-lg text-ink">
+          {{ isManual() ? 'Tell us about your business' : 'Here’s what we found — does this look right?' }}
+        </h1>
+        <p class="mt-2 text-body text-muted">Edit anything below, then save.</p>
+
+        @if (notice()) {
+          <p class="mt-4 rounded-md border border-line bg-surface px-3 py-2 text-sm text-warning" role="status">
+            {{ notice() }}
+          </p>
+        }
+
+        <div class="mt-6 space-y-5">
+          <div>
+            <label for="services" class="block text-sm font-medium text-ink">What you offer</label>
+            <textarea id="services" name="services" rows="3" [(ngModel)]="services"
+              class="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"></textarea>
+          </div>
+          <div>
+            <label for="about" class="block text-sm font-medium text-ink">About you</label>
+            <textarea id="about" name="about" rows="3" [(ngModel)]="about"
+              class="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"></textarea>
+          </div>
+          <div>
+            <label for="valueProp" class="block text-sm font-medium text-ink">Your main promise</label>
+            <input id="valueProp" name="valueProp" [(ngModel)]="valueProp"
+              class="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent" />
+          </div>
+          <div>
+            <label for="tone" class="block text-sm font-medium text-ink">Tone of voice</label>
+            <input id="tone" name="tone" [(ngModel)]="tone" placeholder="e.g. friendly and professional"
+              class="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent" />
+          </div>
+          <div>
+            <label for="proof" class="block text-sm font-medium text-ink">Proof points <span class="text-muted">(one per line)</span></label>
+            <textarea id="proof" name="proof" rows="3" [(ngModel)]="proofText"
+              class="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"></textarea>
+          </div>
+
+          <!-- Branding -->
+          @if (logoUrl || brandColor) {
+            <div class="rounded-lg border border-line bg-surface p-4">
+              <p class="text-heading-sm text-ink">Your branding</p>
+              <div class="mt-3 flex items-center gap-4">
+                @if (logoUrl) {
+                  <img [src]="logoUrl" alt="Your logo" class="h-10 w-10 rounded object-contain" />
+                }
+                @if (brandColor) {
+                  <span class="inline-flex items-center gap-2 text-sm text-muted">
+                    <span class="inline-block h-5 w-5 rounded" [style.background-color]="brandColor"></span>
+                    accent {{ brandColor }}
+                  </span>
+                }
+              </div>
+              @if (brandColor) {
+                <label class="mt-3 flex items-center gap-2 text-sm text-ink">
+                  <input type="checkbox" name="useBranding" [(ngModel)]="useBranding" class="accent-accent" />
+                  Use my branding
+                </label>
+              }
+            </div>
+          }
+        </div>
+
+        @if (error()) {
+          <p class="mt-4 text-sm text-danger" role="alert">{{ error() }}</p>
+        }
+
+        <div class="mt-8">
+          <button
+            type="button"
+            (click)="save()"
+            [disabled]="saving()"
+            class="rounded-md bg-accent px-5 py-3 text-heading-sm text-white transition-colors duration-200 hover:bg-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:opacity-60"
+          >
+            {{ saving() ? 'Saving…' : 'Save and continue' }}
+          </button>
+        </div>
+      </section>
+    }
+  </div>
+</main>

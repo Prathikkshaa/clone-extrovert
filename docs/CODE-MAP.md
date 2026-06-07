@@ -29,6 +29,8 @@
 - `mailbox/gmail.provider.ts`, `mailbox/outlook.provider.ts` — Google/Microsoft OAuth (auth URL, code exchange, refresh; send/listReplies stubbed for Files 10/11).
 - `mailbox/mailbox-oauth.service.ts` + `mailbox.module.ts` — `MailboxOAuthService` selects a provider by key; `isConfigured()` status.
 - `mailbox/oauth.util.ts` — form POST + id_token claim helpers.
+- `crawl/crawl.service.ts` + `crawl.module.ts` — `CrawlService`: site text (Firecrawl → fetch+Cheerio fallback) + `fetchBranding` (logo/theme-color). **Reused by File 08.**
+- `llm/llm.service.ts` + `llm.module.ts` — `LlmService`: OpenRouter completions + robust `extractJson`. **Reused by File 09.**
 
 ## apps/api (`src/`)
 - `main.ts` — bootstrap: creates the HTTP app, global ValidationPipe, reads `API_PORT` from `.env`.
@@ -39,6 +41,7 @@
 - `auth/auth-user.interface.ts` — `AuthUser { id, email }`; `auth/auth.module.ts` — provides/exports the guard.
 - `users/users.service.ts` — `getOrCreateProfile()` (idempotent `users` row creation, admin client); `users/users.controller.ts` — `GET /me` (protected); `users/users.module.ts`.
 - `mailboxes/mailboxes.service.ts` — orchestrates OAuth + token encryption + DB; signed-state CSRF. `mailboxes.controller.ts` — `GET /mailboxes/providers|connect/:provider`, `GET /mailboxes`, `DELETE /mailboxes/:id` (all guarded). `oauth-callback.controller.ts` — `GET /auth/:provider/callback` (unguarded; state-verified). `mailboxes.module.ts`.
+- `onboarding/onboarding.service.ts` — crawl → LLM extract → branding/accent → persist `company_profiles`. `onboarding.controller.ts` — `POST /onboarding/crawl`, `GET`/`PUT /company-profile` (guarded). `theme.util.ts` — accent contrast guard. `onboarding.dto.ts`, `onboarding.module.ts`.
 - Config: `nest-cli.json`, `tsconfig.json`, `tsconfig.build.json`.
 
 ## apps/worker (`src/`)
@@ -57,7 +60,8 @@
 - `app/core/auth.guard.ts` — `authGuard` (require auth) + `guestGuard` (require signed-out); both await `AuthService.ready`.
 - `app/core/auth.interceptor.ts` — attaches `Authorization: Bearer <token>` to requests hitting `environment.apiUrl`.
 - `app/core/mailbox-api.service.ts` — typed client for the mailbox endpoints (metadata only).
-- `app/pages/landing/landing.*` — landing (CTA → /signup, /login). `app/pages/login/*`, `app/pages/signup/*` — auth screens. `app/pages/home/*` — protected home (shows email + fetches `GET /me`; link to /mailboxes). `app/pages/mailboxes/*` — protected Connect-your-mailbox screen.
+- `app/core/company-profile.service.ts` — client for onboarding/company-profile. `app/core/theme.service.ts` — applies/reverts the brand accent token.
+- `app/pages/landing/landing.*` — landing (CTA → /signup, /login). `app/pages/login/*`, `app/pages/signup/*` — auth screens. `app/pages/home/*` — protected home (email + `GET /me`; applies theme; links to onboarding/settings/mailboxes). `app/pages/mailboxes/*` — Connect-your-mailbox. `app/pages/onboarding/*` — website-to-profile flow (URL → skeleton → editable review + manual path). `app/pages/settings/*` — theme reset.
 - `environments/environment.ts` — **generated** (gitignored) public client config; `environment.example.ts` — committed template. Generator: `scripts/gen-web-env.mjs`.
 - `styles.css` — global styles + design tokens (CSS custom properties; dark-mode block).
 - `tailwind.config.js` — maps tokens to semantic Tailwind utilities (bg-canvas, text-ink, bg-accent, …).
