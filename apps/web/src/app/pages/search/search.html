@@ -1,0 +1,131 @@
+<main class="min-h-screen bg-canvas text-ink px-4 py-10">
+  <div class="mx-auto max-w-2xl">
+    <header class="flex items-center justify-between">
+      <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
+      <a routerLink="/home" class="text-sm text-accent hover:text-accent-strong">Back to home</a>
+    </header>
+
+    <section class="mt-8">
+      <h1 class="text-heading-lg text-ink">Find leads</h1>
+      <p class="mt-2 text-body text-muted">Search local businesses by what they do and where they are.</p>
+
+      <!-- Search form -->
+      <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label for="industry" class="block text-sm font-medium text-ink">Industry</label>
+          <input id="industry" name="industry" [(ngModel)]="industry" placeholder="e.g. plumbers"
+            (keyup.enter)="find()"
+            class="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent" />
+        </div>
+        <div>
+          <label for="location" class="block text-sm font-medium text-ink">Location</label>
+          <input id="location" name="location" [(ngModel)]="location" placeholder="e.g. Austin TX"
+            (keyup.enter)="find()"
+            class="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent" />
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-wrap gap-5">
+        <label class="flex items-center gap-2 text-sm text-ink">
+          <input type="checkbox" name="noWebsite" [(ngModel)]="noWebsite" class="accent-accent" />
+          No website
+          <span class="text-muted">(great for selling web/marketing)</span>
+        </label>
+        <label class="flex items-center gap-2 text-sm text-ink">
+          <input type="checkbox" name="lowRating" [(ngModel)]="lowRating" class="accent-accent" />
+          Low rating (≤ 4.0)
+          <span class="text-muted">(improvement opportunity)</span>
+        </label>
+      </div>
+
+      <div class="mt-5 flex items-center gap-4">
+        <button type="button" (click)="find()" [disabled]="loading()"
+          class="rounded-md bg-accent px-5 py-3 text-heading-sm text-white transition-colors duration-200 hover:bg-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:opacity-60">
+          {{ loading() ? 'Searching…' : 'Find leads' }}
+        </button>
+        <span class="text-sm text-muted">This search uses 1 credit.</span>
+      </div>
+
+      @if (error()) {
+        <p class="mt-4 text-sm text-danger" role="alert">{{ error() }}</p>
+      }
+
+      <!-- Loading skeleton -->
+      @if (loading()) {
+        <div class="mt-8 space-y-3">
+          @for (i of [1,2,3,4]; track i) {
+            <div class="h-20 w-full animate-pulse rounded-lg bg-line"></div>
+          }
+        </div>
+      }
+
+      <!-- Results -->
+      @if (!loading() && searched()) {
+        @if (results().length === 0 && !error()) {
+          <p class="mt-8 text-body text-muted">No businesses matched. Try a broader area or a different industry.</p>
+        } @else if (results().length > 0) {
+          <!-- Save-to-list bar -->
+          <div class="mt-8 flex flex-wrap items-center gap-3 rounded-lg border border-line bg-surface p-3">
+            <span class="text-sm text-ink">{{ selectedCount() }} selected</span>
+            <select name="targetList" [(ngModel)]="targetListId"
+              class="rounded-md border border-line bg-canvas px-2 py-1.5 text-sm text-ink">
+              <option value="">New list…</option>
+              @for (l of lists(); track l.id) {
+                <option [value]="l.id">{{ l.name }}</option>
+              }
+            </select>
+            @if (!targetListId) {
+              <input name="newListName" [(ngModel)]="newListName" placeholder="List name"
+                class="rounded-md border border-line bg-canvas px-2 py-1.5 text-sm text-ink" />
+            }
+            <button type="button" (click)="save()" [disabled]="saving()"
+              class="rounded-md bg-accent px-3 py-1.5 text-sm text-white transition-colors duration-200 hover:bg-accent-strong disabled:opacity-60">
+              {{ saving() ? 'Saving…' : 'Save to list' }}
+            </button>
+            @if (saveMsg()) {
+              <span class="text-sm text-positive">{{ saveMsg() }}</span>
+            }
+          </div>
+
+          @if (cached()) {
+            <p class="mt-2 text-xs text-muted">Showing cached results (no credit used).</p>
+          }
+
+          <ul class="mt-4 space-y-3">
+            @for (lead of results(); track lead.id) {
+              <li class="flex items-start gap-3 rounded-lg border border-line bg-surface p-4">
+                <input type="checkbox" [checked]="isSelected(lead.id)" (change)="toggle(lead.id)"
+                  class="mt-1 accent-accent" [attr.aria-label]="'Select ' + lead.name" />
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center justify-between gap-2">
+                    <p class="truncate text-body font-medium text-ink">{{ lead.name }}</p>
+                    @if (lead.rating !== null) {
+                      <span class="shrink-0 text-sm text-muted">★ {{ lead.rating }} ({{ lead.review_count ?? 0 }})</span>
+                    }
+                  </div>
+                  @if (lead.address) {
+                    <p class="mt-0.5 truncate text-sm text-muted">{{ lead.address }}</p>
+                  }
+                  <div class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                    @if (lead.website) {
+                      <span class="text-positive">Website</span>
+                    } @else {
+                      <span class="text-warning">No website</span>
+                    }
+                    @if (lead.phone) {
+                      <span class="text-muted">{{ lead.phone }}</span>
+                    }
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      } @else if (!searched()) {
+        <p class="mt-8 text-body text-muted">
+          No leads yet — try an industry and a city, like “plumbers in Austin”.
+        </p>
+      }
+    </section>
+  </div>
+</main>

@@ -23,6 +23,7 @@
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.0",
     "@supabase/supabase-js": "^2.107.0",
-    "cheerio": "^1.0.0"
+    "cheerio": "^1.0.0",
+    "ioredis": "^5.4.2"
   }
 }

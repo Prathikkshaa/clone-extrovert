@@ -216,6 +216,10 @@ export type Database = {
           hook: string | null;
           status: Database['public']['Enums']['lead_status'];
           enrichment_status: Database['public']['Enums']['enrichment_status'];
+          place_id: string | null;
+          address: string | null;
+          rating: number | null;
+          review_count: number | null;
           created_at: string;
           updated_at: string;
         };
@@ -231,6 +235,10 @@ export type Database = {
           hook?: string | null;
           status?: Database['public']['Enums']['lead_status'];
           enrichment_status?: Database['public']['Enums']['enrichment_status'];
+          place_id?: string | null;
+          address?: string | null;
+          rating?: number | null;
+          review_count?: number | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -246,6 +254,10 @@ export type Database = {
           hook?: string | null;
           status?: Database['public']['Enums']['lead_status'];
           enrichment_status?: Database['public']['Enums']['enrichment_status'];
+          place_id?: string | null;
+          address?: string | null;
+          rating?: number | null;
+          review_count?: number | null;
           created_at?: string;
           updated_at?: string;
         };

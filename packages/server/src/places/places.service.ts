@@ -1,0 +1,159 @@
+// PlacesService — Google Places API (New) text search (master-context §2: Places
+// only, no scraping).
+//
+// WHY: one reusable provider for lead discovery. The New API returns name,
+// rating, review count, website, and phone INLINE via a single field-masked call —
+// no separate per-place detail lookups (the old API's cost trap). We still cache
+// at the search layer (CacheService) to avoid re-charging/re-calling on repeats.
+//
+// Buying-signal filters (no-website, low-rating/low-reviews) are applied
+// CLIENT-SIDE because Places text search has no equivalent query params.
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
+export interface PlacesFilters {
+  noWebsite?: boolean;
+  maxRating?: number; // keep businesses at/below this rating (improvement opportunity)
+  maxReviews?: number; // keep businesses at/below this review count
+}
+
+export interface PlaceResult {
+  placeId: string;
+  name: string;
+  address: string | null;
+  rating: number | null;
+  reviewCount: number | null;
+  website: string | null;
+  phone: string | null;
+  lat: number | null;
+  lng: number | null;
+}
+
+export type PlacesStatus = 'ok' | 'zero_results' | 'rate_limited' | 'error' | 'not_configured';
+
+export interface PlacesSearchResult {
+  status: PlacesStatus;
+  results: PlaceResult[];
+  error?: string;
+}
+
+const ENDPOINT = 'https://places.googleapis.com/v1/places:searchText';
+const FIELD_MASK = [
+  'places.id',
+  'places.displayName',
+  'places.formattedAddress',
+  'places.rating',
+  'places.userRatingCount',
+  'places.websiteUri',
+  'places.nationalPhoneNumber',
+  'places.location',
+].join(',');
+
+@Injectable()
+export class PlacesService {
+  private readonly logger = new Logger(PlacesService.name);
+
+  constructor(private readonly config: ConfigService) {}
+
+  isConfigured(): boolean {
+    return Boolean(this.config.get<string>('GOOGLE_PLACES_API_KEY'));
+  }
+
+  async search(params: {
+    industry: string;
+    location: string;
+    filters?: PlacesFilters;
+    maxResults?: number;
+  }): Promise<PlacesSearchResult> {
+    const apiKey = this.config.get<string>('GOOGLE_PLACES_API_KEY');
+    if (!apiKey) {
+      return { status: 'not_configured', results: [], error: 'Places API is not configured.' };
+    }
+
+    const textQuery = `${params.industry} in ${params.location}`.trim();
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': apiKey,
+          'X-Goog-FieldMask': FIELD_MASK,
+        },
+        body: JSON.stringify({
+          textQuery,
+          maxResultCount: Math.min(params.maxResults ?? 20, 20),
+        }),
+        signal: AbortSignal.timeout(20000),
+      });
+
+      if (res.status === 429) {
+        return { status: 'rate_limited', results: [], error: 'Places API rate-limited.' };
+      }
+
+      const json = (await res.json()) as {
+        places?: RawPlace[];
+        error?: { status?: string; message?: string };
+      };
+
+      if (!res.ok || json.error) {
+        const status = json.error?.status;
+        if (status === 'RESOURCE_EXHAUSTED') {
+          return { status: 'rate_limited', results: [], error: 'Places API rate-limited.' };
+        }
+        return {
+          status: 'error',
+          results: [],
+          error: json.error?.message ?? `Places returned ${res.status}.`,
+        };
+      }
+
+      const all = (json.places ?? []).map((p) => this.toResult(p));
+      const filtered = this.applyFilters(all, params.filters);
+      return { status: filtered.length ? 'ok' : 'zero_results', results: filtered };
+    } catch (err) {
+      this.logger.warn(`Places search failed: ${(err as Error).message}`);
+      return { status: 'error', results: [], error: (err as Error).message };
+    }
+  }
+
+  private toResult(p: RawPlace): PlaceResult {
+    return {
+      placeId: p.id,
+      name: p.displayName?.text ?? '(unnamed)',
+      address: p.formattedAddress ?? null,
+      rating: typeof p.rating === 'number' ? p.rating : null,
+      reviewCount: typeof p.userRatingCount === 'number' ? p.userRatingCount : null,
+      website: p.websiteUri ?? null,
+      phone: p.nationalPhoneNumber ?? null,
+      lat: p.location?.latitude ?? null,
+      lng: p.location?.longitude ?? null,
+    };
+  }
+
+  private applyFilters(results: PlaceResult[], filters?: PlacesFilters): PlaceResult[] {
+    if (!filters) return results;
+    return results.filter((r) => {
+      if (filters.noWebsite && r.website) return false;
+      if (typeof filters.maxRating === 'number' && r.rating !== null && r.rating > filters.maxRating)
+        return false;
+      if (
+        typeof filters.maxReviews === 'number' &&
+        r.reviewCount !== null &&
+        r.reviewCount > filters.maxReviews
+      )
+        return false;
+      return true;
+    });
+  }
+}
+
+interface RawPlace {
+  id: string;
+  displayName?: { text?: string };
+  formattedAddress?: string;
+  rating?: number;
+  userRatingCount?: number;
+  websiteUri?: string;
+  nationalPhoneNumber?: string;
+  location?: { latitude?: number; longitude?: number };
+}

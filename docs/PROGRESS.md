@@ -3,8 +3,8 @@
 > Updated at the end of every build session. New sessions read this + 00-master-context.md to know where things stand.
 
 ## Current status
-- Last completed file: 06
-- Next file: 07 (Lead search: PlacesService, search UI + filters, save to list, caching — FIRST consumer of the credit gate)
+- Last completed file: 07
+- Next file: 08 (Enrichment worker: per saved lead — fetch site, extract email/phone, split reviews, generate "why reach out" hook; metered BullMQ jobs)
 - Branch: main
 - App boots: api ✅ / worker ✅ / web ✅
 - DB: schema + RLS live on Supabase project `ywdrznybrxyskvyccwxb`; generated types in `@extrovertai/shared`.
@@ -12,6 +12,7 @@
 - Mailbox OAuth: built for Gmail + Outlook. **Gmail live OAuth + token refresh VERIFIED** (connected `nuras1999@gmail.com`; access+refresh tokens encrypted at rest; live refresh returns a fresh token). Outlook deferred — Microsoft Azure app/creds pending.
 - Onboarding: `CrawlService` (Firecrawl + fetch fallback) + `LlmService` (OpenRouter) live; website-to-profile extraction, logo/accent theming (contrast-guarded), manual path, Settings theme reset. **Crawl + LLM extraction verified live** (stripe.com → grounded profile).
 - Credits: `BillingService` (balance = sum(ledger); atomic reserve/commit/refund via Postgres functions) + `withCreditGate` (the mandatory path for paid actions); BullMQ live on Upstash with a metering-test queue; `GET /credits/balance` + header chip. **Fully verified live** (ledger, gate, concurrency, BullMQ end-to-end, balance API).
+- Lead search: `PlacesService` (Places API New, single field-masked call) + Redis `CacheService`; `POST /leads/search` (gated via `withCreditGate('search')` + cached + dedup), `GET /lists`, `POST /leads/save-to-list`; web Find-leads screen. **Verified live with the real Places key** (20 leads, metering, caching no re-charge, dedup, no-website filter, save-to-list, out-of-credits).
 
 ## In progress / deferred / blockers
 - **Outlook (Microsoft) credential gap:** `MS_OAUTH_CLIENT_ID/SECRET` are not in `.env` (user is setting up Azure later). `OutlookProvider` is fully implemented; live connect/refresh unverified until then. To verify later: create the Azure app (redirect URI `http://localhost:3000/auth/microsoft/callback`), fill `MS_OAUTH_*` in `.env`, restart the API, `/mailboxes` → Connect Outlook → consent → expect a connected row with encrypted tokens.
@@ -24,6 +25,7 @@
 - [x] 04 — Mailbox OAuth: `CryptoService` (AES-256-GCM) + Gmail/Outlook providers + `MailboxOAuthService` in `@extrovertai/server`; API `MailboxesService` (signed-state CSRF, encrypted token storage), `/mailboxes` connect/list/disconnect/providers + unguarded `/auth/:provider/callback`; web Connect-mailbox screen. Verified: build, lint, AES-GCM round-trip, not-configured 400, CRUD + RLS + metadata-only (no token leak), encrypted-at-rest, 401, visual (login e2e + /mailboxes). **Gmail verified live (see status); Outlook pending creds.** Commit: 480f0fb
 - [x] 05 — Onboarding + website-to-profile + theming: `CrawlService` + `LlmService` (in `@extrovertai/server`, reused by 08/09); API `OnboardingService` + `POST /onboarding/crawl`, `GET`/`PUT /company-profile`; web onboarding flow (URL → skeleton → prefilled editable review), "no website" manual path, `ThemeService` (accent token swap), Settings reset. Verified: build, lint, **live crawl+extract (stripe.com → grounded profile, branding detected, raw_crawl cached)**, visual (URL step, manual review, theme applied on neutral base + reset to official). Commit: a68dc72
 - [x] 06 — Credit ledger + metering: `BillingService` + `InsufficientCreditsError` + `withCreditGate` (in `@extrovertai/server`); Postgres functions `credit_balance`/`reserve_credits`/`commit_usage`/`refund_usage` (atomic, advisory-locked, service_role-only); BullMQ wired on Upstash with a `metering-test` queue demonstrating the gate; `GET /credits/balance` + web header chip. Verified live: ledger math, reserve insufficient/sufficient, commit, idempotent refund, gate success/failure, **concurrency (1 of 2 wins)**, **BullMQ end-to-end (1 committed + 1 refunded)**, balance API (200/401), chip visual. Commit: aa3cddc
+- [x] 07 — Lead search: `PlacesService` (Places API New) + `CacheService` (Redis) in `@extrovertai/server`; api `LeadsService` (gated+cached+dedup search, lists, save-to-list) + `POST /leads/search`, `GET /lists`, `POST /leads/save-to-list`; `leads` gains `place_id`/`address`/`rating`/`review_count` (+ unique index for dedup); web Find-leads screen. Verified live (Places key): 20 real leads, debit 1/search, repeat cached (no re-charge), dedup, no-website filter, save-to-list, out-of-credits, visual. Commit: &lt;set on commit&gt;
 
 ## Decisions & notes (append-only)
 - **Toolchain versions:** Node v24.16.0, npm 11.13.0. Angular **22.0.0** (generated via Angular CLI), TypeScript **~6.0.2** (monorepo-wide), NestJS **11**, `@nestjs/config` **4** (independently versioned — not 11), BullMQ **5**.
@@ -79,6 +81,15 @@
 - **BullMQ on Upstash:** connection built from `REDIS_URL` and passed to BullMQ as **options** (host/port/password/tls parsed from the URL) so BullMQ uses its own bundled ioredis (avoids cross-copy ioredis type/instance conflicts). `maxRetriesPerRequest:null` set. BullMQ 5 supports rate-limiting + delayed jobs (needed for throttled sending in File 10). `metering-test` queue + worker prove the gate end-to-end; real queues are added per-file.
 - **Redis verified** (PONG + set/get over rediss:// TLS). The File 01 worker "REDIS_URL absent" warning path is now the real connection.
 - Credit costs are still the File-01 placeholders (`search/enrichment/draft/send` = 1 each); finalized in File 14.
+
+### File 07 decisions & notes
+- **Places API (New)** (`places.googleapis.com/v1/places:searchText`) with a field mask returns name/rating/reviews/website/phone/location in ONE call — no separate per-place detail lookups (the old API's cost trap). Single page, `maxResultCount` 20 (pagination via `nextPageToken` is a future enhancement).
+- **Credit unit: 1 credit per search** (`CREDIT_COSTS.search`), regardless of result count; a zero-result search still counts (a search ran). Run **inline** through `withCreditGate` (Places is fast); BullMQ not needed for search.
+- **Filters:** industry+location are query-side (the text query); **no-website** and **low-rating (`maxRating`)/low-reviews (`maxReviews`)** are **client-side** (Places text search has no equivalent params). With a single 20-result page, strict filters (e.g. no-website) can yield few/zero — improves once pagination lands.
+- **Caching (CacheService, Redis):** search results cached **per-user** by normalized `industry|location|filters`, TTL 24h. A cache hit returns results with **no Places call and no charge** (verified). Per-user keying keeps metering fair (first search charges; repeats are free).
+- **Dedup:** `leads` unique index `(user_id, place_id)` + a pre-insert existence check, so repeated identical searches create no duplicate leads (verified 20 rows == 20 places).
+- **Leads schema additions** (migration `20260607030000`): `place_id`, `address`, `rating` (real), `review_count` (int). Leads now exist for File 08 to enrich.
+- **Web:** lead results render as a normal list (≤20 items/search). CDK virtual scrolling deferred until pagination brings large result sets — at 20 items it isn't needed.
 
 ## Visual verification (File 01)
 - Performed via the **Claude Preview MCP** (Claude in Chrome was not connected this session). Landing route at `/` confirmed:

@@ -19,3 +19,7 @@ export * from './llm/llm.module';
 export * from './billing/billing.errors';
 export * from './billing/billing.service';
 export * from './billing/billing.module';
+export * from './places/places.service';
+export * from './places/places.module';
+export * from './cache/cache.service';
+export * from './cache/cache.module';
