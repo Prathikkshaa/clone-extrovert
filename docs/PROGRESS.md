@@ -9,10 +9,11 @@
 - App boots: api ✅ / worker ✅ / web ✅
 - DB: schema + RLS live on Supabase project `ywdrznybrxyskvyccwxb`; generated types in `@extrovertai/shared`.
 - Auth: Supabase Auth live — web signup/login + guards; API JWT guard + `GET /me`; `users` profile row auto-created on first authed request.
-- Mailbox OAuth: Gmail + Outlook connect flow, encrypted token storage, `mailboxes` CRUD + UI all built. **Live OAuth UNVERIFIED — no Google/Microsoft credentials yet (see blocker).**
+- Mailbox OAuth: built for Gmail + Outlook. **Gmail live OAuth + token refresh VERIFIED** (connected `nuras1999@gmail.com`; access+refresh tokens encrypted at rest; live refresh returns a fresh token). Outlook deferred — Microsoft Azure app/creds pending.
 
 ## In progress / deferred / blockers
-- **File 04 credential gap:** `GOOGLE_OAUTH_CLIENT_ID/SECRET` and `MS_OAUTH_CLIENT_ID/SECRET` are not in `.env`. Both providers are **fully implemented** (not stubbed) behind the interface, but the live connect handshake and token refresh are **unverified**. To verify once creds are added: fill the Google and/or Microsoft OAuth values in `.env` (redirect URIs already set to `http://localhost:3000/auth/google|microsoft/callback`), restart the API, open `/mailboxes`, click Connect, complete consent → expect a `mailboxes` row with encrypted tokens and a green "Connected" row. Google stays in "testing" mode with test users until verified (fine for dev).
+- **Outlook (Microsoft) credential gap:** `MS_OAUTH_CLIENT_ID/SECRET` are not in `.env` (user is setting up Azure later). `OutlookProvider` is fully implemented; live connect/refresh unverified until then. To verify later: create the Azure app (redirect URI `http://localhost:3000/auth/microsoft/callback`), fill `MS_OAUTH_*` in `.env`, restart the API, `/mailboxes` → Connect Outlook → consent → expect a connected row with encrypted tokens.
+- **Gmail: DONE.** `GOOGLE_OAUTH_*` set; connect URL accepted by Google; full consent → callback → encrypted storage → refresh verified live (2026-06-07). Google app is in "testing" mode (test users only) — fine for dev; production needs Google verification for the restricted `gmail.*` scopes.
 
 ## Completed files
 - [x] 01 — Monorepo scaffold (npm workspaces; web/api/worker skeletons; @extrovertai/shared package; Tailwind + design tokens; .env.example; docs). Commit: c5bea53
