@@ -10,6 +10,7 @@ import { MailboxesModule } from './mailboxes/mailboxes.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
 import { CreditsModule } from './credits/credits.module';
 import { LeadsModule } from './leads/leads.module';
+import { EnrichmentModule } from './enrichment/enrichment.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { LeadsModule } from './leads/leads.module';
     OnboardingModule,
     CreditsModule,
     LeadsModule,
+    EnrichmentModule,
   ],
 })
 export class AppModule {}

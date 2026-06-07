@@ -4,6 +4,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { QueueModule } from './queue/queue.module';
+import { EnrichmentWorkerModule } from './enrichment/enrichment.worker.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { QueueModule } from './queue/queue.module';
       envFilePath: ['../../.env'],
     }),
     QueueModule,
+    EnrichmentWorkerModule,
   ],
 })
 export class AppModule {}

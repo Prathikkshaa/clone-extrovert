@@ -37,7 +37,37 @@ export interface PlacesSearchResult {
   error?: string;
 }
 
+/** A single Google review (subset of the Places "review" object we care about). */
+export interface PlaceReview {
+  rating: number | null;
+  text: string;
+  author: string | null;
+  when: string | null; // e.g. "2 months ago"
+}
+
+export interface PlaceDetails {
+  status: 'ok' | 'rate_limited' | 'error' | 'not_configured';
+  reviews: PlaceReview[];
+  website: string | null;
+  phone: string | null;
+  rating: number | null;
+  reviewCount: number | null;
+  error?: string;
+}
+
 const ENDPOINT = 'https://places.googleapis.com/v1/places:searchText';
+const DETAILS_ENDPOINT = 'https://places.googleapis.com/v1/places';
+// Reviews + freshest contact fields. Place Details (New) returns up to 5 reviews
+// inline; this is the only field set File 08 enrichment needs from the details SKU.
+const DETAILS_FIELD_MASK = [
+  'id',
+  'reviews',
+  'websiteUri',
+  'nationalPhoneNumber',
+  'internationalPhoneNumber',
+  'rating',
+  'userRatingCount',
+].join(',');
 const FIELD_MASK = [
   'places.id',
   'places.displayName',
@@ -116,6 +146,77 @@ export class PlacesService {
     }
   }
 
+  /**
+   * Fetch reviews + freshest contact info for one place (Place Details New).
+   * This is a PAID call (details/reviews SKU) — callers MUST meter it via the
+   * credit gate and SHOULD cache the result by place_id (File 08 does both).
+   */
+  async getPlaceDetails(placeId: string): Promise<PlaceDetails> {
+    const empty: PlaceDetails = {
+      status: 'ok',
+      reviews: [],
+      website: null,
+      phone: null,
+      rating: null,
+      reviewCount: null,
+    };
+    const apiKey = this.config.get<string>('GOOGLE_PLACES_API_KEY');
+    if (!apiKey) {
+      return { ...empty, status: 'not_configured', error: 'Places API is not configured.' };
+    }
+    try {
+      const res = await fetch(`${DETAILS_ENDPOINT}/${encodeURIComponent(placeId)}`, {
+        method: 'GET',
+        headers: {
+          'X-Goog-Api-Key': apiKey,
+          'X-Goog-FieldMask': DETAILS_FIELD_MASK,
+        },
+        signal: AbortSignal.timeout(20000),
+      });
+
+      if (res.status === 429) {
+        return { ...empty, status: 'rate_limited', error: 'Places API rate-limited.' };
+      }
+
+      const json = (await res.json()) as RawPlaceDetails & {
+        error?: { status?: string; message?: string };
+      };
+
+      if (!res.ok || json.error) {
+        if (json.error?.status === 'RESOURCE_EXHAUSTED') {
+          return { ...empty, status: 'rate_limited', error: 'Places API rate-limited.' };
+        }
+        return {
+          ...empty,
+          status: 'error',
+          error: json.error?.message ?? `Places details returned ${res.status}.`,
+        };
+      }
+
+      return {
+        status: 'ok',
+        reviews: (json.reviews ?? []).map((r) => this.toReview(r)),
+        website: json.websiteUri ?? null,
+        phone: json.nationalPhoneNumber ?? json.internationalPhoneNumber ?? null,
+        rating: typeof json.rating === 'number' ? json.rating : null,
+        reviewCount: typeof json.userRatingCount === 'number' ? json.userRatingCount : null,
+      };
+    } catch (err) {
+      this.logger.warn(`Places details failed: ${(err as Error).message}`);
+      return { ...empty, status: 'error', error: (err as Error).message };
+    }
+  }
+
+  private toReview(r: RawReview): PlaceReview {
+    const text = (r.text?.text ?? r.originalText?.text ?? '').trim();
+    return {
+      rating: typeof r.rating === 'number' ? r.rating : null,
+      text,
+      author: r.authorAttribution?.displayName ?? null,
+      when: r.relativePublishTimeDescription ?? null,
+    };
+  }
+
   private toResult(p: RawPlace): PlaceResult {
     return {
       placeId: p.id,
@@ -156,4 +257,21 @@ interface RawPlace {
   websiteUri?: string;
   nationalPhoneNumber?: string;
   location?: { latitude?: number; longitude?: number };
+}
+
+interface RawReview {
+  rating?: number;
+  text?: { text?: string };
+  originalText?: { text?: string };
+  relativePublishTimeDescription?: string;
+  authorAttribution?: { displayName?: string };
+}
+
+interface RawPlaceDetails {
+  reviews?: RawReview[];
+  websiteUri?: string;
+  nationalPhoneNumber?: string;
+  internationalPhoneNumber?: string;
+  rating?: number;
+  userRatingCount?: number;
 }

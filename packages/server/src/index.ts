@@ -23,3 +23,8 @@ export * from './places/places.service';
 export * from './places/places.module';
 export * from './cache/cache.service';
 export * from './cache/cache.module';
+export * from './queue/redis.util';
+export * from './enrichment/contact-extract';
+export * from './enrichment/enrichment.constants';
+export * from './enrichment/enrichment.service';
+export * from './enrichment/enrichment.module';

@@ -32,8 +32,12 @@
 - `crawl/crawl.service.ts` + `crawl.module.ts` — `CrawlService`: site text (Firecrawl → fetch+Cheerio fallback) + `fetchBranding` (logo/theme-color). **Reused by File 08.**
 - `llm/llm.service.ts` + `llm.module.ts` — `LlmService`: OpenRouter completions + robust `extractJson`. **Reused by File 09.**
 - `billing/billing.service.ts` + `billing.module.ts` + `billing.errors.ts` — `BillingService`: balance/addCredits/reserve/commit/refund + **`withCreditGate` (mandatory path for ALL paid actions)**; `InsufficientCreditsError`. **Used by 07/08/09/10/14.**
-- `places/places.service.ts` + `places.module.ts` — `PlacesService`: Google Places API (New) text search + buying-signal filters. **Used by File 07.**
+- `places/places.service.ts` + `places.module.ts` — `PlacesService`: Google Places API (New) text search + buying-signal filters (File 07) + **`getPlaceDetails(placeId)`** (reviews + freshest contact info; paid details SKU — File 08).
 - `cache/cache.service.ts` + `cache.module.ts` — `CacheService`: Redis JSON cache w/ TTL (guarded). Used to avoid re-charging/re-calling paid lookups.
+- `queue/redis.util.ts` — `buildRedisConnection(url)`: parse a redis(s):// URL into BullMQ/ioredis connection options. Shared by the api producer + worker consumer.
+- `enrichment/contact-extract.ts` — **pure** email/phone helpers: `extractEmails`/`extractPhones`/`rankEmails`/`pickPhone`. Ranking de-prioritizes `noreply@`/generic, filters image-traps/placeholders; never fabricates. (File 08)
+- `enrichment/enrichment.service.ts` + `enrichment.module.ts` — `EnrichmentService.enrichLead(userId, leadId)`: the per-lead enrichment unit — Place details (reviews, cached by place_id) + site crawl + email/phone extract + reviews split + "why reach out" hook (one LLM call, deterministic fallback). Metered via one `withCreditGate('enrichment', leadId)`; idempotent (skips already-`complete`). (File 08)
+- `enrichment/enrichment.constants.ts` — `ENRICHMENT_QUEUE` + `EnrichLeadJob` (queue contract shared by api/worker).
 
 ## apps/api (`src/`)
 - `main.ts` — bootstrap: creates the HTTP app, global ValidationPipe, reads `API_PORT` from `.env`.
@@ -46,13 +50,15 @@
 - `mailboxes/mailboxes.service.ts` — orchestrates OAuth + token encryption + DB; signed-state CSRF. `mailboxes.controller.ts` — `GET /mailboxes/providers|connect/:provider`, `GET /mailboxes`, `DELETE /mailboxes/:id` (all guarded). `oauth-callback.controller.ts` — `GET /auth/:provider/callback` (unguarded; state-verified). `mailboxes.module.ts`.
 - `onboarding/onboarding.service.ts` — crawl → LLM extract → branding/accent → persist `company_profiles`. `onboarding.controller.ts` — `POST /onboarding/crawl`, `GET`/`PUT /company-profile` (guarded). `theme.util.ts` — accent contrast guard. `onboarding.dto.ts`, `onboarding.module.ts`.
 - `credits/credits.controller.ts` — `GET /credits/balance` (balance + recent ledger, guarded). `credits.module.ts`.
-- `leads/leads.service.ts` — gated+cached+dedup Places search, lists, save-to-list. `leads.controller.ts` — `POST /leads/search`, `GET /lists`, `POST /leads/save-to-list` (guarded). `leads.dto.ts`, `leads.module.ts`.
+- `leads/leads.service.ts` — gated+cached+dedup Places search, lists, save-to-list, **`getListLeads`** (leads + enrichment fields for the File 08 screen). `leads.controller.ts` — `POST /leads/search`, `GET /lists`, `GET /lists/:id/leads`, `POST /leads/save-to-list` (guarded). `leads.dto.ts`, `leads.module.ts`.
+- `enrichment/enrichment.service.ts` — `EnrichmentApiService`: BullMQ **producer** (enqueue one job per lead) + upfront balance gate (enqueues only what's affordable, reports skipped) + status reads. `enrichment.controller.ts` — `POST /enrichment/enqueue`, `POST /enrichment/status` (guarded). `enrichment.dto.ts`, `enrichment.module.ts`. (File 08)
 - Config: `nest-cli.json`, `tsconfig.json`, `tsconfig.build.json`.
 
 ## apps/worker (`src/`)
 - `main.ts` — bootstrap: standalone application context, startup log, SIGINT/SIGTERM graceful shutdown, keep-alive heartbeat.
-- `app.module.ts` — root module: global `ConfigModule` (repo-root `.env`) + `QueueModule`.
-- `queue/queue.module.ts`, `queue/queue.service.ts` — BullMQ wiring (Upstash). `metering-test` queue + worker demonstrating `withCreditGate`; warns + runs without queues when `REDIS_URL` is unset. Real queues added per feature file.
+- `app.module.ts` — root module: global `ConfigModule` (repo-root `.env`) + `QueueModule` + `EnrichmentWorkerModule`.
+- `queue/queue.module.ts`, `queue/queue.service.ts` — BullMQ wiring (Upstash). `metering-test` queue + worker demonstrating `withCreditGate`; warns + runs without queues when `REDIS_URL` is unset.
+- `enrichment/enrichment.worker.ts` + `enrichment.worker.module.ts` — `EnrichmentWorker`: BullMQ **consumer** on `ENRICHMENT_QUEUE` (concurrency 3) → `EnrichmentService.enrichLead`. Guarded by `REDIS_URL`. (File 08)
 - Config: `nest-cli.json`, `tsconfig.json`, `tsconfig.build.json`.
 
 ## apps/web (`src/`)
@@ -65,8 +71,9 @@
 - `app/core/auth.guard.ts` — `authGuard` (require auth) + `guestGuard` (require signed-out); both await `AuthService.ready`.
 - `app/core/auth.interceptor.ts` — attaches `Authorization: Bearer <token>` to requests hitting `environment.apiUrl`.
 - `app/core/mailbox-api.service.ts` — typed client for the mailbox endpoints (metadata only).
-- `app/core/company-profile.service.ts` — client for onboarding/company-profile. `app/core/theme.service.ts` — applies/reverts the brand accent token. `app/core/credits.service.ts` — reads credit balance + recent ledger (home header chip). `app/core/leads.service.ts` — lead search + lists client.
-- `app/pages/search/*` — protected Find-leads screen (search form, filters, results cards, save-to-list).
+- `app/core/company-profile.service.ts` — client for onboarding/company-profile. `app/core/theme.service.ts` — applies/reverts the brand accent token. `app/core/credits.service.ts` — reads credit balance + recent ledger (home header chip). `app/core/leads.service.ts` — lead search + lists client. `app/core/enrichment.service.ts` — enrichment client (list leads, enqueue, status poll). (File 08)
+- `app/pages/search/*` — protected Find-leads screen (search form, filters, results cards, save-to-list, "Enrich them →" link).
+- `app/pages/enrich/*` — protected Enrich-leads screen: pick a list, enrich selected/all, **per-lead progress poll** (non-blocking), cards show email-or-"no email found", phone, positive/negative reviews, and the **hook as a highlighted callout**; cost shown before, balance chip updates after. (File 08)
 - `app/pages/landing/landing.*` — landing (CTA → /signup, /login). `app/pages/login/*`, `app/pages/signup/*` — auth screens. `app/pages/home/*` — protected home (email + `GET /me`; applies theme; links to onboarding/settings/mailboxes). `app/pages/mailboxes/*` — Connect-your-mailbox. `app/pages/onboarding/*` — website-to-profile flow (URL → skeleton → editable review + manual path). `app/pages/settings/*` — theme reset.
 - `environments/environment.ts` — **generated** (gitignored) public client config; `environment.example.ts` — committed template. Generator: `scripts/gen-web-env.mjs`.
 - `styles.css` — global styles + design tokens (CSS custom properties; dark-mode block).

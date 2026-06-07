@@ -1,0 +1,180 @@
+<main class="min-h-screen bg-canvas text-ink px-4 py-10">
+  <div class="mx-auto max-w-2xl">
+    <header class="flex items-center justify-between">
+      <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
+      <div class="flex items-center gap-3">
+        @if (balance() !== null) {
+          <span
+            class="rounded-full border border-line bg-surface px-3 py-1 text-sm font-medium text-ink"
+            [class.text-danger]="balance()! <= 0"
+            title="Credit balance"
+          >
+            {{ balance() }} credits
+          </span>
+        }
+        <a routerLink="/home" class="text-sm text-accent hover:text-accent-strong">Back to home</a>
+      </div>
+    </header>
+
+    <section class="mt-8">
+      <h1 class="text-heading-lg text-ink">Enrich leads</h1>
+      <p class="mt-2 text-body text-muted">
+        Find a contact email and phone, read what reviews say, and get a clear reason to reach out.
+      </p>
+
+      <!-- List picker -->
+      <div class="mt-6">
+        <label for="list" class="block text-sm font-medium text-ink">Pick a list</label>
+        <select id="list" name="list" [(ngModel)]="selectedListId" (ngModelChange)="loadList()"
+          class="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+          <option value="">Choose a saved list…</option>
+          @for (l of lists(); track l.id) {
+            <option [value]="l.id">{{ l.name }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Action bar -->
+      @if (selectedListId && leads().length > 0) {
+        <div class="mt-5 flex flex-wrap items-center gap-3 rounded-lg border border-line bg-surface p-3">
+          <span class="text-sm text-ink">{{ selectedCount() }} selected</span>
+          <button type="button" (click)="enrichSelected()" [disabled]="busy()"
+            class="rounded-md bg-accent px-3 py-1.5 text-sm text-white transition-colors duration-200 hover:bg-accent-strong disabled:opacity-60">
+            Enrich selected
+          </button>
+          <button type="button" (click)="enrichAll()" [disabled]="busy()"
+            class="rounded-md border border-line px-3 py-1.5 text-sm text-ink transition-colors duration-200 hover:bg-canvas disabled:opacity-60">
+            Enrich all ({{ pendingLeads().length }})
+          </button>
+          <span class="text-sm text-muted">Each lead uses {{ costPer }} credit.</span>
+        </div>
+      }
+
+      <!-- Status message -->
+      @if (message(); as m) {
+        <p class="mt-4 text-sm"
+          [class.text-muted]="m.kind === 'info'"
+          [class.text-warning]="m.kind === 'warn'"
+          [class.text-danger]="m.kind === 'error'"
+          role="status">{{ m.text }}</p>
+      }
+
+      <!-- Loading skeleton -->
+      @if (loading()) {
+        <div class="mt-6 space-y-3">
+          @for (i of [1,2,3]; track i) {
+            <div class="h-28 w-full animate-pulse rounded-lg bg-line"></div>
+          }
+        </div>
+      }
+
+      <!-- Empty list -->
+      @if (!loading() && selectedListId && leads().length === 0) {
+        <p class="mt-8 text-body text-muted">
+          This list has no leads yet.
+          <a routerLink="/search" class="text-accent hover:text-accent-strong">Find leads →</a>
+        </p>
+      }
+
+      @if (!selectedListId) {
+        <p class="mt-8 text-body text-muted">
+          Pick a list to start. Don’t have one?
+          <a routerLink="/search" class="text-accent hover:text-accent-strong">Find leads →</a>
+        </p>
+      }
+
+      <!-- Lead cards -->
+      @if (!loading() && leads().length > 0) {
+        <ul class="mt-6 space-y-3">
+          @for (lead of leads(); track lead.id) {
+            <li class="rounded-lg border border-line bg-surface p-4">
+              <div class="flex items-start gap-3">
+                <input type="checkbox" [checked]="isSelected(lead.id)" (change)="toggle(lead.id)"
+                  [disabled]="lead.enrichment_status === 'complete'"
+                  class="mt-1 accent-accent disabled:opacity-40" [attr.aria-label]="'Select ' + lead.name" />
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center justify-between gap-2">
+                    <p class="truncate text-body font-medium text-ink">{{ lead.name }}</p>
+                    @if (lead.rating !== null) {
+                      <span class="shrink-0 text-sm text-muted">★ {{ lead.rating }} ({{ lead.review_count ?? 0 }})</span>
+                    }
+                  </div>
+                  <div class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                    @if (lead.website) {
+                      <a [href]="lead.website" target="_blank" rel="noopener"
+                        class="text-accent hover:text-accent-strong">Website</a>
+                    } @else {
+                      <span class="text-warning">No website</span>
+                    }
+                  </div>
+
+                  <!-- Per-lead progress / results -->
+                  @switch (lead.enrichment_status) {
+                    @case ('pending') {
+                      <p class="mt-3 text-sm text-muted">⏳ Queued…</p>
+                    }
+                    @case ('in_progress') {
+                      <div class="mt-3 space-y-2" aria-label="Enriching">
+                        <p class="text-sm text-muted">Enriching…</p>
+                        <div class="h-3 w-2/3 animate-pulse rounded bg-line"></div>
+                        <div class="h-3 w-1/2 animate-pulse rounded bg-line"></div>
+                      </div>
+                    }
+                    @case ('failed') {
+                      <p class="mt-3 text-sm text-danger">
+                        Couldn’t finish enriching this lead. Nothing was charged — try again.
+                      </p>
+                    }
+                    @case ('complete') {
+                      <!-- Contact -->
+                      <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                        @if (lead.email) {
+                          <span class="text-ink"><span class="text-muted">Email:</span> {{ lead.email }}</span>
+                        } @else {
+                          <span class="text-muted">No email found — add one by hand or skip.</span>
+                        }
+                        @if (lead.phone) {
+                          <span class="text-ink"><span class="text-muted">Phone:</span> {{ lead.phone }}</span>
+                        }
+                      </div>
+
+                      <!-- Reviews summary -->
+                      @if (hasReviewSummary(lead)) {
+                        <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          @if (positives(lead).length > 0) {
+                            <div>
+                              <p class="text-xs font-medium uppercase tracking-wide text-positive">Customers like</p>
+                              <ul class="mt-1 space-y-0.5 text-sm text-ink">
+                                @for (p of positives(lead); track p) { <li>+ {{ p }}</li> }
+                              </ul>
+                            </div>
+                          }
+                          @if (negatives(lead).length > 0) {
+                            <div>
+                              <p class="text-xs font-medium uppercase tracking-wide text-warning">Common complaints</p>
+                              <ul class="mt-1 space-y-0.5 text-sm text-ink">
+                                @for (n of negatives(lead); track n) { <li>− {{ n }}</li> }
+                              </ul>
+                            </div>
+                          }
+                        </div>
+                      }
+
+                      <!-- The hook — highlighted callout that draws the eye -->
+                      @if (lead.hook) {
+                        <div class="mt-3 rounded-md border-l-4 border-accent bg-canvas px-3 py-2">
+                          <p class="text-xs font-medium uppercase tracking-wide text-accent">Why reach out</p>
+                          <p class="mt-0.5 text-sm text-ink">{{ lead.hook }}</p>
+                        </div>
+                      }
+                    }
+                  }
+                </div>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+</main>

@@ -34,11 +34,30 @@ export type LeadCard = Pick<
   | 'status'
 >;
 
+/** A lead with its enrichment fields — the shape the File 08 enrich screen renders. */
+export type EnrichedLeadCard = Pick<
+  Tables<'leads'>,
+  | 'id'
+  | 'name'
+  | 'website'
+  | 'email'
+  | 'phone'
+  | 'address'
+  | 'rating'
+  | 'review_count'
+  | 'reviews'
+  | 'hook'
+  | 'status'
+  | 'enrichment_status'
+>;
+
 export type SearchOutcome =
   | { ok: true; cached: boolean; searchId: string; leads: LeadCard[]; count: number }
   | { ok: false; reason: 'out_of_credits' | 'busy' | 'error'; message: string };
 
 const LEAD_CARD_COLUMNS = 'id,name,website,phone,address,rating,review_count,place_id,status';
+const ENRICHED_LEAD_COLUMNS =
+  'id,name,website,email,phone,address,rating,review_count,reviews,hook,status,enrichment_status';
 const CACHE_TTL_SECONDS = 24 * 60 * 60;
 
 @Injectable()
@@ -134,6 +153,31 @@ export class LeadsService {
       .order('created_at', { ascending: false });
     if (error) throw new BadRequestException('Could not load your lists.');
     return data ?? [];
+  }
+
+  /** Leads in a list, with enrichment fields, scoped to the user (File 08 screen). */
+  async getListLeads(userId: string, listId: string): Promise<EnrichedLeadCard[]> {
+    const admin = this.supabase.getAdminClient();
+    const list = await admin
+      .from('lists')
+      .select('id')
+      .eq('id', listId)
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (!list.data) throw new NotFoundException('List not found.');
+
+    const links = await admin.from('lead_list').select('lead_id').eq('list_id', listId);
+    const leadIds = (links.data ?? []).map((r) => r.lead_id);
+    if (leadIds.length === 0) return [];
+
+    const { data, error } = await admin
+      .from('leads')
+      .select(ENRICHED_LEAD_COLUMNS)
+      .eq('user_id', userId)
+      .in('id', leadIds)
+      .order('created_at', { ascending: false });
+    if (error) throw new BadRequestException('Could not load the list’s leads.');
+    return (data as EnrichedLeadCard[]) ?? [];
   }
 
   /** Save leads into a list (new or existing). Both scoped to the user. */

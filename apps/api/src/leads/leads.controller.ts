@@ -1,11 +1,11 @@
 // LeadsController — lead search + lists (master-context §2/§6).
 // WHY: the search endpoint is the first consumer of the credit gate. All routes
 // require auth and are scoped to the caller.
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { SupabaseAuthGuard } from '../auth/supabase-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import type { AuthUser } from '../auth/auth-user.interface';
-import { LeadsService, type SearchOutcome } from './leads.service';
+import { LeadsService, type EnrichedLeadCard, type SearchOutcome } from './leads.service';
 import { SearchDto, SaveToListDto } from './leads.dto';
 
 @Controller()
@@ -27,6 +27,14 @@ export class LeadsController {
   @Get('lists')
   getLists(@CurrentUser() user: AuthUser) {
     return this.leads.getLists(user.id);
+  }
+
+  @Get('lists/:id/leads')
+  getListLeads(
+    @CurrentUser() user: AuthUser,
+    @Param('id') id: string,
+  ): Promise<EnrichedLeadCard[]> {
+    return this.leads.getListLeads(user.id, id);
   }
 
   @Post('leads/save-to-list')
