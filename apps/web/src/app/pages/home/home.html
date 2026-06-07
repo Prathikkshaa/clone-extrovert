@@ -8,6 +8,15 @@
         <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
       </div>
       <div class="flex items-center gap-3">
+        @if (balance() !== null) {
+          <span
+            class="rounded-full border border-line bg-surface px-3 py-1 text-sm font-medium text-ink"
+            [class.text-danger]="balance()! <= 0"
+            title="Credit balance"
+          >
+            {{ balance() }} credits
+          </span>
+        }
         <a routerLink="/settings" class="text-sm text-accent hover:text-accent-strong">Settings</a>
         <button
           type="button"

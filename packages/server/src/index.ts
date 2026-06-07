@@ -16,3 +16,6 @@ export * from './crawl/crawl.service';
 export * from './crawl/crawl.module';
 export * from './llm/llm.service';
 export * from './llm/llm.module';
+export * from './billing/billing.errors';
+export * from './billing/billing.service';
+export * from './billing/billing.module';

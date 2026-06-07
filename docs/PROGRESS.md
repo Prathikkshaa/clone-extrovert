@@ -3,14 +3,15 @@
 > Updated at the end of every build session. New sessions read this + 00-master-context.md to know where things stand.
 
 ## Current status
-- Last completed file: 05
-- Next file: 06 (Credit ledger + metering core: ledger/usage services, atomic reserve→commit→refund, balance = sum(ledger), BullMQ gate scaffold)
+- Last completed file: 06
+- Next file: 07 (Lead search: PlacesService, search UI + filters, save to list, caching — FIRST consumer of the credit gate)
 - Branch: main
 - App boots: api ✅ / worker ✅ / web ✅
 - DB: schema + RLS live on Supabase project `ywdrznybrxyskvyccwxb`; generated types in `@extrovertai/shared`.
 - Auth: Supabase Auth live — web signup/login + guards; API JWT guard + `GET /me`; `users` profile row auto-created on first authed request.
 - Mailbox OAuth: built for Gmail + Outlook. **Gmail live OAuth + token refresh VERIFIED** (connected `nuras1999@gmail.com`; access+refresh tokens encrypted at rest; live refresh returns a fresh token). Outlook deferred — Microsoft Azure app/creds pending.
 - Onboarding: `CrawlService` (Firecrawl + fetch fallback) + `LlmService` (OpenRouter) live; website-to-profile extraction, logo/accent theming (contrast-guarded), manual path, Settings theme reset. **Crawl + LLM extraction verified live** (stripe.com → grounded profile).
+- Credits: `BillingService` (balance = sum(ledger); atomic reserve/commit/refund via Postgres functions) + `withCreditGate` (the mandatory path for paid actions); BullMQ live on Upstash with a metering-test queue; `GET /credits/balance` + header chip. **Fully verified live** (ledger, gate, concurrency, BullMQ end-to-end, balance API).
 
 ## In progress / deferred / blockers
 - **Outlook (Microsoft) credential gap:** `MS_OAUTH_CLIENT_ID/SECRET` are not in `.env` (user is setting up Azure later). `OutlookProvider` is fully implemented; live connect/refresh unverified until then. To verify later: create the Azure app (redirect URI `http://localhost:3000/auth/microsoft/callback`), fill `MS_OAUTH_*` in `.env`, restart the API, `/mailboxes` → Connect Outlook → consent → expect a connected row with encrypted tokens.
@@ -22,6 +23,7 @@
 - [x] 03 — Authentication: Supabase Auth. Web `AuthService` (anon client), login/signup screens, `authGuard`/`guestGuard`, Bearer HTTP interceptor, protected Home; API `SupabaseAuthGuard` (validates JWT via `auth.getUser`), `@CurrentUser()`, `GET /me`, idempotent `users` profile creation. Verified end-to-end (login → /me 200, no token → 401, RLS own-row only, profile created exactly once) + visual (login/signup). Commit: 793d15a
 - [x] 04 — Mailbox OAuth: `CryptoService` (AES-256-GCM) + Gmail/Outlook providers + `MailboxOAuthService` in `@extrovertai/server`; API `MailboxesService` (signed-state CSRF, encrypted token storage), `/mailboxes` connect/list/disconnect/providers + unguarded `/auth/:provider/callback`; web Connect-mailbox screen. Verified: build, lint, AES-GCM round-trip, not-configured 400, CRUD + RLS + metadata-only (no token leak), encrypted-at-rest, 401, visual (login e2e + /mailboxes). **Gmail verified live (see status); Outlook pending creds.** Commit: 480f0fb
 - [x] 05 — Onboarding + website-to-profile + theming: `CrawlService` + `LlmService` (in `@extrovertai/server`, reused by 08/09); API `OnboardingService` + `POST /onboarding/crawl`, `GET`/`PUT /company-profile`; web onboarding flow (URL → skeleton → prefilled editable review), "no website" manual path, `ThemeService` (accent token swap), Settings reset. Verified: build, lint, **live crawl+extract (stripe.com → grounded profile, branding detected, raw_crawl cached)**, visual (URL step, manual review, theme applied on neutral base + reset to official). Commit: a68dc72
+- [x] 06 — Credit ledger + metering: `BillingService` + `InsufficientCreditsError` + `withCreditGate` (in `@extrovertai/server`); Postgres functions `credit_balance`/`reserve_credits`/`commit_usage`/`refund_usage` (atomic, advisory-locked, service_role-only); BullMQ wired on Upstash with a `metering-test` queue demonstrating the gate; `GET /credits/balance` + web header chip. Verified live: ledger math, reserve insufficient/sufficient, commit, idempotent refund, gate success/failure, **concurrency (1 of 2 wins)**, **BullMQ end-to-end (1 committed + 1 refunded)**, balance API (200/401), chip visual. Commit: &lt;set on commit&gt;
 
 ## Decisions & notes (append-only)
 - **Toolchain versions:** Node v24.16.0, npm 11.13.0. Angular **22.0.0** (generated via Angular CLI), TypeScript **~6.0.2** (monorepo-wide), NestJS **11**, `@nestjs/config` **4** (independently versioned — not 11), BullMQ **5**.
@@ -69,6 +71,14 @@
 - **Theming (contrast guard):** `resolveAccent` applies the detected `brand_color` as the accent ONLY if its contrast vs white ≥ 3.0 (button text is white); otherwise it falls back to the official accent `#0F766E` and flags it. Theme is a pure token swap — web `ThemeService` sets `--color-accent`/`--color-accent-strong`; it never repaints canvas/text. `theme_source` toggles `fetched`/`official`; Settings has the one-click reset. Verified visually (orange brand accent applied on neutral base, then reset to teal).
 - **Crawl runs inline** in `POST /onboarding/crawl` (HTTP 201). Because the current model is slow, consider moving this behind the BullMQ queue (File 06) with polling if it stays slow; inline is acceptable for MVP per the build file.
 - **Failure handling:** unreachable/empty site → 400 with plain copy + manual path; LLM parse failure → profile saved with empty fields + a "couldn't auto-fill, add details" notice (never fabricated). `PUT /company-profile` sends the full profile (Settings included) so theme toggles never drop fields.
+
+### File 06 decisions & notes
+- **`withCreditGate(userId, action, refId, fn)`** (on `BillingService`, `@extrovertai/server`) is **THE MANDATORY PATH** for every paid external action (Files 07/08/09/10). It reserves → runs `fn` → commits on success / refunds on failure. `InsufficientCreditsError` is thrown BEFORE `fn` runs when the user can't afford it. No paid external call may bypass it.
+- **Atomicity/race-safety** lives in Postgres functions (migration `20260607020000_credit_functions.sql`): `reserve_credits` takes a per-user `pg_advisory_xact_lock`, checks `sum(delta)`, then debits + writes a `reserved` usage_event — so two concurrent reserves can't both pass on a 1-credit balance (verified). `refund_usage` is idempotent (no double-credit). Balance is **always** `sum(credit_ledger.delta)` — never stored.
+- **Security:** these functions are `revoke execute ... from public` + `grant execute ... to service_role`, so only the backend can mint/reserve/refund — never the anon/authenticated API roles. Function signatures were added to the generated `Database` type for typed `.rpc()`.
+- **BullMQ on Upstash:** connection built from `REDIS_URL` and passed to BullMQ as **options** (host/port/password/tls parsed from the URL) so BullMQ uses its own bundled ioredis (avoids cross-copy ioredis type/instance conflicts). `maxRetriesPerRequest:null` set. BullMQ 5 supports rate-limiting + delayed jobs (needed for throttled sending in File 10). `metering-test` queue + worker prove the gate end-to-end; real queues are added per-file.
+- **Redis verified** (PONG + set/get over rediss:// TLS). The File 01 worker "REDIS_URL absent" warning path is now the real connection.
+- Credit costs are still the File-01 placeholders (`search/enrichment/draft/send` = 1 each); finalized in File 14.
 
 ## Visual verification (File 01)
 - Performed via the **Claude Preview MCP** (Claude in Chrome was not connected this session). Landing route at `/` confirmed:

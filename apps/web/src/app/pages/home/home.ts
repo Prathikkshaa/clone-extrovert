@@ -11,6 +11,7 @@ import {
   CompanyProfileApiService,
   type CompanyProfile,
 } from '../../core/company-profile.service';
+import { CreditsApiService } from '../../core/credits.service';
 import { ThemeService } from '../../core/theme.service';
 import { environment } from '../../../environments/environment';
 
@@ -24,15 +25,23 @@ export class Home {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly profiles = inject(CompanyProfileApiService);
+  private readonly credits = inject(CreditsApiService);
   private readonly theme = inject(ThemeService);
 
   protected readonly appName = APP_NAME;
   protected readonly email = this.auth.currentEmail();
   protected readonly profile = signal<Tables<'users'> | null>(null);
   protected readonly company = signal<CompanyProfile | null>(null);
+  protected readonly balance = signal<number | null>(null);
   protected readonly loadError = signal<string | null>(null);
 
   constructor() {
+    this.credits.balance().subscribe({
+      next: (b) => this.balance.set(b.balance),
+      error: () => {
+        /* balance chip is non-critical; ignore load errors */
+      },
+    });
     this.http.get<Tables<'users'>>(`${environment.apiUrl}/me`).subscribe({
       next: (profile) => this.profile.set(profile),
       error: () =>

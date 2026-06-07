@@ -782,7 +782,22 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      credit_balance: {
+        Args: { p_user: string };
+        Returns: number;
+      };
+      reserve_credits: {
+        Args: { p_user: string; p_action: string; p_cost: number; p_ref?: string | null };
+        Returns: string;
+      };
+      commit_usage: {
+        Args: { p_usage: string };
+        Returns: boolean;
+      };
+      refund_usage: {
+        Args: { p_usage: string };
+        Returns: boolean;
+      };
     };
     Enums: {
       lead_status: 'new' | 'contacted' | 'replied' | 'meeting' | 'won' | 'lost';
