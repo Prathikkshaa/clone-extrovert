@@ -10,8 +10,17 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailboxProvider } from '@extrovertai/shared';
 import type { MailboxProviderClient } from './mailbox-provider.interface';
-import type { OAuthConnection, OAuthProviderKey, OAuthTokenSet } from './mailbox.types';
+import {
+  MailboxSendError,
+  type OAuthConnection,
+  type OAuthProviderKey,
+  type OAuthTokenSet,
+  type OutboundEmail,
+  type SendResult,
+} from './mailbox.types';
 import { decodeJwtClaim, expiresInToIso, postForm } from './oauth.util';
+
+const SENDMAIL_ENDPOINT = 'https://graph.microsoft.com/v1.0/me/sendMail';
 
 const AUTH_ENDPOINT = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
 const TOKEN_ENDPOINT = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
@@ -86,8 +95,41 @@ export class OutlookProvider implements MailboxProviderClient {
     };
   }
 
-  send(): Promise<void> {
-    throw new Error('OutlookProvider.send() is implemented in File 10.');
+  async send(accessToken: string, message: OutboundEmail): Promise<SendResult> {
+    // Graph /sendMail returns 202 with no body/id. Threading by id isn't exposed
+    // here; File 11 refines reply matching. Best-effort (Outlook creds pending).
+    let res: Response;
+    try {
+      res = await fetch(SENDMAIL_ENDPOINT, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: {
+            subject: message.subject,
+            body: { contentType: 'Text', content: message.body },
+            toRecipients: [{ emailAddress: { address: message.to } }],
+          },
+          saveToSentItems: true,
+        }),
+        signal: AbortSignal.timeout(30000),
+      });
+    } catch (err) {
+      throw new MailboxSendError('transient', `Outlook send failed: ${(err as Error).message}`);
+    }
+    if (!res.ok && res.status !== 202) {
+      const text = await res.text().catch(() => '');
+      if (res.status === 401 || res.status === 403) {
+        throw new MailboxSendError('reauth', 'Outlook authorization expired — reconnect the mailbox.');
+      }
+      if (res.status === 429) {
+        throw new MailboxSendError('rate_limited', 'Outlook is rate-limiting sends right now.');
+      }
+      throw new MailboxSendError(
+        res.status >= 400 && res.status < 500 ? 'rejected' : 'transient',
+        `Outlook send error (${res.status}): ${text.slice(0, 120)}`,
+      );
+    }
+    return { providerMessageId: '', threadId: message.threadId ?? null, rfcMessageId: null };
   }
 
   listReplies(): Promise<unknown> {

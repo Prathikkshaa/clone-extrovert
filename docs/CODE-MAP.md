@@ -27,7 +27,9 @@
 - `crypto/crypto.service.ts` + `crypto.module.ts` — `CryptoService`: AES-256-GCM encrypt/decrypt for secrets at rest (mailbox tokens).
 - `mailbox/mailbox-provider.interface.ts` + `mailbox.types.ts` — provider abstraction + OAuth token/identity types.
 - `mailbox/gmail.provider.ts`, `mailbox/outlook.provider.ts` — Google/Microsoft OAuth (auth URL, code exchange, refresh; send/listReplies stubbed for Files 10/11).
-- `mailbox/mailbox-oauth.service.ts` + `mailbox.module.ts` — `MailboxOAuthService` selects a provider by key; `isConfigured()` status.
+- `mailbox/mailbox-oauth.service.ts` + `mailbox.module.ts` — `MailboxOAuthService` selects a provider by key; `isConfigured()` status. `mailbox.module` also provides **`MailboxSenderService`** (File 10): decrypt access token + refresh-on-expiry (persist new ciphertext) + `provider.send()`; throws typed `MailboxSendError`. Provider `send()` is implemented (Gmail base64url MIME via `mime.util`; Outlook Graph sendMail).
+- `mailbox/mime.util.ts` — `buildMimeMessage`: RFC 822 message (UTF-8 base64 body, RFC2047 subjects, self Message-ID) → base64url `raw` for Gmail send. (File 10)
+- `sending/sending.service.ts` + `sending.module.ts` — **`SendingService.processSend(userId, messageId)`**: the sequence-engine core — stop-checks (replied/suppressed) → pick a mailbox → metered send (`withCreditGate('send')`) → persist sent state/ids → return next-step/retry/pause outcome. `MailboxCapacityService`: per-inbox daily cap + warm-up ramp + rotation (Redis counters). `sending.constants.ts`: `SENDING_QUEUE`/`SendStepJob`, warm-up + spacing + backoff tuning, `msUntilTomorrow`/`waitDaysToMs`. (File 10)
 - `mailbox/oauth.util.ts` — form POST + id_token claim helpers.
 - `crawl/crawl.service.ts` + `crawl.module.ts` — `CrawlService`: site text (Firecrawl → fetch+Cheerio fallback) + `fetchBranding` (logo/theme-color). **Reused by File 08.**
 - `llm/llm.service.ts` + `llm.module.ts` — `LlmService`: OpenRouter completions + robust `extractJson`. **Reused by File 09.**
@@ -55,6 +57,7 @@
 - `leads/leads.service.ts` — gated+cached+dedup Places search, lists, save-to-list, **`getListLeads`** (leads + enrichment fields for the File 08 screen). `leads.controller.ts` — `POST /leads/search`, `GET /lists`, `GET /lists/:id/leads`, `POST /leads/save-to-list` (guarded). `leads.dto.ts`, `leads.module.ts`.
 - `enrichment/enrichment.service.ts` — `EnrichmentApiService`: BullMQ **producer** (enqueue one job per lead) + upfront balance gate (enqueues only what's affordable, reports skipped) + status reads. `enrichment.controller.ts` — `POST /enrichment/enqueue`, `POST /enrichment/status` (guarded). `enrichment.dto.ts`, `enrichment.module.ts`. (File 08)
 - `drafting/drafting.service.ts` — `DraftingApiService`: BullMQ **producer** (bulk draft, balance-gated) + review queue (`byLeads` → drafts grouped per lead with the hook) + `edit` (one message) + `approve` (a lead's whole set) + `regenerate` (delete + re-enqueue). `drafting.controller.ts` — `POST /drafts/enqueue|by-leads|approve|regenerate`, `PUT /drafts/:id` (guarded). `drafting.dto.ts`, `drafting.module.ts`. (File 09)
+- `campaigns/campaigns.service.ts` — `CampaignsService`: BullMQ **producer** for `SENDING_QUEUE` + `plan` (send-plan preview respecting caps), `start` (create campaign + `sequence_steps`, link approved drafts, enqueue first sends), `list`/`detail` (monitor with per-lead step states + capacity), `setStatus` (pause/resume). `campaigns.controller.ts` — `GET /campaigns/plan|:id`, `POST /campaigns/start`, `GET /campaigns`, `POST /campaigns/:id/status` (guarded). `campaigns.dto.ts`, `campaigns.module.ts`. (File 10)
 - Config: `nest-cli.json`, `tsconfig.json`, `tsconfig.build.json`.
 
 ## apps/worker (`src/`)
@@ -63,6 +66,7 @@
 - `queue/queue.module.ts`, `queue/queue.service.ts` — BullMQ wiring (Upstash). `metering-test` queue + worker demonstrating `withCreditGate`; warns + runs without queues when `REDIS_URL` is unset.
 - `enrichment/enrichment.worker.ts` + `enrichment.worker.module.ts` — `EnrichmentWorker`: BullMQ **consumer** on `ENRICHMENT_QUEUE` (concurrency 3) → `EnrichmentService.enrichLead`. Guarded by `REDIS_URL`. (File 08)
 - `drafting/drafting.worker.ts` + `drafting.worker.module.ts` — `DraftingWorker`: BullMQ **consumer** on `DRAFTING_QUEUE` (concurrency 2 — LLM rate limits) → `DraftingService.draftForLead`. (File 09)
+- `sending/sending.worker.ts` + `sending.worker.module.ts` — `SendingWorker`: BullMQ **consumer** on `SENDING_QUEUE` (concurrency 1, rate-limited + jittered) → `SendingService.processSend`; schedules follow-ups (delayed) + retries from the outcome. (File 10)
 - Config: `nest-cli.json`, `tsconfig.json`, `tsconfig.build.json`.
 
 ## apps/web (`src/`)
@@ -79,6 +83,7 @@
 - `app/pages/search/*` — protected Find-leads screen (search form, filters, results cards, save-to-list, "Enrich them →" link).
 - `app/pages/enrich/*` — protected Enrich-leads screen: pick a list, enrich selected/all, **per-lead progress poll** (non-blocking), cards show email-or-"no email found", phone, positive/negative reviews, and the **hook as a highlighted callout**; cost shown before, balance chip updates after. (File 08)
 - `app/core/drafting.service.ts` — drafting client (enqueue, by-leads, edit, approve, regenerate). `app/pages/draft/*` — protected **keyboard-first review queue**: pick list, bulk-generate, one lead at a time with the **hook beside the draft**, step tabs (email + 2 follow-ups), inline edit (saved on blur), approve/skip/regenerate with keyboard shortcuts (Enter/→ approve, ↓ skip, ↑ back, R regenerate, 1/2/3 step), per-lead progress poll, failed-draft retry. (File 09)
+- `app/core/campaigns.service.ts` — campaigns client (plan, start, list, detail, setStatus). `app/pages/send/*` — protected **Start sending** screen: pick list → plain-language send plan respecting safe caps (warm-up surfaced) → Start sending; lists existing campaigns. `app/pages/campaign/*` — protected **campaign monitor**: per-lead step states (sent/queued/replied/bounced/stopped), today's count vs cap, pause/resume, paused-reason guidance, live poll. (File 10)
 - `app/pages/landing/landing.*` — landing (CTA → /signup, /login). `app/pages/login/*`, `app/pages/signup/*` — auth screens. `app/pages/home/*` — protected home (email + `GET /me`; applies theme; links to onboarding/settings/mailboxes). `app/pages/mailboxes/*` — Connect-your-mailbox. `app/pages/onboarding/*` — website-to-profile flow (URL → skeleton → editable review + manual path). `app/pages/settings/*` — theme reset.
 - `environments/environment.ts` — **generated** (gitignored) public client config; `environment.example.ts` — committed template. Generator: `scripts/gen-web-env.mjs`.
 - `styles.css` — global styles + design tokens (CSS custom properties; dark-mode block).

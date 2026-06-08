@@ -20,3 +20,38 @@ export interface OAuthTokenSet {
 export interface OAuthConnection extends OAuthTokenSet {
   email: string;
 }
+
+/** An outbound email to send through the user's mailbox (File 10). */
+export interface OutboundEmail {
+  to: string;
+  subject: string;
+  /** Plain-text body. File 11 adds the HTML + compliance footer variant. */
+  body: string;
+  /** The connected mailbox address (From header). */
+  fromEmail: string;
+  /** Provider thread to send within (threads follow-ups under the first email). */
+  threadId?: string | null;
+  /** RFC Message-ID of the message we're replying to (In-Reply-To/References). */
+  inReplyToRfcId?: string | null;
+}
+
+/** Result of a successful send: provider message id + thread id (for threading). */
+export interface SendResult {
+  providerMessageId: string;
+  threadId: string | null;
+  /** RFC Message-ID header of the sent message (used to thread the next step). */
+  rfcMessageId: string | null;
+}
+
+/** How a send failure is classified, so the UI/engine can react appropriately. */
+export type SendErrorKind = 'reauth' | 'rate_limited' | 'rejected' | 'transient';
+
+export class MailboxSendError extends Error {
+  constructor(
+    readonly kind: SendErrorKind,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'MailboxSendError';
+  }
+}

@@ -12,6 +12,7 @@ import { CreditsModule } from './credits/credits.module';
 import { LeadsModule } from './leads/leads.module';
 import { EnrichmentModule } from './enrichment/enrichment.module';
 import { DraftingModule } from './drafting/drafting.module';
+import { CampaignsModule } from './campaigns/campaigns.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { DraftingModule } from './drafting/drafting.module';
     LeadsModule,
     EnrichmentModule,
     DraftingModule,
+    CampaignsModule,
   ],
 })
 export class AppModule {}

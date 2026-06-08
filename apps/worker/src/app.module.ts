@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { QueueModule } from './queue/queue.module';
 import { EnrichmentWorkerModule } from './enrichment/enrichment.worker.module';
 import { DraftingWorkerModule } from './drafting/drafting.worker.module';
+import { SendingWorkerModule } from './sending/sending.worker.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { DraftingWorkerModule } from './drafting/drafting.worker.module';
     QueueModule,
     EnrichmentWorkerModule,
     DraftingWorkerModule,
+    SendingWorkerModule,
   ],
 })
 export class AppModule {}

@@ -443,6 +443,10 @@ export type Database = {
           body: string | null;
           step_order: number;
           approved: boolean;
+          mailbox_id: string | null;
+          provider_message_id: string | null;
+          scheduled_at: string | null;
+          send_error: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -458,6 +462,10 @@ export type Database = {
           body?: string | null;
           step_order?: number;
           approved?: boolean;
+          mailbox_id?: string | null;
+          provider_message_id?: string | null;
+          scheduled_at?: string | null;
+          send_error?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -473,6 +481,10 @@ export type Database = {
           body?: string | null;
           step_order?: number;
           approved?: boolean;
+          mailbox_id?: string | null;
+          provider_message_id?: string | null;
+          scheduled_at?: string | null;
+          send_error?: string | null;
           created_at?: string;
           updated_at?: string;
         };

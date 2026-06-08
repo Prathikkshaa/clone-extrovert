@@ -5,7 +5,13 @@
 // send() and listReplies() are declared here as signatures only — they are
 // implemented in File 10 (sending) and File 11 (replies). They throw for now.
 import type { MailboxProvider } from '@extrovertai/shared';
-import type { OAuthConnection, OAuthProviderKey, OAuthTokenSet } from './mailbox.types';
+import type {
+  OAuthConnection,
+  OAuthProviderKey,
+  OAuthTokenSet,
+  OutboundEmail,
+  SendResult,
+} from './mailbox.types';
 
 export interface MailboxProviderClient {
   /** URL identifier ('google' | 'microsoft'), matching the redirect URI. */
@@ -25,9 +31,10 @@ export interface MailboxProviderClient {
   /** Exchange a refresh token for a fresh access token. */
   refreshToken(refreshToken: string): Promise<OAuthTokenSet>;
 
+  /** Send an email; returns provider message/thread ids. Throws MailboxSendError. */
+  send(accessToken: string, message: OutboundEmail): Promise<SendResult>;
+
   // --- Implemented later ---
-  /** File 10. */
-  send(_accessToken: string, _message: unknown): Promise<void>;
   /** File 11. */
   listReplies(_accessToken: string, _since: Date): Promise<unknown>;
 }

@@ -11,11 +11,20 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailboxProvider } from '@extrovertai/shared';
 import type { MailboxProviderClient } from './mailbox-provider.interface';
-import type { OAuthConnection, OAuthProviderKey, OAuthTokenSet } from './mailbox.types';
+import {
+  MailboxSendError,
+  type OAuthConnection,
+  type OAuthProviderKey,
+  type OAuthTokenSet,
+  type OutboundEmail,
+  type SendResult,
+} from './mailbox.types';
+import { buildMimeMessage } from './mime.util';
 import { decodeJwtClaim, expiresInToIso, postForm } from './oauth.util';
 
 const AUTH_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth';
 const TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
+const SEND_ENDPOINT = 'https://gmail.googleapis.com/gmail/v1/users/me/messages/send';
 const SCOPES = [
   'https://www.googleapis.com/auth/gmail.send',
   'https://www.googleapis.com/auth/gmail.readonly',
@@ -86,8 +95,50 @@ export class GmailProvider implements MailboxProviderClient {
     };
   }
 
-  send(): Promise<void> {
-    throw new Error('GmailProvider.send() is implemented in File 10.');
+  async send(accessToken: string, message: OutboundEmail): Promise<SendResult> {
+    const { raw, rfcMessageId } = buildMimeMessage(message);
+    let res: Response;
+    try {
+      res = await fetch(SEND_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+          message.threadId ? { raw, threadId: message.threadId } : { raw },
+        ),
+        signal: AbortSignal.timeout(30000),
+      });
+    } catch (err) {
+      throw new MailboxSendError('transient', `Gmail send failed: ${(err as Error).message}`);
+    }
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw this.classifyError(res.status, text);
+    }
+
+    const json = (await res.json()) as { id?: string; threadId?: string };
+    return {
+      providerMessageId: json.id ?? '',
+      threadId: json.threadId ?? null,
+      rfcMessageId,
+    };
+  }
+
+  /** Map a Gmail API error to a typed MailboxSendError so the engine can react. */
+  private classifyError(status: number, body: string): MailboxSendError {
+    if (status === 401 || status === 403 || /invalid_grant|insufficient/i.test(body)) {
+      return new MailboxSendError('reauth', 'Gmail authorization expired — reconnect the mailbox.');
+    }
+    if (status === 429 || status === 503) {
+      return new MailboxSendError('rate_limited', 'Gmail is rate-limiting sends right now.');
+    }
+    if (status >= 400 && status < 500) {
+      return new MailboxSendError('rejected', `Gmail rejected the message (${status}).`);
+    }
+    return new MailboxSendError('transient', `Gmail send error (${status}).`);
   }
 
   listReplies(): Promise<unknown> {

@@ -7,6 +7,7 @@
           <span class="rounded-full border border-line bg-surface px-3 py-1 text-sm font-medium text-ink"
             [class.text-danger]="balance()! <= 0" title="Credit balance">{{ balance() }} credits</span>
         }
+        <a routerLink="/send" class="text-sm text-accent hover:text-accent-strong">Start sending</a>
         <a routerLink="/home" class="text-sm text-accent hover:text-accent-strong">Back to home</a>
       </div>
     </header>
