@@ -65,5 +65,10 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./pages/campaign/campaign').then((m) => m.Campaign),
   },
+  {
+    path: 'inbox',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/inbox/inbox').then((m) => m.Inbox),
+  },
   { path: '**', redirectTo: '' },
 ];

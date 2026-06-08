@@ -43,6 +43,19 @@ export interface SendResult {
   rfcMessageId: string | null;
 }
 
+/** An inbound message read from a thread we started (a reply or a bounce). File 11. */
+export interface InboundMessage {
+  threadId: string;
+  providerMessageId: string;
+  from: string; // sender email, lowercased
+  fromName: string | null;
+  subject: string | null;
+  snippet: string;
+  body: string;
+  receivedAt: string; // ISO
+  isBounce: boolean; // mailer-daemon / delivery-status notification
+}
+
 /** How a send failure is classified, so the UI/engine can react appropriately. */
 export type SendErrorKind = 'reauth' | 'rate_limited' | 'rejected' | 'transient';
 

@@ -79,6 +79,32 @@ export class UsersService {
     throw new InternalServerErrorException('Could not load or create your profile.');
   }
 
+  /** Update the caller's profile settings (mailing address + send mode). */
+  async updateProfile(
+    userId: string,
+    email: string | null,
+    patch: { physical_address?: string; mode?: 'draft' | 'autonomous' },
+  ): Promise<UserProfile> {
+    await this.getOrCreateProfile(userId, email); // ensure the row exists
+    const update: Partial<UserProfile> = {};
+    if (patch.physical_address !== undefined) {
+      update.physical_address = patch.physical_address.trim() || null;
+    }
+    if (patch.mode !== undefined) update.mode = patch.mode;
+
+    const { data, error } = await this.supabase
+      .getAdminClient()
+      .from('users')
+      .update(update)
+      .eq('id', userId)
+      .select('*')
+      .single();
+    if (error || !data) {
+      throw new InternalServerErrorException('Could not update your profile.');
+    }
+    return data;
+  }
+
   /** One-time starter credits for a brand-new account. Never blocks signup. */
   private async grantSignupBonus(userId: string): Promise<void> {
     const raw = this.config.get<string>('SIGNUP_CREDITS');

@@ -6,6 +6,7 @@
 // implemented in File 10 (sending) and File 11 (replies). They throw for now.
 import type { MailboxProvider } from '@extrovertai/shared';
 import type {
+  InboundMessage,
   OAuthConnection,
   OAuthProviderKey,
   OAuthTokenSet,
@@ -34,7 +35,10 @@ export interface MailboxProviderClient {
   /** Send an email; returns provider message/thread ids. Throws MailboxSendError. */
   send(accessToken: string, message: OutboundEmail): Promise<SendResult>;
 
-  // --- Implemented later ---
-  /** File 11. */
-  listReplies(_accessToken: string, _since: Date): Promise<unknown>;
+  /** Read inbound messages from the given threads we started (replies + bounces). */
+  listReplies(
+    accessToken: string,
+    threadIds: string[],
+    selfEmail: string,
+  ): Promise<InboundMessage[]>;
 }

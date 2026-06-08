@@ -12,6 +12,7 @@ import { MailboxProvider } from '@extrovertai/shared';
 import type { MailboxProviderClient } from './mailbox-provider.interface';
 import {
   MailboxSendError,
+  type InboundMessage,
   type OAuthConnection,
   type OAuthProviderKey,
   type OAuthTokenSet,
@@ -132,8 +133,11 @@ export class OutlookProvider implements MailboxProviderClient {
     return { providerMessageId: '', threadId: message.threadId ?? null, rfcMessageId: null };
   }
 
-  listReplies(): Promise<unknown> {
-    throw new Error('OutlookProvider.listReplies() is implemented in File 11.');
+  // Reply ingestion for Outlook needs Graph /messages filtering by conversationId;
+  // deferred until MS creds exist (Gmail is the tested path). Returns nothing so the
+  // poller skips Outlook mailboxes cleanly rather than throwing.
+  listReplies(): Promise<InboundMessage[]> {
+    return Promise.resolve([]);
   }
 
   private clientId(): string {

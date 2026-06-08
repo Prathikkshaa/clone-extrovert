@@ -13,6 +13,7 @@ import { MailboxProvider } from '@extrovertai/shared';
 import type { MailboxProviderClient } from './mailbox-provider.interface';
 import {
   MailboxSendError,
+  type InboundMessage,
   type OAuthConnection,
   type OAuthProviderKey,
   type OAuthTokenSet,
@@ -25,6 +26,8 @@ import { decodeJwtClaim, expiresInToIso, postForm } from './oauth.util';
 const AUTH_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth';
 const TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
 const SEND_ENDPOINT = 'https://gmail.googleapis.com/gmail/v1/users/me/messages/send';
+const THREADS_ENDPOINT = 'https://gmail.googleapis.com/gmail/v1/users/me/threads';
+const MAX_THREADS_PER_POLL = 40;
 const SCOPES = [
   'https://www.googleapis.com/auth/gmail.send',
   'https://www.googleapis.com/auth/gmail.readonly',
@@ -141,8 +144,89 @@ export class GmailProvider implements MailboxProviderClient {
     return new MailboxSendError('transient', `Gmail send error (${status}).`);
   }
 
-  listReplies(): Promise<unknown> {
-    throw new Error('GmailProvider.listReplies() is implemented in File 11.');
+  /**
+   * Read inbound messages from the threads we started (privacy-friendly: only OUR
+   * threads, not the whole inbox). A message is inbound if its From is not the
+   * mailbox owner. Bounces (mailer-daemon) are flagged.
+   */
+  async listReplies(
+    accessToken: string,
+    threadIds: string[],
+    selfEmail: string,
+  ): Promise<InboundMessage[]> {
+    const self = selfEmail.toLowerCase();
+    const out: InboundMessage[] = [];
+    for (const threadId of threadIds.slice(0, MAX_THREADS_PER_POLL)) {
+      let thread: GmailThread | null = null;
+      try {
+        const res = await fetch(`${THREADS_ENDPOINT}/${threadId}?format=full`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          signal: AbortSignal.timeout(20000),
+        });
+        if (!res.ok) continue;
+        thread = (await res.json()) as GmailThread;
+      } catch {
+        continue;
+      }
+      for (const m of thread.messages ?? []) {
+        const headers = m.payload?.headers ?? [];
+        const fromRaw = this.header(headers, 'From');
+        const { email, name } = this.parseFrom(fromRaw);
+        if (!email || email === self) continue; // skip our own outbound messages
+        const subject = this.header(headers, 'Subject');
+        out.push({
+          threadId,
+          providerMessageId: m.id,
+          from: email,
+          fromName: name,
+          subject,
+          snippet: this.decodeSnippet(m.snippet ?? ''),
+          body: this.extractPlainText(m.payload) || this.decodeSnippet(m.snippet ?? ''),
+          receivedAt: m.internalDate
+            ? new Date(Number(m.internalDate)).toISOString()
+            : new Date().toISOString(),
+          isBounce: this.looksLikeBounce(email, subject),
+        });
+      }
+    }
+    return out;
+  }
+
+  private header(headers: { name: string; value: string }[], name: string): string | null {
+    return headers.find((h) => h.name.toLowerCase() === name.toLowerCase())?.value ?? null;
+  }
+
+  private parseFrom(value: string | null): { email: string | null; name: string | null } {
+    if (!value) return { email: null, name: null };
+    const match = value.match(/<([^>]+)>/);
+    const email = (match ? match[1] : value).trim().toLowerCase();
+    const name = match ? value.replace(/<[^>]+>/, '').replace(/"/g, '').trim() : null;
+    return { email: /\S+@\S+\.\S+/.test(email) ? email : null, name: name || null };
+  }
+
+  private looksLikeBounce(email: string, subject: string | null): boolean {
+    if (/mailer-daemon|postmaster/i.test(email)) return true;
+    return /delivery status notification|undeliverable|delivery failure|returned mail|mail delivery failed/i.test(
+      subject ?? '',
+    );
+  }
+
+  private decodeSnippet(snippet: string): string {
+    // Gmail snippets HTML-encode a few entities.
+    return snippet.replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&').trim();
+  }
+
+  /** Walk MIME parts for the first text/plain body (base64url). */
+  private extractPlainText(payload: GmailPart | undefined): string {
+    if (!payload) return '';
+    if (payload.mimeType === 'text/plain' && payload.body?.data) {
+      return Buffer.from(payload.body.data, 'base64url').toString('utf8').trim();
+    }
+    for (const part of payload.parts ?? []) {
+      const text = this.extractPlainText(part);
+      if (text) return text;
+    }
+    return '';
   }
 
   private clientId(): string {
@@ -154,4 +238,22 @@ export class GmailProvider implements MailboxProviderClient {
   private redirectUri(): string {
     return this.config.get<string>('GOOGLE_OAUTH_REDIRECT_URI') ?? '';
   }
+}
+
+interface GmailPart {
+  mimeType?: string;
+  headers?: { name: string; value: string }[];
+  body?: { data?: string };
+  parts?: GmailPart[];
+}
+
+interface GmailMessage {
+  id: string;
+  internalDate?: string;
+  snippet?: string;
+  payload?: GmailPart;
+}
+
+interface GmailThread {
+  messages?: GmailMessage[];
 }

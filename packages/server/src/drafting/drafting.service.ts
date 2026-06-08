@@ -30,6 +30,10 @@ export type DraftOutcome =
   | { status: 'skipped'; leadId: string; reason: 'already_drafted' | 'not_found' }
   | { status: 'failed'; leadId: string; reason: 'out_of_credits' | 'error'; message: string };
 
+export type ReplyDraftResult =
+  | { ok: true; body: string }
+  | { ok: false; reason: 'out_of_credits' | 'error' | 'not_found' };
+
 interface GeneratedMessage {
   step: number;
   subject: string;
@@ -94,6 +98,67 @@ export class DraftingService {
         message: 'Drafting didn’t finish. Nothing was charged — try again.',
       };
     }
+  }
+
+  /**
+   * Draft a REPLY to a lead in the user's voice, grounded in the thread + profile
+   * (File 11). Metered as one `draft` unit. Returns the proposed body — it is NOT
+   * sent or stored (approval-by-default: the user reviews/edits, then sends).
+   */
+  async draftReply(
+    userId: string,
+    leadId: string,
+    thread: { direction: string; body: string | null }[],
+  ): Promise<ReplyDraftResult> {
+    const lead = await this.loadLead(userId, leadId);
+    if (!lead) return { ok: false, reason: 'not_found' };
+    const profile = await this.loadProfile(userId);
+    try {
+      const body = await this.billing.withCreditGate(userId, 'draft', `reply:${leadId}`, () =>
+        this.generateReply(lead, profile, thread),
+      );
+      return { ok: true, body };
+    } catch (err) {
+      if (err instanceof InsufficientCreditsError) return { ok: false, reason: 'out_of_credits' };
+      this.logger.warn(`Reply draft failed for ${leadId} (refunded): ${(err as Error).message}`);
+      return { ok: false, reason: 'error' };
+    }
+  }
+
+  private async generateReply(
+    lead: LeadRow,
+    profile: ProfileRow,
+    thread: { direction: string; body: string | null }[],
+  ): Promise<string> {
+    const convo = thread
+      .filter((m) => (m.body ?? '').trim())
+      .map(
+        (m) =>
+          `${m.direction === 'inbound' ? lead.name ?? 'Them' : 'You'}: ${(m.body ?? '').slice(0, 800)}`,
+      )
+      .join('\n\n');
+    const profileBlock = profile
+      ? [
+          profile.services ? `Sender services: ${profile.services}` : '',
+          profile.value_prop ? `Value prop: ${profile.value_prop}` : '',
+          profile.tone ? `Tone: ${profile.tone}` : '',
+        ]
+          .filter(Boolean)
+          .join('\n')
+      : '(no sender profile — keep it natural and helpful, do not invent offerings)';
+    const body = await this.llm.complete({
+      system:
+        'You write a SHORT, warm, human reply to a B2B email, in the sender\'s voice. ' +
+        'Respond directly to what they said. No filler, no hype. Only use facts given — never ' +
+        'invent results, prices, or commitments. End with a simple sign-off the user can edit. ' +
+        'Return ONLY the reply body text (no subject, no quotes).',
+      prompt: `Sender:\n${profileBlock}\n\nConversation so far:\n${convo}\n\nWrite the sender's next reply.`,
+      maxTokens: 400,
+      temperature: 0.5,
+    });
+    const text = body.trim();
+    if (!text) throw new Error('The model returned an empty reply.');
+    return text;
   }
 
   /** Delete a lead's holding-area drafts (used by "regenerate" before redrafting). */

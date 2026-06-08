@@ -60,6 +60,26 @@
           }
         </div>
 
+        <!-- Mailing address (legally required to send cold email) -->
+        <div class="mt-6 rounded-lg border border-line bg-surface p-6">
+          <h2 class="text-heading-sm text-ink">Mailing address</h2>
+          <p class="mt-1 text-sm text-muted">
+            Required by law in every cold email. Shown in your email footer, alongside an unsubscribe link.
+          </p>
+          <textarea name="address" [(ngModel)]="address" rows="3"
+            placeholder="Your Company, 123 Main St, City, State ZIP, Country"
+            class="mt-3 w-full rounded-md border border-line bg-canvas px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"></textarea>
+          <div class="mt-3 flex items-center gap-3">
+            <button type="button" (click)="saveAddress()" [disabled]="savingAddress()"
+              class="rounded-md bg-accent px-4 py-2 text-sm text-white transition-colors duration-200 hover:bg-accent-strong disabled:opacity-60">
+              {{ savingAddress() ? 'Saving…' : 'Save address' }}
+            </button>
+            @if (addressMsg(); as a) {
+              <span class="text-sm" [class.text-positive]="a.kind === 'info'" [class.text-warning]="a.kind === 'warn'">{{ a.text }}</span>
+            }
+          </div>
+        </div>
+
         <div class="mt-6">
           <a routerLink="/onboarding" class="text-sm text-accent hover:text-accent-strong">
             Update profile from website

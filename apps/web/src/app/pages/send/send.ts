@@ -79,6 +79,11 @@ export class Send {
             kind: 'warn',
             text: 'Connect a mailbox first so we can send from your own inbox.',
           });
+        } else if (res.reason === 'no_address') {
+          this.message.set({
+            kind: 'warn',
+            text: 'Add your mailing address in Settings to send — it’s legally required.',
+          });
         } else {
           this.message.set({
             kind: 'warn',

@@ -7,6 +7,7 @@ import { QueueModule } from './queue/queue.module';
 import { EnrichmentWorkerModule } from './enrichment/enrichment.worker.module';
 import { DraftingWorkerModule } from './drafting/drafting.worker.module';
 import { SendingWorkerModule } from './sending/sending.worker.module';
+import { ReplyPollerModule } from './replies/reply.poller.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { SendingWorkerModule } from './sending/sending.worker.module';
     EnrichmentWorkerModule,
     DraftingWorkerModule,
     SendingWorkerModule,
+    ReplyPollerModule,
   ],
 })
 export class AppModule {}

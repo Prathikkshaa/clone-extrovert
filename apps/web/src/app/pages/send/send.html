@@ -50,6 +50,13 @@
               Connect a mailbox →
             </a>
           </div>
+        } @else if (p.needsAddress) {
+          <div class="mt-6 rounded-lg border border-line bg-surface p-4">
+            <p class="text-sm text-ink">Add your mailing address before sending — it’s legally required in every email.</p>
+            <a routerLink="/settings" class="mt-2 inline-block text-sm font-medium text-accent hover:text-accent-strong">
+              Add your address in Settings →
+            </a>
+          </div>
         } @else if (p.leadCount === 0) {
           <div class="mt-6 rounded-lg border border-line bg-surface p-4">
             <p class="text-sm text-ink">No approved emails in this list yet.</p>

@@ -447,6 +447,7 @@ export type Database = {
           provider_message_id: string | null;
           scheduled_at: string | null;
           send_error: string | null;
+          direction: string;
           created_at: string;
           updated_at: string;
         };
@@ -466,6 +467,7 @@ export type Database = {
           provider_message_id?: string | null;
           scheduled_at?: string | null;
           send_error?: string | null;
+          direction?: string;
           created_at?: string;
           updated_at?: string;
         };
@@ -485,6 +487,7 @@ export type Database = {
           provider_message_id?: string | null;
           scheduled_at?: string | null;
           send_error?: string | null;
+          direction?: string;
           created_at?: string;
           updated_at?: string;
         };

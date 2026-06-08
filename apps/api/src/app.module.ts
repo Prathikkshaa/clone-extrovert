@@ -13,6 +13,8 @@ import { LeadsModule } from './leads/leads.module';
 import { EnrichmentModule } from './enrichment/enrichment.module';
 import { DraftingModule } from './drafting/drafting.module';
 import { CampaignsModule } from './campaigns/campaigns.module';
+import { InboxModule } from './inbox/inbox.module';
+import { ComplianceApiModule } from './compliance/compliance.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { CampaignsModule } from './campaigns/campaigns.module';
     EnrichmentModule,
     DraftingModule,
     CampaignsModule,
+    InboxModule,
+    ComplianceApiModule,
   ],
 })
 export class AppModule {}

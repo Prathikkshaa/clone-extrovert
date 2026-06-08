@@ -22,6 +22,7 @@ export interface CapacitySummary {
 }
 export interface SendPlan {
   hasMailbox: boolean;
+  needsAddress: boolean;
   leadCount: number;
   todayCount: number;
   laterCount: number;
@@ -29,7 +30,7 @@ export interface SendPlan {
 }
 export type StartResult =
   | { ok: true; campaignId: string; plan: SendPlan }
-  | { ok: false; reason: 'no_mailbox' | 'no_drafts' };
+  | { ok: false; reason: 'no_mailbox' | 'no_drafts' | 'no_address' };
 
 export interface CampaignCounts {
   total: number;

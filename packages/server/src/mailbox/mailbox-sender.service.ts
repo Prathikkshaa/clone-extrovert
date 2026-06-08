@@ -33,6 +33,11 @@ export class MailboxSenderService {
     return provider.send(accessToken, email);
   }
 
+  /** A fresh (refreshed-if-needed) access token for read operations (File 11 poller). */
+  async accessTokenFor(mailbox: MailboxRow): Promise<string> {
+    return this.freshAccessToken(mailbox, this.providerFor(mailbox));
+  }
+
   private providerFor(mailbox: MailboxRow): MailboxProviderClient {
     // DB enum gmail/outlook → OAuth key google/microsoft.
     return this.oauth.get(mailbox.provider === 'gmail' ? 'google' : 'microsoft');

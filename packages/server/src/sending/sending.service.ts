@@ -13,6 +13,7 @@ import { BillingService } from '../billing/billing.service';
 import { InsufficientCreditsError } from '../billing/billing.errors';
 import { MailboxSenderService } from '../mailbox/mailbox-sender.service';
 import { MailboxSendError, type OutboundEmail } from '../mailbox/mailbox.types';
+import { ComplianceService } from '../compliance/compliance.service';
 import { MailboxCapacityService } from './mailbox-capacity.service';
 import {
   FOLLOWUP_WAIT_DAYS,
@@ -33,7 +34,11 @@ export type SendOutcome =
       delayMs: number;
       reason: 'no_capacity' | 'rate_limited' | 'transient';
     }
-  | { kind: 'paused'; messageId: string; reason: 'out_of_credits' | 'reauth' | 'no_mailbox' }
+  | {
+      kind: 'paused';
+      messageId: string;
+      reason: 'out_of_credits' | 'reauth' | 'no_mailbox' | 'no_address';
+    }
   | { kind: 'failed'; messageId: string; reason: 'rejected' | 'error' };
 
 type MessageRow = Pick<
@@ -51,6 +56,7 @@ export class SendingService {
     private readonly billing: BillingService,
     private readonly sender: MailboxSenderService,
     private readonly capacity: MailboxCapacityService,
+    private readonly compliance: ComplianceService,
   ) {}
 
   async processSend(userId: string, messageId: string): Promise<SendOutcome> {
@@ -68,7 +74,8 @@ export class SendingService {
       await this.stopLeadSequence(msg.campaign_id, msg.lead_id);
       return { kind: 'stopped', messageId, reason: 'replied' };
     }
-    if (lead.email && (await this.isSuppressed(userId, lead.email))) {
+    // Shared compliance guard — never send to a suppressed address (File 11).
+    if (lead.email && (await this.compliance.isSuppressed(userId, lead.email))) {
       await this.stopLeadSequence(msg.campaign_id, msg.lead_id);
       return { kind: 'stopped', messageId, reason: 'suppressed' };
     }
@@ -89,13 +96,26 @@ export class SendingService {
     }
     const mailbox = pick.mailbox;
 
+    // --- Compliance: append unsubscribe + physical address; block if no address ---
+    const compliant = await this.compliance.applyCompliance(
+      userId,
+      lead.id,
+      lead.email,
+      msg.body ?? '',
+    );
+    if (!compliant.ok) {
+      await this.setMessageError(messageId, 'Add your mailing address to send (legally required).');
+      await this.pauseCampaign(msg.campaign_id);
+      return { kind: 'paused', messageId, reason: 'no_address' };
+    }
+
     // --- Build the email (thread follow-ups under the first email) ---
     const threadId = msg.step_order > 1 ? await this.priorThreadId(msg) : null;
     const subject = msg.step_order > 1 ? this.ensureRe(msg.subject) : (msg.subject ?? '');
     const email: OutboundEmail = {
       to: lead.email,
       subject,
-      body: msg.body ?? '',
+      body: compliant.body,
       fromEmail: mailbox.email,
       threadId,
       inReplyToRfcId: null,
@@ -115,6 +135,7 @@ export class SendingService {
           thread_id: result.threadId ?? threadId,
           sent_at: new Date().toISOString(),
           send_error: null,
+          body: compliant.body, // store what was actually sent (incl. compliance footer)
         })
         .eq('id', messageId);
       await this.capacity.recordSend(mailbox.id);
@@ -181,17 +202,6 @@ export class SendingService {
       .eq('user_id', userId)
       .maybeSingle();
     return (data as LeadRow) ?? null;
-  }
-
-  private async isSuppressed(userId: string, email: string): Promise<boolean> {
-    const { data } = await this.supabase
-      .getAdminClient()
-      .from('suppressions')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('email', email)
-      .maybeSingle();
-    return Boolean(data);
   }
 
   private async priorThreadId(msg: MessageRow): Promise<string | null> {

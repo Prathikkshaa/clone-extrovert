@@ -16,6 +16,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Queue, type ConnectionOptions } from 'bullmq';
 import {
+  ComplianceService,
   MailboxCapacityService,
   SupabaseService,
   buildRedisConnection,
@@ -28,6 +29,7 @@ import type { Tables } from '@extrovertai/shared';
 
 export interface SendPlan {
   hasMailbox: boolean;
+  needsAddress: boolean; // physical mailing address missing (legally required)
   leadCount: number; // leads with approved drafts ready to start
   todayCount: number; // how many can go out today within safe limits
   laterCount: number; // the rest, scheduled for upcoming days
@@ -36,7 +38,7 @@ export interface SendPlan {
 
 export type StartResult =
   | { ok: true; campaignId: string; plan: SendPlan }
-  | { ok: false; reason: 'no_mailbox' | 'no_drafts' };
+  | { ok: false; reason: 'no_mailbox' | 'no_drafts' | 'no_address' };
 
 export interface CampaignStepState {
   step_order: number;
@@ -73,6 +75,7 @@ export class CampaignsService implements OnModuleInit, OnModuleDestroy {
     private readonly config: ConfigService,
     private readonly supabase: SupabaseService,
     private readonly capacity: MailboxCapacityService,
+    private readonly compliance: ComplianceService,
   ) {}
 
   onModuleInit(): void {
@@ -94,6 +97,7 @@ export class CampaignsService implements OnModuleInit, OnModuleDestroy {
     const todayCount = Math.min(leadCount, capacity.totalRemaining);
     return {
       hasMailbox: capacity.connectedCount > 0,
+      needsAddress: !(await this.compliance.physicalAddress(userId)),
       leadCount,
       todayCount,
       laterCount: Math.max(0, leadCount - todayCount),
@@ -106,6 +110,11 @@ export class CampaignsService implements OnModuleInit, OnModuleDestroy {
     await this.assertOwnsList(userId, listId);
     const capacity = await this.capacity.summary(userId);
     if (capacity.connectedCount === 0) return { ok: false, reason: 'no_mailbox' };
+
+    // Compliance: a mailing address is legally required in every email — fail fast.
+    if (!(await this.compliance.physicalAddress(userId))) {
+      return { ok: false, reason: 'no_address' };
+    }
 
     const drafts = await this.approvedDrafts(userId, listId);
     if (drafts.length === 0) return { ok: false, reason: 'no_drafts' };
@@ -157,6 +166,7 @@ export class CampaignsService implements OnModuleInit, OnModuleDestroy {
       campaignId,
       plan: {
         hasMailbox: true,
+        needsAddress: false, // checked above
         leadCount,
         todayCount,
         laterCount: Math.max(0, leadCount - todayCount),
