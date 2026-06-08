@@ -74,7 +74,10 @@ export class Draft implements OnDestroy {
   protected readonly activeDraft = computed<DraftMessage | null>(
     () => this.current()?.drafts.find((d) => d.step_order === this.step()) ?? null,
   );
-  protected readonly busyGenerating = computed(() => this.generating.size > 0);
+  // True while a generation batch is polling. A signal (not a computed over the
+  // plain `generating` Map) so the UI actually reacts — a computed has no signal
+  // dependency on Map.size and would stay stuck at its first value.
+  protected readonly busyGenerating = signal(false);
   protected readonly remaining = computed(() => this.review().filter((l) => !l.approved).length);
 
   constructor() {
@@ -314,6 +317,7 @@ export class Draft implements OnDestroy {
 
   private startPolling(): void {
     this.stopPolling();
+    this.busyGenerating.set(true);
     this.pollTimer = setInterval(() => this.poll(), POLL_MS);
     this.poll();
   }
@@ -374,6 +378,7 @@ export class Draft implements OnDestroy {
   }
 
   private stopPolling(): void {
+    this.busyGenerating.set(false);
     if (this.pollTimer) {
       clearInterval(this.pollTimer);
       this.pollTimer = null;

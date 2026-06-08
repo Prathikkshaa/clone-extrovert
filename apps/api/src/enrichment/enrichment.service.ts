@@ -39,6 +39,7 @@ export type EnqueueResult =
   | {
       ok: true;
       enqueued: number;
+      enqueuedLeadIds: string[];
       skipped: number;
       costPer: number;
       balance: number;
@@ -123,6 +124,7 @@ export class EnrichmentApiService implements OnModuleInit, OnModuleDestroy {
     return {
       ok: true,
       enqueued: toEnqueue.length,
+      enqueuedLeadIds: toEnqueue,
       skipped,
       costPer,
       balance,

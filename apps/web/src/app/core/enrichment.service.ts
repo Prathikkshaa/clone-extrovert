@@ -32,6 +32,7 @@ export type EnqueueResult =
   | {
       ok: true;
       enqueued: number;
+      enqueuedLeadIds: string[];
       skipped: number;
       costPer: number;
       balance: number;

@@ -17,6 +17,8 @@ import {
 } from '../../core/enrichment.service';
 
 const POLL_MS = 2500;
+// Safety cap so a hung job never leaves the buttons permanently disabled.
+const POLL_MAX_MS = 3 * 60 * 1000;
 
 @Component({
   selector: 'app-enrich',
@@ -43,17 +45,20 @@ export class Enrich implements OnDestroy {
   );
 
   private pollTimer: ReturnType<typeof setInterval> | null = null;
+  // Lead ids for the enrichment batch currently in flight (this session). Button
+  // disable + polling key off THIS set — NOT the persisted 'pending' status: a
+  // freshly-saved lead is 'pending' (never enriched) and must NOT disable the
+  // buttons or trigger polling.
+  private inFlight = new Set<string>();
+  private pollDeadline = 0;
 
   // Leads still needing enrichment (for "enrich all" + cost preview).
   protected readonly pendingLeads = computed(() =>
     this.leads().filter((l) => l.enrichment_status !== 'complete'),
   );
   protected readonly selectedCount = computed(() => this.selected().size);
-  protected readonly busy = computed(() =>
-    this.leads().some(
-      (l) => l.enrichment_status === 'pending' || l.enrichment_status === 'in_progress',
-    ),
-  );
+  // True only while a batch we started is still running (disables the buttons).
+  protected readonly working = signal(false);
 
   constructor() {
     this.leadsApi.getLists().subscribe({
@@ -79,7 +84,10 @@ export class Enrich implements OnDestroy {
       next: (rows) => {
         this.leads.set(rows);
         this.loading.set(false);
-        if (this.busy()) this.startPolling();
+        // Resume progress ONLY for leads genuinely mid-enrichment (in_progress) —
+        // e.g. a batch started elsewhere. 'pending' = never enriched, not in flight.
+        const running = rows.filter((l) => l.enrichment_status === 'in_progress').map((l) => l.id);
+        if (running.length > 0) this.beginBatch(running);
       },
       error: () => {
         this.loading.set(false);
@@ -97,6 +105,11 @@ export class Enrich implements OnDestroy {
 
   isSelected(id: string): boolean {
     return this.selected().has(id);
+  }
+
+  /** True only for leads in the batch we're currently running (vs idle 'pending'). */
+  isQueued(id: string): boolean {
+    return this.inFlight.has(id);
   }
 
   enrichSelected(): void {
@@ -165,21 +178,31 @@ export class Enrich implements OnDestroy {
             text: `Enriching ${res.enqueued} lead${res.enqueued === 1 ? '' : 's'}…`,
           });
         }
-        // Optimistically mark queued leads as pending so progress shows immediately.
-        const queued = new Set(ids);
+        // Track exactly the leads the server actually enqueued (partial-credit
+        // batches enqueue only what's affordable).
+        const queued = res.enqueuedLeadIds;
+        const queuedSet = new Set(queued);
+        // Optimistically mark them as in-progress so progress shows immediately.
         this.leads.update((rows) =>
           rows.map((l) =>
-            queued.has(l.id) && l.enrichment_status !== 'complete'
-              ? { ...l, enrichment_status: 'pending' as const }
-              : l,
+            queuedSet.has(l.id) ? { ...l, enrichment_status: 'in_progress' as const } : l,
           ),
         );
         this.selected.set(new Set());
-        this.startPolling();
+        this.beginBatch(queued);
       },
       error: () =>
         this.message.set({ kind: 'error', text: 'Could not start enrichment. Please try again.' }),
     });
+  }
+
+  /** Start (or extend) the in-flight batch + its progress polling. */
+  private beginBatch(ids: string[]): void {
+    if (ids.length === 0) return;
+    ids.forEach((id) => this.inFlight.add(id));
+    this.working.set(true);
+    this.pollDeadline = Date.now() + POLL_MAX_MS;
+    this.startPolling();
   }
 
   private startPolling(): void {
@@ -189,27 +212,39 @@ export class Enrich implements OnDestroy {
   }
 
   private poll(): void {
-    const ids = this.leads()
-      .filter((l) => l.enrichment_status === 'pending' || l.enrichment_status === 'in_progress')
-      .map((l) => l.id);
+    const ids = [...this.inFlight];
     if (ids.length === 0) {
-      this.stopPolling();
-      this.refreshBalance();
+      this.endBatch();
+      return;
+    }
+    // Safety: never leave the buttons stuck disabled if a job hangs.
+    if (Date.now() > this.pollDeadline) {
+      this.inFlight.clear();
+      this.endBatch();
       return;
     }
     this.api.status(ids).subscribe({
       next: (updates) => {
         const byId = new Map(updates.map((u) => [u.id, u]));
         this.leads.update((rows) => rows.map((l) => byId.get(l.id) ?? l));
-        if (!this.busy()) {
-          this.stopPolling();
-          this.refreshBalance();
+        // A lead leaves the batch once it settles (done or failed).
+        for (const u of updates) {
+          if (u.enrichment_status === 'complete' || u.enrichment_status === 'failed') {
+            this.inFlight.delete(u.id);
+          }
         }
+        if (this.inFlight.size === 0) this.endBatch();
       },
       error: () => {
         /* transient poll failure — keep the timer; next tick retries */
       },
     });
+  }
+
+  private endBatch(): void {
+    this.stopPolling();
+    this.working.set(false);
+    this.refreshBalance();
   }
 
   private stopPolling(): void {
