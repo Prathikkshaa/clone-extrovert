@@ -48,7 +48,7 @@
 - `auth/supabase-auth.guard.ts` — `SupabaseAuthGuard`: validates `Bearer` JWT via `auth.getUser`, attaches `request.user`. **Reuse on every protected route.**
 - `auth/current-user.decorator.ts` — `@CurrentUser()` param decorator (reads `request.user`).
 - `auth/auth-user.interface.ts` — `AuthUser { id, email }`; `auth/auth.module.ts` — provides/exports the guard.
-- `users/users.service.ts` — `getOrCreateProfile()` (idempotent `users` row creation, admin client); `users/users.controller.ts` — `GET /me` (protected); `users/users.module.ts`.
+- `users/users.service.ts` — `getOrCreateProfile()` (idempotent `users` row creation, admin client) + **one-time signup credit bonus** (`SIGNUP_CREDITS`, default 100, granted on first create; best-effort); `users/users.controller.ts` — `GET /me` (protected); `users/users.module.ts` (imports `BillingModule`).
 - `mailboxes/mailboxes.service.ts` — orchestrates OAuth + token encryption + DB; signed-state CSRF. `mailboxes.controller.ts` — `GET /mailboxes/providers|connect/:provider`, `GET /mailboxes`, `DELETE /mailboxes/:id` (all guarded). `oauth-callback.controller.ts` — `GET /auth/:provider/callback` (unguarded; state-verified). `mailboxes.module.ts`.
 - `onboarding/onboarding.service.ts` — crawl → LLM extract → branding/accent → persist `company_profiles`. `onboarding.controller.ts` — `POST /onboarding/crawl`, `GET`/`PUT /company-profile` (guarded). `theme.util.ts` — accent contrast guard. `onboarding.dto.ts`, `onboarding.module.ts`.
 - `credits/credits.controller.ts` — `GET /credits/balance` (balance + recent ledger, guarded). `credits.module.ts`.

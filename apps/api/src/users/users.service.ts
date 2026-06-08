@@ -8,17 +8,30 @@
 // column defaults (see the initial migration); physical_address stays null until
 // onboarding (File 05). 50/day is a conservative account-level ceiling — actual
 // throttling/warm-up is enforced per-mailbox in File 10.
+//
+// SIGNUP BONUS: on first profile creation we grant `SIGNUP_CREDITS` starter
+// credits (default 100) so a new account can use the paid actions (search/
+// enrichment/draft) before Stripe top-up exists (File 14). Granted exactly once
+// (only in the branch that actually created the row) and best-effort (a failed
+// grant never blocks profile creation). Set SIGNUP_CREDITS=0 to disable.
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
-import { SupabaseService } from '@extrovertai/server';
-import type { Tables } from '@extrovertai/shared';
+import { ConfigService } from '@nestjs/config';
+import { BillingService, SupabaseService } from '@extrovertai/server';
+import { CreditReason, type Tables } from '@extrovertai/shared';
 
 type UserProfile = Tables<'users'>;
+
+const DEFAULT_SIGNUP_CREDITS = 100;
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(
+    private readonly supabase: SupabaseService,
+    private readonly billing: BillingService,
+    private readonly config: ConfigService,
+  ) {}
 
   /**
    * Returns the user's profile row, creating it on first call. Idempotent:
@@ -44,6 +57,8 @@ export class UsersService {
       .single();
 
     if (!inserted.error && inserted.data) {
+      // Brand-new account → grant starter credits exactly once (best-effort).
+      await this.grantSignupBonus(userId);
       return inserted.data;
     }
 
@@ -62,5 +77,21 @@ export class UsersService {
       `Failed to create profile for ${userId}: ${inserted.error?.message ?? 'unknown error'}`,
     );
     throw new InternalServerErrorException('Could not load or create your profile.');
+  }
+
+  /** One-time starter credits for a brand-new account. Never blocks signup. */
+  private async grantSignupBonus(userId: string): Promise<void> {
+    const raw = this.config.get<string>('SIGNUP_CREDITS');
+    const amount = raw === undefined ? DEFAULT_SIGNUP_CREDITS : Number(raw);
+    if (!Number.isFinite(amount) || amount <= 0) return;
+    try {
+      // ref_id is a uuid column (references an action id); a signup bonus has no
+      // such id, so it stays null. The `purchase` reason marks it as granted credit.
+      await this.billing.addCredits(userId, amount, CreditReason.Purchase, null);
+      this.logger.log(`Granted ${amount} signup credits to ${userId}.`);
+    } catch (err) {
+      // Best-effort: a failed grant must not break profile creation / login.
+      this.logger.warn(`Signup credit grant failed for ${userId}: ${(err as Error).message}`);
+    }
   }
 }
