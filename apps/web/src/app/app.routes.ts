@@ -50,5 +50,10 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./pages/enrich/enrich').then((m) => m.Enrich),
   },
+  {
+    path: 'draft',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/draft/draft').then((m) => m.Draft),
+  },
   { path: '**', redirectTo: '' },
 ];

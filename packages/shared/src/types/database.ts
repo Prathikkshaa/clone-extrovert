@@ -439,7 +439,10 @@ export type Database = {
           state: Database['public']['Enums']['message_state'];
           thread_id: string | null;
           sent_at: string | null;
+          subject: string | null;
           body: string | null;
+          step_order: number;
+          approved: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -451,7 +454,10 @@ export type Database = {
           state?: Database['public']['Enums']['message_state'];
           thread_id?: string | null;
           sent_at?: string | null;
+          subject?: string | null;
           body?: string | null;
+          step_order?: number;
+          approved?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -463,7 +469,10 @@ export type Database = {
           state?: Database['public']['Enums']['message_state'];
           thread_id?: string | null;
           sent_at?: string | null;
+          subject?: string | null;
           body?: string | null;
+          step_order?: number;
+          approved?: boolean;
           created_at?: string;
           updated_at?: string;
         };

@@ -38,6 +38,8 @@
 - `enrichment/contact-extract.ts` — **pure** email/phone helpers: `extractEmails`/`extractPhones`/`rankEmails`/`pickPhone`. Ranking de-prioritizes `noreply@`/generic, filters image-traps/placeholders; never fabricates. (File 08)
 - `enrichment/enrichment.service.ts` + `enrichment.module.ts` — `EnrichmentService.enrichLead(userId, leadId)`: the per-lead enrichment unit — Place details (reviews, cached by place_id) + site crawl + email/phone extract + reviews split + "why reach out" hook (one LLM call, deterministic fallback). Metered via one `withCreditGate('enrichment', leadId)`; idempotent (skips already-`complete`). (File 08)
 - `enrichment/enrichment.constants.ts` — `ENRICHMENT_QUEUE` + `EnrichLeadJob` (queue contract shared by api/worker).
+- `drafting/drafting.service.ts` + `drafting.module.ts` — `DraftingService.draftForLead(userId, leadId)`: builds a grounded prompt from `company_profiles` + the lead's hook/reviews → ONE LLM call → a 3-message sequence (email + 2 follow-ups). Metered via one `withCreditGate('draft', leadId)`; idempotent (skips leads that already have holding-area drafts); `deleteDrafts` supports regenerate. Honesty guardrail in the prompt (never fabricate). (File 09)
+- `drafting/drafting.constants.ts` — `DRAFTING_QUEUE` + `DraftLeadJob` + `SEQUENCE_STEPS` (step/label/waitDays).
 
 ## apps/api (`src/`)
 - `main.ts` — bootstrap: creates the HTTP app, global ValidationPipe, reads `API_PORT` from `.env`.
@@ -52,6 +54,7 @@
 - `credits/credits.controller.ts` — `GET /credits/balance` (balance + recent ledger, guarded). `credits.module.ts`.
 - `leads/leads.service.ts` — gated+cached+dedup Places search, lists, save-to-list, **`getListLeads`** (leads + enrichment fields for the File 08 screen). `leads.controller.ts` — `POST /leads/search`, `GET /lists`, `GET /lists/:id/leads`, `POST /leads/save-to-list` (guarded). `leads.dto.ts`, `leads.module.ts`.
 - `enrichment/enrichment.service.ts` — `EnrichmentApiService`: BullMQ **producer** (enqueue one job per lead) + upfront balance gate (enqueues only what's affordable, reports skipped) + status reads. `enrichment.controller.ts` — `POST /enrichment/enqueue`, `POST /enrichment/status` (guarded). `enrichment.dto.ts`, `enrichment.module.ts`. (File 08)
+- `drafting/drafting.service.ts` — `DraftingApiService`: BullMQ **producer** (bulk draft, balance-gated) + review queue (`byLeads` → drafts grouped per lead with the hook) + `edit` (one message) + `approve` (a lead's whole set) + `regenerate` (delete + re-enqueue). `drafting.controller.ts` — `POST /drafts/enqueue|by-leads|approve|regenerate`, `PUT /drafts/:id` (guarded). `drafting.dto.ts`, `drafting.module.ts`. (File 09)
 - Config: `nest-cli.json`, `tsconfig.json`, `tsconfig.build.json`.
 
 ## apps/worker (`src/`)
@@ -59,6 +62,7 @@
 - `app.module.ts` — root module: global `ConfigModule` (repo-root `.env`) + `QueueModule` + `EnrichmentWorkerModule`.
 - `queue/queue.module.ts`, `queue/queue.service.ts` — BullMQ wiring (Upstash). `metering-test` queue + worker demonstrating `withCreditGate`; warns + runs without queues when `REDIS_URL` is unset.
 - `enrichment/enrichment.worker.ts` + `enrichment.worker.module.ts` — `EnrichmentWorker`: BullMQ **consumer** on `ENRICHMENT_QUEUE` (concurrency 3) → `EnrichmentService.enrichLead`. Guarded by `REDIS_URL`. (File 08)
+- `drafting/drafting.worker.ts` + `drafting.worker.module.ts` — `DraftingWorker`: BullMQ **consumer** on `DRAFTING_QUEUE` (concurrency 2 — LLM rate limits) → `DraftingService.draftForLead`. (File 09)
 - Config: `nest-cli.json`, `tsconfig.json`, `tsconfig.build.json`.
 
 ## apps/web (`src/`)
@@ -74,6 +78,7 @@
 - `app/core/company-profile.service.ts` — client for onboarding/company-profile. `app/core/theme.service.ts` — applies/reverts the brand accent token. `app/core/credits.service.ts` — reads credit balance + recent ledger (home header chip). `app/core/leads.service.ts` — lead search + lists client. `app/core/enrichment.service.ts` — enrichment client (list leads, enqueue, status poll). (File 08)
 - `app/pages/search/*` — protected Find-leads screen (search form, filters, results cards, save-to-list, "Enrich them →" link).
 - `app/pages/enrich/*` — protected Enrich-leads screen: pick a list, enrich selected/all, **per-lead progress poll** (non-blocking), cards show email-or-"no email found", phone, positive/negative reviews, and the **hook as a highlighted callout**; cost shown before, balance chip updates after. (File 08)
+- `app/core/drafting.service.ts` — drafting client (enqueue, by-leads, edit, approve, regenerate). `app/pages/draft/*` — protected **keyboard-first review queue**: pick list, bulk-generate, one lead at a time with the **hook beside the draft**, step tabs (email + 2 follow-ups), inline edit (saved on blur), approve/skip/regenerate with keyboard shortcuts (Enter/→ approve, ↓ skip, ↑ back, R regenerate, 1/2/3 step), per-lead progress poll, failed-draft retry. (File 09)
 - `app/pages/landing/landing.*` — landing (CTA → /signup, /login). `app/pages/login/*`, `app/pages/signup/*` — auth screens. `app/pages/home/*` — protected home (email + `GET /me`; applies theme; links to onboarding/settings/mailboxes). `app/pages/mailboxes/*` — Connect-your-mailbox. `app/pages/onboarding/*` — website-to-profile flow (URL → skeleton → editable review + manual path). `app/pages/settings/*` — theme reset.
 - `environments/environment.ts` — **generated** (gitignored) public client config; `environment.example.ts` — committed template. Generator: `scripts/gen-web-env.mjs`.
 - `styles.css` — global styles + design tokens (CSS custom properties; dark-mode block).

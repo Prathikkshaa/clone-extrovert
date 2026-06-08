@@ -1,0 +1,172 @@
+<main class="min-h-screen bg-canvas text-ink px-4 py-10">
+  <div class="mx-auto max-w-2xl">
+    <header class="flex items-center justify-between">
+      <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
+      <div class="flex items-center gap-3">
+        @if (balance() !== null) {
+          <span class="rounded-full border border-line bg-surface px-3 py-1 text-sm font-medium text-ink"
+            [class.text-danger]="balance()! <= 0" title="Credit balance">{{ balance() }} credits</span>
+        }
+        <a routerLink="/home" class="text-sm text-accent hover:text-accent-strong">Back to home</a>
+      </div>
+    </header>
+
+    <section class="mt-8">
+      <h1 class="text-heading-lg text-ink">Write emails</h1>
+      <p class="mt-2 text-body text-muted">
+        Personalized for each lead — in your voice, using their hook. Review fast, edit, approve.
+      </p>
+
+      <!-- List picker -->
+      <div class="mt-6">
+        <label for="list" class="block text-sm font-medium text-ink">Pick a list</label>
+        <select id="list" name="list" [(ngModel)]="selectedListId" (ngModelChange)="loadList()"
+          class="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+          <option value="">Choose a saved list…</option>
+          @for (l of lists(); track l.id) {
+            <option [value]="l.id">{{ l.name }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Generate bar -->
+      @if (selectedListId && (todo().length > 0 || busyGenerating())) {
+        <div class="mt-5 flex flex-wrap items-center gap-3 rounded-lg border border-line bg-surface p-3">
+          @if (todo().length > 0) {
+            <button type="button" (click)="generateAll()" [disabled]="busyGenerating()"
+              class="rounded-md bg-accent px-3 py-1.5 text-sm text-white transition-colors duration-200 hover:bg-accent-strong disabled:opacity-60">
+              Write drafts ({{ todo().length }})
+            </button>
+            <span class="text-sm text-muted">Each lead uses {{ costPer }} credit.</span>
+          }
+          @if (busyGenerating()) {
+            <span class="text-sm text-muted">Writing drafts…</span>
+            <div class="h-3 w-24 animate-pulse rounded bg-line"></div>
+          }
+        </div>
+      }
+
+      @if (message(); as m) {
+        <p class="mt-4 text-sm"
+          [class.text-muted]="m.kind === 'info'" [class.text-warning]="m.kind === 'warn'"
+          [class.text-danger]="m.kind === 'error'" role="status">{{ m.text }}</p>
+      }
+
+      @if (loading()) {
+        <div class="mt-6 space-y-3">
+          @for (i of [1,2,3]; track i) { <div class="h-40 w-full animate-pulse rounded-lg bg-line"></div> }
+        </div>
+      }
+
+      <!-- Empty states -->
+      @if (!loading() && !selectedListId) {
+        <p class="mt-8 text-body text-muted">
+          Pick a list to write emails for. Don’t have one?
+          <a routerLink="/search" class="text-accent hover:text-accent-strong">Find leads →</a>
+        </p>
+      }
+      @if (!loading() && selectedListId && todo().length === 0 && review().length === 0 && !busyGenerating()) {
+        <p class="mt-8 text-body text-muted">
+          This list has no leads yet.
+          <a routerLink="/enrich" class="text-accent hover:text-accent-strong">Enrich some leads →</a>
+        </p>
+      }
+
+      <!-- Review queue -->
+      @if (current(); as lead) {
+        <div class="mt-6 rounded-lg border border-line bg-surface p-5">
+          <div class="flex items-center justify-between text-sm text-muted">
+            <span>Lead {{ index() + 1 }} of {{ review().length }}</span>
+            <span>{{ remaining() }} left to review</span>
+          </div>
+
+          <div class="mt-2 flex items-center gap-2">
+            <h2 class="text-heading-md text-ink">{{ lead.name }}</h2>
+            @if (lead.approved) {
+              <span class="rounded-full bg-canvas px-2 py-0.5 text-xs font-medium text-positive">✓ Approved</span>
+            }
+          </div>
+
+          <!-- The hook, beside the draft, so the user sees WHY -->
+          @if (lead.hook) {
+            <div class="mt-2 rounded-md border-l-4 border-accent bg-canvas px-3 py-2">
+              <p class="text-xs font-medium uppercase tracking-wide text-accent">Why reach out</p>
+              <p class="mt-0.5 text-sm text-ink">{{ lead.hook }}</p>
+            </div>
+          }
+
+          <!-- Step tabs -->
+          <div class="mt-4 flex gap-2">
+            @for (s of [1,2,3]; track s) {
+              <button type="button" (click)="setStep(s)"
+                class="rounded-md px-3 py-1.5 text-sm transition-colors duration-200"
+                [class.bg-accent]="step() === s" [class.text-white]="step() === s"
+                [class.border]="step() !== s" [class.border-line]="step() !== s"
+                [class.text-ink]="step() !== s" [class.hover:bg-canvas]="step() !== s">
+                {{ stepLabel(s) }}
+              </button>
+            }
+          </div>
+
+          @if (activeDraft(); as d) {
+            <div class="mt-4">
+              <label class="block text-sm font-medium text-ink">Subject</label>
+              <input name="subject" [(ngModel)]="subject" (blur)="saveEdit()"
+                class="mt-1 w-full rounded-md border border-line bg-canvas px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent" />
+            </div>
+            <div class="mt-3">
+              <label class="block text-sm font-medium text-ink">Message</label>
+              <textarea name="body" [(ngModel)]="body" (blur)="saveEdit()" rows="9"
+                class="mt-1 w-full resize-y rounded-md border border-line bg-canvas px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"></textarea>
+            </div>
+          } @else {
+            <p class="mt-4 text-sm text-muted">No draft for this step.</p>
+          }
+
+          <!-- Actions + keyboard hints -->
+          <div class="mt-4 flex flex-wrap items-center gap-3">
+            <button type="button" (click)="approveCurrent()"
+              class="rounded-md bg-accent px-4 py-2 text-sm text-white transition-colors duration-200 hover:bg-accent-strong">
+              Approve &amp; next
+            </button>
+            <button type="button" (click)="goNext()"
+              class="rounded-md border border-line px-3 py-2 text-sm text-ink transition-colors duration-200 hover:bg-canvas">
+              Skip
+            </button>
+            <button type="button" (click)="regenerateCurrent()"
+              class="rounded-md border border-line px-3 py-2 text-sm text-ink transition-colors duration-200 hover:bg-canvas">
+              Regenerate
+            </button>
+          </div>
+          <p class="mt-3 text-xs text-muted">
+            Keys: <span class="text-ink">Enter</span>/<span class="text-ink">→</span> approve ·
+            <span class="text-ink">↓</span> skip · <span class="text-ink">↑</span> back ·
+            <span class="text-ink">R</span> regenerate · <span class="text-ink">1/2/3</span> switch step
+          </p>
+        </div>
+      } @else if (!loading() && review().length > 0) {
+        <p class="mt-6 rounded-lg border border-line bg-surface p-5 text-body text-positive">
+          🎉 All drafts reviewed. Approved drafts are ready to send.
+        </p>
+      }
+
+      <!-- Failed generation -->
+      @if (failed().length > 0) {
+        <div class="mt-6 rounded-lg border border-line bg-surface p-4">
+          <p class="text-sm text-danger">Some leads didn’t finish — nothing was charged for those.</p>
+          <ul class="mt-2 space-y-2">
+            @for (f of failed(); track f.leadId) {
+              <li class="flex items-center justify-between gap-3 text-sm">
+                <span class="truncate text-ink">{{ f.name }}</span>
+                <button type="button" (click)="retryFailed(f)"
+                  class="shrink-0 rounded-md border border-line px-3 py-1 text-sm text-ink hover:bg-canvas">
+                  Regenerate
+                </button>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </section>
+  </div>
+</main>

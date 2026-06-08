@@ -28,3 +28,6 @@ export * from './enrichment/contact-extract';
 export * from './enrichment/enrichment.constants';
 export * from './enrichment/enrichment.service';
 export * from './enrichment/enrichment.module';
+export * from './drafting/drafting.constants';
+export * from './drafting/drafting.service';
+export * from './drafting/drafting.module';
