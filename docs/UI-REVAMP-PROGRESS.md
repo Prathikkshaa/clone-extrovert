@@ -110,4 +110,4 @@
   the checklist with correct checks/strike-through and the "what's next" banner correctly
   tracking the first incomplete step (mailing address @ 3/5, company profile @ 2/5); breadcrumb
   "Home" shows in the topbar (ui-page-header→BreadcrumbService working); no console errors.
-  Commit: <pending>.
+  Commit: 423556d.

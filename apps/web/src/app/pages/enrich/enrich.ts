@@ -1,20 +1,29 @@
-// Enrichment screen (File 08) — the core value screen.
+// Enrichment screen (File 08; File 16 shell + kit) — the core value screen.
 // WHY: turns saved leads into actionable ones. Pick a list, enrich selected/all,
 // watch per-lead progress (non-blocking), and read each enriched card: best email
 // (or an honest "no email found"), phone, a positive/negative reviews summary, and
-// the "why reach out" hook as a highlighted callout. Cost is shown before; the
-// balance updates as jobs commit. Plain, honest copy for not-found/partial cases.
+// the "why reach out" hook as a highlighted callout. The credit chip + transient
+// status now live in the shell/toasts. Enrichment in-flight logic is unchanged
+// (the inFlight set drives button-disable + polling — see PROGRESS notes).
 import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { APP_NAME, CREDIT_COSTS } from '@extrovertai/shared';
+import { CREDIT_COSTS } from '@extrovertai/shared';
 import { LeadsApiService, type LeadList } from '../../core/leads.service';
-import { CreditsApiService } from '../../core/credits.service';
 import {
   EnrichmentApiService,
   type EnrichedLead,
   type ParsedReviews,
 } from '../../core/enrichment.service';
+import { Button } from '../../ui/button/button';
+import { Card } from '../../ui/card/card';
+import { EmptyState } from '../../ui/empty-state/empty-state';
+import { Field } from '../../ui/field/field';
+import { Icon } from '../../ui/icon/icon';
+import { PageHeader } from '../../ui/page-header/page-header';
+import { PipelineStepper } from '../../ui/pipeline-stepper/pipeline-stepper';
+import { Skeleton } from '../../ui/skeleton/skeleton';
+import { ToastService } from '../../ui/toast/toast.service';
 
 const POLL_MS = 2500;
 // Safety cap so a hung job never leaves the buttons permanently disabled.
@@ -22,15 +31,25 @@ const POLL_MAX_MS = 3 * 60 * 1000;
 
 @Component({
   selector: 'app-enrich',
-  imports: [FormsModule, RouterLink],
+  imports: [
+    FormsModule,
+    RouterLink,
+    Button,
+    Card,
+    EmptyState,
+    Field,
+    Icon,
+    PageHeader,
+    PipelineStepper,
+    Skeleton,
+  ],
   templateUrl: './enrich.html',
 })
 export class Enrich implements OnDestroy {
   private readonly leadsApi = inject(LeadsApiService);
   private readonly api = inject(EnrichmentApiService);
-  private readonly credits = inject(CreditsApiService);
+  private readonly toast = inject(ToastService);
 
-  protected readonly appName = APP_NAME;
   protected readonly costPer = CREDIT_COSTS.enrichment;
 
   protected readonly lists = signal<LeadList[]>([]);
@@ -39,10 +58,6 @@ export class Enrich implements OnDestroy {
   protected readonly leads = signal<EnrichedLead[]>([]);
   protected readonly loading = signal(false);
   protected readonly selected = signal<Set<string>>(new Set());
-  protected readonly balance = signal<number | null>(null);
-  protected readonly message = signal<{ kind: 'info' | 'warn' | 'error'; text: string } | null>(
-    null,
-  );
 
   private pollTimer: ReturnType<typeof setInterval> | null = null;
   // Lead ids for the enrichment batch currently in flight (this session). Button
@@ -63,9 +78,8 @@ export class Enrich implements OnDestroy {
   constructor() {
     this.leadsApi.getLists().subscribe({
       next: (l) => this.lists.set(l),
-      error: () => this.message.set({ kind: 'error', text: 'Could not load your lists.' }),
+      error: () => this.toast.error('Could not load your lists.'),
     });
-    this.refreshBalance();
   }
 
   ngOnDestroy(): void {
@@ -73,7 +87,6 @@ export class Enrich implements OnDestroy {
   }
 
   loadList(): void {
-    this.message.set(null);
     this.selected.set(new Set());
     if (!this.selectedListId) {
       this.leads.set([]);
@@ -91,7 +104,7 @@ export class Enrich implements OnDestroy {
       },
       error: () => {
         this.loading.set(false);
-        this.message.set({ kind: 'error', text: 'Could not load this list’s leads.' });
+        this.toast.error('Could not load this list’s leads.');
       },
     });
   }
@@ -117,7 +130,7 @@ export class Enrich implements OnDestroy {
       this.pendingLeads().some((l) => l.id === id),
     );
     if (ids.length === 0) {
-      this.message.set({ kind: 'warn', text: 'Select at least one lead that still needs enriching.' });
+      this.toast.warn('Select at least one lead that still needs enriching.');
       return;
     }
     this.enqueue(ids);
@@ -126,7 +139,7 @@ export class Enrich implements OnDestroy {
   enrichAll(): void {
     const ids = this.pendingLeads().map((l) => l.id);
     if (ids.length === 0) {
-      this.message.set({ kind: 'info', text: 'Every lead in this list is already enriched.' });
+      this.toast.info('Every lead in this list is already enriched.');
       return;
     }
     this.enqueue(ids);
@@ -150,33 +163,24 @@ export class Enrich implements OnDestroy {
   }
 
   private enqueue(ids: string[]): void {
-    this.message.set(null);
     this.api.enqueue(ids).subscribe({
       next: (res) => {
         if (!res.ok) {
           if (res.reason === 'out_of_credits') {
-            this.message.set({
-              kind: 'warn',
-              text: 'You’re out of credits. Top up to enrich these leads — nothing was charged.',
-            });
+            this.toast.warn(
+              'You’re out of credits. Top up to enrich these leads — nothing was charged.',
+            );
           } else {
-            this.message.set({
-              kind: 'error',
-              text: 'Enrichment is unavailable right now. Please try again shortly.',
-            });
+            this.toast.error('Enrichment is unavailable right now. Please try again shortly.');
           }
           return;
         }
         if (res.reason === 'partial_credits') {
-          this.message.set({
-            kind: 'warn',
-            text: `Started ${res.enqueued} lead${res.enqueued === 1 ? '' : 's'}; ${res.skipped} skipped — you ran out of credits. Top up to finish the rest.`,
-          });
+          this.toast.warn(
+            `Started ${res.enqueued} lead${res.enqueued === 1 ? '' : 's'}; ${res.skipped} skipped — you ran out of credits. Top up to finish the rest.`,
+          );
         } else {
-          this.message.set({
-            kind: 'info',
-            text: `Enriching ${res.enqueued} lead${res.enqueued === 1 ? '' : 's'}…`,
-          });
+          this.toast.info(`Enriching ${res.enqueued} lead${res.enqueued === 1 ? '' : 's'}…`);
         }
         // Track exactly the leads the server actually enqueued (partial-credit
         // batches enqueue only what's affordable).
@@ -191,8 +195,7 @@ export class Enrich implements OnDestroy {
         this.selected.set(new Set());
         this.beginBatch(queued);
       },
-      error: () =>
-        this.message.set({ kind: 'error', text: 'Could not start enrichment. Please try again.' }),
+      error: () => this.toast.error('Could not start enrichment. Please try again.'),
     });
   }
 
@@ -244,7 +247,6 @@ export class Enrich implements OnDestroy {
   private endBatch(): void {
     this.stopPolling();
     this.working.set(false);
-    this.refreshBalance();
   }
 
   private stopPolling(): void {
@@ -252,14 +254,5 @@ export class Enrich implements OnDestroy {
       clearInterval(this.pollTimer);
       this.pollTimer = null;
     }
-  }
-
-  private refreshBalance(): void {
-    this.credits.balance().subscribe({
-      next: (b) => this.balance.set(b.balance),
-      error: () => {
-        /* balance chip is non-critical */
-      },
-    });
   }
 }

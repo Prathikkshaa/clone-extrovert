@@ -1,173 +1,238 @@
-<main class="min-h-screen bg-canvas text-ink px-4 py-10">
-  <div class="mx-auto max-w-2xl">
-    <header class="flex items-center justify-between">
-      <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
-      <div class="flex items-center gap-3">
-        @if (balance() !== null) {
-          <span class="rounded-full border border-line bg-surface px-3 py-1 text-sm font-medium text-ink"
-            [class.text-danger]="balance()! <= 0" title="Credit balance">{{ balance() }} credits</span>
+<div class="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+  <ui-page-header
+    title="Write emails"
+    subtitle="Personalised for each lead — in your voice, using their hook. Review fast, edit, approve."
+    [breadcrumb]="[{ label: 'Home', link: '/home' }, { label: 'Write' }]"
+  >
+    @if (current()) {
+      <button ui-button actions variant="primary" iconRight="arrow-right" (click)="approveCurrent()">
+        Approve &amp; next
+      </button>
+    } @else if (todo().length > 0) {
+      <button
+        ui-button
+        actions
+        variant="primary"
+        iconLeft="pen-line"
+        [loading]="busyGenerating()"
+        (click)="generateAll()"
+      >
+        Write drafts ({{ todo().length }})
+      </button>
+    }
+  </ui-page-header>
+
+  <pipeline-stepper current="write" class="mt-6" />
+
+  <!-- List picker -->
+  <ui-card class="mt-6">
+    <ui-field label="Pick a list" for="list">
+      <select
+        id="list"
+        name="list"
+        class="ui-select"
+        [(ngModel)]="selectedListId"
+        (ngModelChange)="loadList()"
+      >
+        <option value="">Choose a saved list…</option>
+        @for (l of lists(); track l.id) {
+          <option [value]="l.id">{{ l.name }}</option>
         }
-        <a routerLink="/send" class="text-sm text-accent hover:text-accent-strong">Start sending</a>
-        <a routerLink="/home" class="text-sm text-accent hover:text-accent-strong">Back to home</a>
-      </div>
-    </header>
+      </select>
+    </ui-field>
 
-    <section class="mt-8">
-      <h1 class="text-heading-lg text-ink">Write emails</h1>
-      <p class="mt-2 text-body text-muted">
-        Personalized for each lead — in your voice, using their hook. Review fast, edit, approve.
+    @if (selectedListId && (todo().length > 0 || busyGenerating())) {
+      <div class="mt-4 flex flex-wrap items-center gap-3 border-t border-line pt-4">
+        @if (todo().length > 0) {
+          <span class="text-sm text-muted">Each lead uses {{ costPer }} credit.</span>
+        }
+        @if (busyGenerating()) {
+          <span class="text-sm text-muted">Writing drafts…</span>
+          <ui-skeleton width="6rem" />
+        }
+      </div>
+    }
+  </ui-card>
+
+  @if (loading()) {
+    <div class="mt-6 space-y-3">
+      @for (i of [1, 2, 3]; track i) {
+        <ui-card><ui-skeleton [lines]="4" /></ui-card>
+      }
+    </div>
+  }
+
+  <!-- Empty states -->
+  @if (!loading() && !selectedListId) {
+    <div class="mt-6">
+      <ui-empty-state
+        icon="list"
+        title="Pick a list to write for"
+        message="Choose a list with enriched leads, or find new ones first."
+      >
+        <a routerLink="/search">
+          <button ui-button variant="primary" iconLeft="search">Find leads</button>
+        </a>
+      </ui-empty-state>
+    </div>
+  }
+  @if (
+    !loading() &&
+    selectedListId &&
+    todo().length === 0 &&
+    review().length === 0 &&
+    !busyGenerating()
+  ) {
+    <div class="mt-6">
+      <ui-empty-state
+        icon="sparkles"
+        title="No enriched leads here yet"
+        message="Enrich the leads in this list so we can write in their context."
+      >
+        <a routerLink="/enrich">
+          <button ui-button variant="primary" iconLeft="sparkles">Enrich leads</button>
+        </a>
+      </ui-empty-state>
+    </div>
+  }
+
+  <!-- Review queue -->
+  @if (current(); as lead) {
+    <ui-card class="mt-6">
+      <div class="flex items-center justify-between text-sm text-muted">
+        <span>Lead {{ index() + 1 }} of {{ review().length }}</span>
+        <span>{{ remaining() }} left to review</span>
+      </div>
+
+      <div class="mt-2 flex items-center gap-2">
+        <h2 class="text-heading-md text-ink">{{ lead.name }}</h2>
+        @if (lead.approved) {
+          <ui-status-badge status="complete" text="Approved" />
+        }
+      </div>
+
+      <!-- The hook, beside the draft, so the user sees WHY -->
+      @if (lead.hook) {
+        <div class="mt-2 rounded-md border-l-4 border-accent bg-accent-soft px-3 py-2">
+          <p class="text-xs font-medium uppercase tracking-wide text-accent">Why reach out</p>
+          <p class="mt-0.5 text-sm text-ink">{{ lead.hook }}</p>
+        </div>
+      }
+
+      <!-- Step tabs -->
+      <div class="mt-4 flex gap-2">
+        @for (s of [1, 2, 3]; track s) {
+          <button
+            type="button"
+            (click)="setStep(s)"
+            class="rounded-md px-3 py-1.5 text-sm transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            [class.bg-accent]="step() === s"
+            [class.text-white]="step() === s"
+            [class.border]="step() !== s"
+            [class.border-line]="step() !== s"
+            [class.text-ink]="step() !== s"
+            [class.hover:bg-canvas]="step() !== s"
+          >
+            {{ stepLabel(s) }}
+          </button>
+        }
+      </div>
+
+      @if (activeDraft(); as d) {
+        <div class="mt-4">
+          <ui-field label="Subject" for="subject">
+            <input
+              id="subject"
+              name="subject"
+              class="ui-input"
+              [(ngModel)]="subject"
+              (blur)="saveEdit()"
+            />
+          </ui-field>
+        </div>
+        <div class="mt-3">
+          <ui-field label="Message" for="body">
+            <textarea
+              id="body"
+              name="body"
+              class="ui-textarea"
+              rows="9"
+              [(ngModel)]="body"
+              (blur)="saveEdit()"
+            ></textarea>
+          </ui-field>
+        </div>
+      } @else {
+        <p class="mt-4 text-sm text-muted">No draft for this step.</p>
+      }
+
+      <!-- Actions + keyboard hints -->
+      <div class="mt-4 flex flex-wrap items-center gap-2">
+        <button ui-button variant="primary" iconRight="arrow-right" (click)="approveCurrent()">
+          Approve &amp; next
+        </button>
+        <button ui-button variant="ghost" (click)="goNext()">Skip</button>
+        <button ui-button variant="ghost" iconLeft="refresh-cw" (click)="regenerateCurrent()">
+          Regenerate
+        </button>
+      </div>
+      <p class="mt-3 text-xs text-muted">
+        Keys: <span class="text-ink">Enter</span>/<span class="text-ink">→</span> approve ·
+        <span class="text-ink">↓</span> skip · <span class="text-ink">↑</span> back ·
+        <span class="text-ink">R</span> regenerate · <span class="text-ink">1/2/3</span> switch step
       </p>
+    </ui-card>
 
-      <!-- List picker -->
-      <div class="mt-6">
-        <label for="list" class="block text-sm font-medium text-ink">Pick a list</label>
-        <select id="list" name="list" [(ngModel)]="selectedListId" (ngModelChange)="loadList()"
-          class="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
-          <option value="">Choose a saved list…</option>
-          @for (l of lists(); track l.id) {
-            <option [value]="l.id">{{ l.name }}</option>
-          }
-        </select>
+    <!-- What's next -->
+    <div
+      class="mt-6 flex flex-col gap-3 rounded-lg bg-accent-soft p-4 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div class="flex items-start gap-3">
+        <ui-icon name="send" [size]="18" class="mt-0.5 shrink-0 text-accent" />
+        <div>
+          <p class="text-sm font-medium text-ink">Next: start sending</p>
+          <p class="text-sm text-muted">Send your approved emails on a safe, throttled schedule.</p>
+        </div>
       </div>
-
-      <!-- Generate bar -->
-      @if (selectedListId && (todo().length > 0 || busyGenerating())) {
-        <div class="mt-5 flex flex-wrap items-center gap-3 rounded-lg border border-line bg-surface p-3">
-          @if (todo().length > 0) {
-            <button type="button" (click)="generateAll()" [disabled]="busyGenerating()"
-              class="rounded-md bg-accent px-3 py-1.5 text-sm text-white transition-colors duration-200 hover:bg-accent-strong disabled:opacity-60">
-              Write drafts ({{ todo().length }})
-            </button>
-            <span class="text-sm text-muted">Each lead uses {{ costPer }} credit.</span>
-          }
-          @if (busyGenerating()) {
-            <span class="text-sm text-muted">Writing drafts…</span>
-            <div class="h-3 w-24 animate-pulse rounded bg-line"></div>
-          }
+      <a routerLink="/send" class="shrink-0">
+        <button ui-button variant="primary" iconRight="arrow-right">Start sending</button>
+      </a>
+    </div>
+  } @else if (!loading() && review().length > 0) {
+    <ui-card class="mt-6">
+      <div class="flex items-center gap-3">
+        <span
+          class="flex h-9 w-9 items-center justify-center rounded-lg bg-positive-soft text-positive"
+        >
+          <ui-icon name="circle-check" [size]="20" />
+        </span>
+        <div>
+          <p class="text-heading-sm text-ink">All drafts reviewed</p>
+          <p class="text-sm text-muted">Approved drafts are ready to send.</p>
         </div>
-      }
+        <a routerLink="/send" class="ml-auto">
+          <button ui-button variant="primary" iconRight="arrow-right">Start sending</button>
+        </a>
+      </div>
+    </ui-card>
+  }
 
-      @if (message(); as m) {
-        <p class="mt-4 text-sm"
-          [class.text-muted]="m.kind === 'info'" [class.text-warning]="m.kind === 'warn'"
-          [class.text-danger]="m.kind === 'error'" role="status">{{ m.text }}</p>
-      }
-
-      @if (loading()) {
-        <div class="mt-6 space-y-3">
-          @for (i of [1,2,3]; track i) { <div class="h-40 w-full animate-pulse rounded-lg bg-line"></div> }
-        </div>
-      }
-
-      <!-- Empty states -->
-      @if (!loading() && !selectedListId) {
-        <p class="mt-8 text-body text-muted">
-          Pick a list to write emails for. Don’t have one?
-          <a routerLink="/search" class="text-accent hover:text-accent-strong">Find leads →</a>
-        </p>
-      }
-      @if (!loading() && selectedListId && todo().length === 0 && review().length === 0 && !busyGenerating()) {
-        <p class="mt-8 text-body text-muted">
-          This list has no leads yet.
-          <a routerLink="/enrich" class="text-accent hover:text-accent-strong">Enrich some leads →</a>
-        </p>
-      }
-
-      <!-- Review queue -->
-      @if (current(); as lead) {
-        <div class="mt-6 rounded-lg border border-line bg-surface p-5">
-          <div class="flex items-center justify-between text-sm text-muted">
-            <span>Lead {{ index() + 1 }} of {{ review().length }}</span>
-            <span>{{ remaining() }} left to review</span>
-          </div>
-
-          <div class="mt-2 flex items-center gap-2">
-            <h2 class="text-heading-md text-ink">{{ lead.name }}</h2>
-            @if (lead.approved) {
-              <span class="rounded-full bg-canvas px-2 py-0.5 text-xs font-medium text-positive">✓ Approved</span>
-            }
-          </div>
-
-          <!-- The hook, beside the draft, so the user sees WHY -->
-          @if (lead.hook) {
-            <div class="mt-2 rounded-md border-l-4 border-accent bg-canvas px-3 py-2">
-              <p class="text-xs font-medium uppercase tracking-wide text-accent">Why reach out</p>
-              <p class="mt-0.5 text-sm text-ink">{{ lead.hook }}</p>
-            </div>
-          }
-
-          <!-- Step tabs -->
-          <div class="mt-4 flex gap-2">
-            @for (s of [1,2,3]; track s) {
-              <button type="button" (click)="setStep(s)"
-                class="rounded-md px-3 py-1.5 text-sm transition-colors duration-200"
-                [class.bg-accent]="step() === s" [class.text-white]="step() === s"
-                [class.border]="step() !== s" [class.border-line]="step() !== s"
-                [class.text-ink]="step() !== s" [class.hover:bg-canvas]="step() !== s">
-                {{ stepLabel(s) }}
-              </button>
-            }
-          </div>
-
-          @if (activeDraft(); as d) {
-            <div class="mt-4">
-              <label class="block text-sm font-medium text-ink">Subject</label>
-              <input name="subject" [(ngModel)]="subject" (blur)="saveEdit()"
-                class="mt-1 w-full rounded-md border border-line bg-canvas px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent" />
-            </div>
-            <div class="mt-3">
-              <label class="block text-sm font-medium text-ink">Message</label>
-              <textarea name="body" [(ngModel)]="body" (blur)="saveEdit()" rows="9"
-                class="mt-1 w-full resize-y rounded-md border border-line bg-canvas px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"></textarea>
-            </div>
-          } @else {
-            <p class="mt-4 text-sm text-muted">No draft for this step.</p>
-          }
-
-          <!-- Actions + keyboard hints -->
-          <div class="mt-4 flex flex-wrap items-center gap-3">
-            <button type="button" (click)="approveCurrent()"
-              class="rounded-md bg-accent px-4 py-2 text-sm text-white transition-colors duration-200 hover:bg-accent-strong">
-              Approve &amp; next
-            </button>
-            <button type="button" (click)="goNext()"
-              class="rounded-md border border-line px-3 py-2 text-sm text-ink transition-colors duration-200 hover:bg-canvas">
-              Skip
-            </button>
-            <button type="button" (click)="regenerateCurrent()"
-              class="rounded-md border border-line px-3 py-2 text-sm text-ink transition-colors duration-200 hover:bg-canvas">
+  <!-- Failed generation -->
+  @if (failed().length > 0) {
+    <ui-card class="mt-6">
+      <p class="text-sm text-danger">
+        Some leads didn’t finish — nothing was charged for those.
+      </p>
+      <ul class="mt-3 space-y-2">
+        @for (f of failed(); track f.leadId) {
+          <li class="flex items-center justify-between gap-3 text-sm">
+            <span class="truncate text-ink">{{ f.name }}</span>
+            <button ui-button variant="secondary" size="sm" iconLeft="refresh-cw" (click)="retryFailed(f)">
               Regenerate
             </button>
-          </div>
-          <p class="mt-3 text-xs text-muted">
-            Keys: <span class="text-ink">Enter</span>/<span class="text-ink">→</span> approve ·
-            <span class="text-ink">↓</span> skip · <span class="text-ink">↑</span> back ·
-            <span class="text-ink">R</span> regenerate · <span class="text-ink">1/2/3</span> switch step
-          </p>
-        </div>
-      } @else if (!loading() && review().length > 0) {
-        <p class="mt-6 rounded-lg border border-line bg-surface p-5 text-body text-positive">
-          🎉 All drafts reviewed. Approved drafts are ready to send.
-        </p>
-      }
-
-      <!-- Failed generation -->
-      @if (failed().length > 0) {
-        <div class="mt-6 rounded-lg border border-line bg-surface p-4">
-          <p class="text-sm text-danger">Some leads didn’t finish — nothing was charged for those.</p>
-          <ul class="mt-2 space-y-2">
-            @for (f of failed(); track f.leadId) {
-              <li class="flex items-center justify-between gap-3 text-sm">
-                <span class="truncate text-ink">{{ f.name }}</span>
-                <button type="button" (click)="retryFailed(f)"
-                  class="shrink-0 rounded-md border border-line px-3 py-1 text-sm text-ink hover:bg-canvas">
-                  Regenerate
-                </button>
-              </li>
-            }
-          </ul>
-        </div>
-      }
-    </section>
-  </div>
-</main>
+          </li>
+        }
+      </ul>
+    </ui-card>
+  }
+</div>

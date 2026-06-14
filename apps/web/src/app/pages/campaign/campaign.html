@@ -1,97 +1,147 @@
-<main class="min-h-screen bg-canvas text-ink px-4 py-10">
-  <div class="mx-auto max-w-2xl">
-    <header class="flex items-center justify-between">
-      <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
-      <a routerLink="/send" class="text-sm text-accent hover:text-accent-strong">All campaigns</a>
-    </header>
+<div class="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+  @if (loading()) {
+    <ui-skeleton width="12rem" [height]="28" />
+    <ui-card class="mt-6"><ui-skeleton [lines]="4" /></ui-card>
+  }
 
-    @if (loading()) {
-      <div class="mt-8 space-y-3">
-        <div class="h-10 w-1/2 animate-pulse rounded bg-line"></div>
-        <div class="h-24 w-full animate-pulse rounded-lg bg-line"></div>
+  @if (loadFailed()) {
+    <ui-empty-state
+      icon="circle-alert"
+      title="Couldn’t load this campaign"
+      message="Something went wrong. Head back to your campaigns and try again."
+    >
+      <a routerLink="/send">
+        <button ui-button variant="primary" iconLeft="arrow-left">All campaigns</button>
+      </a>
+    </ui-empty-state>
+  }
+
+  @if (detail(); as d) {
+    <ui-page-header
+      title="Campaign"
+      [subtitle]="d.counts.sent + ' sent · ' + d.counts.replied + ' replied'"
+      [breadcrumb]="[
+        { label: 'Home', link: '/home' },
+        { label: 'Send', link: '/send' },
+        { label: 'Campaign' },
+      ]"
+    >
+      <div actions class="flex items-center gap-2">
+        <ui-status-badge [status]="d.status" />
+        @if (d.status === 'active') {
+          <button ui-button variant="secondary" iconLeft="pause" [loading]="pausing()" (click)="pause()">
+            Pause
+          </button>
+        } @else {
+          <button ui-button variant="primary" iconLeft="play" [loading]="pausing()" (click)="resume()">
+            Resume
+          </button>
+        }
+      </div>
+    </ui-page-header>
+
+    <!-- Counts -->
+    <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
+      <div class="rounded-lg border border-line bg-surface p-3 text-center">
+        <p class="text-xl font-medium text-ink">{{ d.counts.sent }}</p>
+        <p class="text-xs text-muted">Sent</p>
+      </div>
+      <div class="rounded-lg border border-line bg-surface p-3 text-center">
+        <p class="text-xl font-medium text-ink">{{ d.counts.queued }}</p>
+        <p class="text-xs text-muted">Queued</p>
+      </div>
+      <div class="rounded-lg border border-line bg-surface p-3 text-center">
+        <p class="text-xl font-medium text-positive">{{ d.counts.replied }}</p>
+        <p class="text-xs text-muted">Replied</p>
+      </div>
+      <div class="rounded-lg border border-line bg-surface p-3 text-center">
+        <p class="text-xl font-medium text-ink">{{ d.counts.stopped }}</p>
+        <p class="text-xs text-muted">Stopped</p>
+      </div>
+      <div class="rounded-lg border border-line bg-surface p-3 text-center">
+        <p class="text-xl font-medium text-danger">{{ d.counts.bounced }}</p>
+        <p class="text-xs text-muted">Bounced</p>
+      </div>
+    </div>
+
+    <!-- Paused explanation -->
+    @if (isPaused()) {
+      <ui-card class="mt-4">
+        <p class="text-sm font-medium text-ink">This campaign is paused. To keep sending:</p>
+        <ul class="mt-2 space-y-1 text-sm">
+          <li>
+            <a routerLink="/billing" class="text-accent hover:text-accent-strong">Top up credits</a>
+            if you’ve run out.
+          </li>
+          <li>
+            <a routerLink="/mailboxes" class="text-accent hover:text-accent-strong"
+              >Reconnect your mailbox</a
+            >
+            if it needs reauthorizing.
+          </li>
+          <li>
+            <a routerLink="/settings" class="text-accent hover:text-accent-strong"
+              >Add your mailing address</a
+            >
+            if it’s missing (required to send).
+          </li>
+        </ul>
+        <p class="mt-2 text-xs text-muted">Then press Resume — nothing is lost.</p>
+      </ui-card>
+    }
+
+    <!-- Today's capacity -->
+    @if (d.capacity.connectedCount > 0) {
+      <div class="mt-4 rounded-lg border border-line bg-surface p-3">
+        <p class="text-sm text-ink">
+          Today: <span class="font-medium">{{ d.capacity.totalUsed }}</span> sent of
+          <span class="font-medium">{{ d.capacity.totalCap }}</span> safe daily limit ({{
+            d.capacity.totalRemaining
+          }}
+          left today).
+        </p>
       </div>
     }
 
-    @if (error()) {
-      <p class="mt-8 text-sm text-danger" role="alert">{{ error() }}</p>
-    }
-
-    @if (detail(); as d) {
-      <section class="mt-8">
-        <div class="flex items-center justify-between gap-3">
-          <h1 class="text-heading-lg text-ink">Campaign</h1>
-          <div class="flex items-center gap-3">
-            <span class="text-sm"
-              [class.text-positive]="d.status === 'active'"
-              [class.text-warning]="d.status === 'paused'">{{ d.status }}</span>
-            @if (d.status === 'active') {
-              <button type="button" (click)="pause()" [disabled]="pausing()"
-                class="rounded-md border border-line px-3 py-1.5 text-sm text-ink hover:bg-surface disabled:opacity-60">Pause</button>
-            } @else {
-              <button type="button" (click)="resume()" [disabled]="pausing()"
-                class="rounded-md bg-accent px-3 py-1.5 text-sm text-white hover:bg-accent-strong disabled:opacity-60">Resume</button>
+    <!-- Per-lead states -->
+    <ul class="mt-6 space-y-2">
+      @for (lead of d.leads; track lead.leadId) {
+        <li class="rounded-lg border border-line bg-surface p-3">
+          <div class="flex items-center justify-between gap-2">
+            <p class="truncate text-body font-medium text-ink">{{ lead.name || lead.email }}</p>
+            <span class="shrink-0 truncate text-xs text-muted">{{ lead.email }}</span>
+          </div>
+          <div class="mt-2 flex flex-wrap items-center gap-2">
+            @for (s of lead.steps; track s.step_order) {
+              <span class="inline-flex items-center gap-1.5 text-xs text-muted">
+                {{ stepLabel(s.step_order) }}:
+                <ui-status-badge [status]="s.state" />
+                @if (s.sent_at) {
+                  <span>· {{ s.sent_at | date: 'MMM d' }}</span>
+                }
+              </span>
             }
           </div>
-        </div>
-
-        <!-- Counts -->
-        <div class="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted">
-          <span><span class="text-ink font-medium">{{ d.counts.sent }}</span> sent</span>
-          <span><span class="text-ink font-medium">{{ d.counts.queued }}</span> queued</span>
-          <span><span class="text-positive font-medium">{{ d.counts.replied }}</span> replied</span>
-          <span><span class="text-ink font-medium">{{ d.counts.stopped }}</span> stopped</span>
-          <span><span class="text-danger font-medium">{{ d.counts.bounced }}</span> bounced</span>
-        </div>
-
-        <!-- Paused explanation -->
-        @if (isPaused()) {
-          <div class="mt-4 rounded-lg border border-line bg-surface p-4">
-            <p class="text-sm text-ink">This campaign is paused. To keep sending:</p>
-            <ul class="mt-2 space-y-1 text-sm">
-              <li><a routerLink="/settings" class="text-accent hover:text-accent-strong">Top up credits</a> if you’ve run out.</li>
-              <li><a routerLink="/mailboxes" class="text-accent hover:text-accent-strong">Reconnect your mailbox</a> if it needs reauthorizing.</li>
-              <li><a routerLink="/settings" class="text-accent hover:text-accent-strong">Add your mailing address</a> if it’s missing (required to send).</li>
-            </ul>
-            <p class="mt-2 text-xs text-muted">Then press Resume — nothing is lost.</p>
-          </div>
-        }
-
-        <!-- Today's capacity -->
-        @if (d.capacity.connectedCount > 0) {
-          <div class="mt-4 rounded-lg border border-line bg-surface p-3">
-            <p class="text-sm text-ink">
-              Today: <span class="font-medium">{{ d.capacity.totalUsed }}</span> sent of
-              <span class="font-medium">{{ d.capacity.totalCap }}</span> safe daily limit
-              ({{ d.capacity.totalRemaining }} left today).
-            </p>
-          </div>
-        }
-
-        <!-- Per-lead states -->
-        <ul class="mt-6 space-y-2">
-          @for (lead of d.leads; track lead.leadId) {
-            <li class="rounded-lg border border-line bg-surface p-3">
-              <div class="flex items-center justify-between gap-2">
-                <p class="truncate text-body font-medium text-ink">{{ lead.name || lead.email }}</p>
-                <span class="shrink-0 truncate text-xs text-muted">{{ lead.email }}</span>
-              </div>
-              <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-                @for (s of lead.steps; track s.step_order) {
-                  <span [class]="stepClass(s.state)">
-                    {{ s.step_order === 1 ? 'Email' : 'Follow-up ' + (s.step_order - 1) }}: {{ s.state }}
-                    @if (s.sent_at) { · {{ s.sent_at | date: 'MMM d' }} }
-                  </span>
-                }
-              </div>
-              @for (s of lead.steps; track s.step_order) {
-                @if (s.send_error) {
-                  <p class="mt-1 text-xs text-danger">{{ s.send_error }}</p>
-                }
-              }
-            </li>
+          @for (s of lead.steps; track s.step_order) {
+            @if (s.send_error) {
+              <p class="mt-1 text-xs text-danger">{{ s.send_error }}</p>
+            }
           }
-        </ul>
-      </section>
-    }
-  </div>
-</main>
+        </li>
+      }
+    </ul>
+
+    <!-- What's next -->
+    <div
+      class="mt-6 flex flex-col gap-3 rounded-lg bg-accent-soft p-4 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div class="flex items-start gap-3">
+        <ui-icon name="inbox" [size]="18" class="mt-0.5 shrink-0 text-accent" />
+        <p class="text-sm font-medium text-ink">Replies show up in your inbox as they arrive.</p>
+      </div>
+      <a routerLink="/inbox" class="shrink-0">
+        <button ui-button variant="secondary" iconRight="arrow-right">Open inbox</button>
+      </a>
+    </div>
+  }
+</div>

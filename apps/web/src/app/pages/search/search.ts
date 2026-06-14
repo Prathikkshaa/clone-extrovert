@@ -1,26 +1,47 @@
-// Lead search screen (master-context §2/§7).
+// Lead search screen (master-context §2/§7; File 16 shell + kit).
 // WHY: the core discovery screen — industry/location + buying-signal filters,
-// a metered "Find leads" action, results as selectable cards, and save-to-list.
-// Plain copy, teaching empty states, friendly out-of-credits/busy handling.
+// a metered "Search leads" action, results as selectable cards, and save-to-list.
+// Renders inside the app shell with a ui-page-header, the pipeline stepper, kit
+// states, and a "what's next → Enrich" step. Behaviour/data wiring unchanged.
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { APP_NAME } from '@extrovertai/shared';
 import {
   LeadsApiService,
   type LeadCard,
   type LeadList,
 } from '../../core/leads.service';
+import { Button } from '../../ui/button/button';
+import { Card } from '../../ui/card/card';
+import { EmptyState } from '../../ui/empty-state/empty-state';
+import { Field } from '../../ui/field/field';
+import { Icon } from '../../ui/icon/icon';
+import { PageHeader } from '../../ui/page-header/page-header';
+import { PipelineStepper } from '../../ui/pipeline-stepper/pipeline-stepper';
+import { Skeleton } from '../../ui/skeleton/skeleton';
+import { StatusBadge } from '../../ui/status-badge/status-badge';
+import { ToastService } from '../../ui/toast/toast.service';
 
 @Component({
   selector: 'app-search',
-  imports: [FormsModule, RouterLink],
+  imports: [
+    FormsModule,
+    RouterLink,
+    Button,
+    Card,
+    EmptyState,
+    Field,
+    Icon,
+    PageHeader,
+    PipelineStepper,
+    Skeleton,
+    StatusBadge,
+  ],
   templateUrl: './search.html',
 })
 export class Search {
   private readonly api = inject(LeadsApiService);
-
-  protected readonly appName = APP_NAME;
+  private readonly toast = inject(ToastService);
 
   // form
   protected industry = '';
@@ -32,17 +53,17 @@ export class Search {
   protected readonly loading = signal(false);
   protected readonly searched = signal(false);
   protected readonly cached = signal(false);
-  protected readonly error = signal<string | null>(null);
   protected readonly results = signal<LeadCard[]>([]);
   protected readonly selected = signal<Set<string>>(new Set());
   protected readonly selectedCount = computed(() => this.selected().size);
+  /** True once at least one lead has been saved (drives the next-step card). */
+  protected readonly savedAny = signal(false);
 
   // save-to-list
   protected readonly lists = signal<LeadList[]>([]);
   protected targetListId = ''; // '' = new list
   protected newListName = '';
   protected readonly saving = signal(false);
-  protected readonly saveMsg = signal<string | null>(null);
 
   constructor() {
     this.api.getLists().subscribe({
@@ -54,10 +75,8 @@ export class Search {
   }
 
   find(): void {
-    this.error.set(null);
-    this.saveMsg.set(null);
     if (!this.industry.trim() || !this.location.trim()) {
-      this.error.set('Enter an industry and a location to search.');
+      this.toast.warn('Enter an industry and a location to search.');
       return;
     }
     this.loading.set(true);
@@ -78,15 +97,18 @@ export class Search {
           if (res.ok) {
             this.results.set(res.leads);
             this.cached.set(res.cached);
+            if (res.count === 0) {
+              this.toast.info('No businesses matched. Try a broader area.');
+            }
           } else {
             this.results.set([]);
-            this.error.set(res.message);
+            this.toast.error(res.message);
           }
         },
         error: () => {
           this.loading.set(false);
           this.searched.set(true);
-          this.error.set('Something went wrong. Please try again.');
+          this.toast.error('Something went wrong — nothing was charged. Try again.');
         },
       });
   }
@@ -103,14 +125,13 @@ export class Search {
   }
 
   save(): void {
-    this.saveMsg.set(null);
     const leadIds = [...this.selected()];
     if (leadIds.length === 0) {
-      this.saveMsg.set('Select at least one lead first.');
+      this.toast.warn('Select at least one lead first.');
       return;
     }
     if (!this.targetListId && !this.newListName.trim()) {
-      this.saveMsg.set('Pick a list or name a new one.');
+      this.toast.warn('Pick a list or name a new one.');
       return;
     }
     this.saving.set(true);
@@ -123,14 +144,17 @@ export class Search {
       .subscribe({
         next: (r) => {
           this.saving.set(false);
-          this.saveMsg.set(`Saved ${r.linked} lead${r.linked === 1 ? '' : 's'} to your list.`);
+          this.savedAny.set(true);
+          this.toast.success(
+            `Saved ${r.linked} lead${r.linked === 1 ? '' : 's'} to your list.`,
+          );
           this.selected.set(new Set());
           this.newListName = '';
           this.api.getLists().subscribe({ next: (l) => this.lists.set(l) });
         },
         error: () => {
           this.saving.set(false);
-          this.saveMsg.set('Could not save to the list. Please try again.');
+          this.toast.error('Could not save to the list. Please try again.');
         },
       });
   }

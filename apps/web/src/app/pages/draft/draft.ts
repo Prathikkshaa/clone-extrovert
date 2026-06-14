@@ -1,21 +1,31 @@
-// Drafting review queue (File 09) — the personalization USP screen.
+// Drafting review queue (File 09; File 16 shell + kit) — the personalization USP.
 // WHY: a FAST, calm, keyboard-first review queue (not a wall of textareas). One
 // lead at a time with its name + hook beside the draft so the user sees WHY this
 // message. Approve / skip / edit / regenerate from the keyboard; edits persist;
-// approving marks the sequence ready for sending (File 10). Per-lead progress
-// while generating; failed drafts flagged with a clear Regenerate next step.
+// approving marks the sequence ready for sending (File 10). Transient status now
+// goes through toasts; the credit chip lives in the shell. Queue logic + the
+// busyGenerating signal pattern (see PROGRESS) are unchanged.
 import { Component, HostListener, OnDestroy, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { APP_NAME, CREDIT_COSTS } from '@extrovertai/shared';
+import { CREDIT_COSTS } from '@extrovertai/shared';
 import { LeadsApiService, type LeadList } from '../../core/leads.service';
-import { CreditsApiService } from '../../core/credits.service';
 import { EnrichmentApiService } from '../../core/enrichment.service';
 import {
   DraftingApiService,
   type DraftMessage,
   type LeadDrafts,
 } from '../../core/drafting.service';
+import { Button } from '../../ui/button/button';
+import { Card } from '../../ui/card/card';
+import { EmptyState } from '../../ui/empty-state/empty-state';
+import { Field } from '../../ui/field/field';
+import { Icon } from '../../ui/icon/icon';
+import { PageHeader } from '../../ui/page-header/page-header';
+import { PipelineStepper } from '../../ui/pipeline-stepper/pipeline-stepper';
+import { Skeleton } from '../../ui/skeleton/skeleton';
+import { StatusBadge } from '../../ui/status-badge/status-badge';
+import { ToastService } from '../../ui/toast/toast.service';
 
 interface ReviewLead {
   leadId: string;
@@ -37,24 +47,33 @@ const STEP_LABELS: Record<number, string> = { 1: 'Email', 2: 'Follow-up 1', 3: '
 
 @Component({
   selector: 'app-draft',
-  imports: [FormsModule, RouterLink],
+  imports: [
+    FormsModule,
+    RouterLink,
+    Button,
+    Card,
+    EmptyState,
+    Field,
+    Icon,
+    PageHeader,
+    PipelineStepper,
+    Skeleton,
+    StatusBadge,
+  ],
   templateUrl: './draft.html',
 })
 export class Draft implements OnDestroy {
   private readonly leadsApi = inject(LeadsApiService);
   private readonly enrichApi = inject(EnrichmentApiService);
   private readonly api = inject(DraftingApiService);
-  private readonly credits = inject(CreditsApiService);
+  private readonly toast = inject(ToastService);
 
-  protected readonly appName = APP_NAME;
   protected readonly costPer = CREDIT_COSTS.draft;
   protected readonly stepLabel = (s: number): string => STEP_LABELS[s] ?? `Step ${s}`;
 
   protected readonly lists = signal<LeadList[]>([]);
   protected selectedListId = '';
   protected readonly loading = signal(false);
-  protected readonly balance = signal<number | null>(null);
-  protected readonly message = signal<{ kind: 'info' | 'warn' | 'error'; text: string } | null>(null);
 
   protected readonly todo = signal<TodoLead[]>([]); // leads with no drafts yet
   protected readonly review = signal<ReviewLead[]>([]); // leads with drafts (the queue)
@@ -83,9 +102,8 @@ export class Draft implements OnDestroy {
   constructor() {
     this.leadsApi.getLists().subscribe({
       next: (l) => this.lists.set(l),
-      error: () => this.message.set({ kind: 'error', text: 'Could not load your lists.' }),
+      error: () => this.toast.error('Could not load your lists.'),
     });
-    this.refreshBalance();
   }
 
   ngOnDestroy(): void {
@@ -93,7 +111,6 @@ export class Draft implements OnDestroy {
   }
 
   loadList(): void {
-    this.message.set(null);
     this.todo.set([]);
     this.review.set([]);
     this.failed.set([]);
@@ -116,13 +133,13 @@ export class Draft implements OnDestroy {
           },
           error: () => {
             this.loading.set(false);
-            this.message.set({ kind: 'error', text: 'Could not load drafts for this list.' });
+            this.toast.error('Could not load drafts for this list.');
           },
         });
       },
       error: () => {
         this.loading.set(false);
-        this.message.set({ kind: 'error', text: 'Could not load this list’s leads.' });
+        this.toast.error('Could not load this list’s leads.');
       },
     });
   }
@@ -130,7 +147,7 @@ export class Draft implements OnDestroy {
   generateAll(): void {
     const ids = this.todo().map((l) => l.leadId);
     if (ids.length === 0) {
-      this.message.set({ kind: 'info', text: 'Every lead here already has drafts.' });
+      this.toast.info('Every lead here already has drafts.');
       return;
     }
     this.enqueue(ids);
@@ -169,8 +186,7 @@ export class Draft implements OnDestroy {
       rows.map((l) => (l.leadId === lead.leadId ? { ...l, approved: true } : l)),
     );
     this.api.approve(lead.leadId).subscribe({
-      error: () =>
-        this.message.set({ kind: 'error', text: 'Could not save approval. Try again.' }),
+      error: () => this.toast.error('Could not save approval. Try again.'),
     });
     this.goNext();
   }
@@ -181,13 +197,11 @@ export class Draft implements OnDestroy {
     this.api.regenerate(lead.leadId).subscribe({
       next: (res) => {
         if (!res.ok) {
-          this.message.set({
-            kind: 'warn',
-            text:
-              res.reason === 'out_of_credits'
-                ? 'Out of credits — top up to regenerate. Nothing was charged.'
-                : 'Regenerate is unavailable right now.',
-          });
+          this.toast.warn(
+            res.reason === 'out_of_credits'
+              ? 'Out of credits — top up to regenerate. Nothing was charged.'
+              : 'Regenerate is unavailable right now.',
+          );
           return;
         }
         // Move this lead back to "generating" and remove its current drafts.
@@ -197,9 +211,9 @@ export class Draft implements OnDestroy {
         if (this.index() >= this.review().length) this.index.set(Math.max(0, this.review().length - 1));
         this.loadActive();
         this.startPolling();
-        this.message.set({ kind: 'info', text: 'Rewriting this lead’s drafts…' });
+        this.toast.info('Rewriting this lead’s drafts…');
       },
-      error: () => this.message.set({ kind: 'error', text: 'Could not regenerate. Try again.' }),
+      error: () => this.toast.error('Could not regenerate. Try again.'),
     });
   }
 
@@ -217,7 +231,7 @@ export class Draft implements OnDestroy {
       })),
     );
     this.api.edit(draft.id, { subject, body }).subscribe({
-      error: () => this.message.set({ kind: 'error', text: 'Could not save your edit. Try again.' }),
+      error: () => this.toast.error('Could not save your edit. Try again.'),
     });
   }
 
@@ -259,36 +273,31 @@ export class Draft implements OnDestroy {
 
   // --- internals ---
   private enqueue(ids: string[]): void {
-    this.message.set(null);
     this.api.enqueue(ids).subscribe({
       next: (res) => {
         if (!res.ok) {
-          this.message.set({
-            kind: res.reason === 'out_of_credits' ? 'warn' : 'error',
-            text:
-              res.reason === 'out_of_credits'
-                ? 'You’re out of credits. Top up to write drafts — nothing was charged.'
-                : 'Drafting is unavailable right now. Please try again shortly.',
-          });
+          if (res.reason === 'out_of_credits') {
+            this.toast.warn('You’re out of credits. Top up to write drafts — nothing was charged.');
+          } else {
+            this.toast.error('Drafting is unavailable right now. Please try again shortly.');
+          }
           return;
         }
         const now = Date.now();
         ids.forEach((id) => this.generating.set(id, now));
         this.todo.set([]);
         if (res.reason === 'partial_credits') {
-          this.message.set({
-            kind: 'warn',
-            text: `Writing ${res.enqueued} draft set${res.enqueued === 1 ? '' : 's'}; ${res.skipped} skipped — out of credits. Top up to finish.`,
-          });
+          this.toast.warn(
+            `Writing ${res.enqueued} draft set${res.enqueued === 1 ? '' : 's'}; ${res.skipped} skipped — out of credits. Top up to finish.`,
+          );
         } else {
-          this.message.set({
-            kind: 'info',
-            text: `Writing drafts for ${res.enqueued} lead${res.enqueued === 1 ? '' : 's'}…`,
-          });
+          this.toast.info(
+            `Writing drafts for ${res.enqueued} lead${res.enqueued === 1 ? '' : 's'}…`,
+          );
         }
         this.startPolling();
       },
-      error: () => this.message.set({ kind: 'error', text: 'Could not start drafting. Try again.' }),
+      error: () => this.toast.error('Could not start drafting. Try again.'),
     });
   }
 
@@ -326,7 +335,6 @@ export class Draft implements OnDestroy {
     const ids = [...this.generating.keys()];
     if (ids.length === 0) {
       this.stopPolling();
-      this.refreshBalance();
       return;
     }
     this.api.byLeads(ids).subscribe({
@@ -344,10 +352,7 @@ export class Draft implements OnDestroy {
           }
         }
         if (changed) this.loadActive();
-        if (this.generating.size === 0) {
-          this.stopPolling();
-          this.refreshBalance();
-        }
+        if (this.generating.size === 0) this.stopPolling();
       },
       error: () => {
         /* transient — next tick retries */
@@ -383,15 +388,6 @@ export class Draft implements OnDestroy {
       clearInterval(this.pollTimer);
       this.pollTimer = null;
     }
-  }
-
-  private refreshBalance(): void {
-    this.credits.balance().subscribe({
-      next: (b) => this.balance.set(b.balance),
-      error: () => {
-        /* non-critical */
-      },
-    });
   }
 
   retryFailed(lead: TodoLead): void {

@@ -1,125 +1,167 @@
-<main class="min-h-screen bg-canvas text-ink px-4 py-10">
-  <div class="mx-auto max-w-2xl">
-    <header class="flex items-center justify-between">
-      <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
-      <div class="flex items-center gap-3">
-        @if (balance() !== null) {
-          <span class="rounded-full border border-line bg-surface px-3 py-1 text-sm font-medium text-ink"
-            [class.text-danger]="balance()! <= 0" title="Credit balance">{{ balance() }} credits</span>
+<div class="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+  <ui-page-header
+    title="Start sending"
+    subtitle="Send your approved emails from your own inbox — paced safely to protect your deliverability."
+    [breadcrumb]="[{ label: 'Home', link: '/home' }, { label: 'Send' }]"
+  >
+    <button
+      ui-button
+      actions
+      variant="primary"
+      iconLeft="send"
+      [loading]="starting()"
+      [disabled]="!canSend()"
+      (click)="start()"
+    >
+      Start sending
+    </button>
+  </ui-page-header>
+
+  <pipeline-stepper current="send" class="mt-6" />
+
+  <!-- List picker -->
+  <ui-card class="mt-6">
+    <ui-field label="Pick a list" for="list">
+      <select
+        id="list"
+        name="list"
+        class="ui-select"
+        [(ngModel)]="selectedListId"
+        (ngModelChange)="loadPlan()"
+      >
+        <option value="">Choose a saved list…</option>
+        @for (l of lists(); track l.id) {
+          <option [value]="l.id">{{ l.name }}</option>
         }
-        <a routerLink="/home" class="text-sm text-accent hover:text-accent-strong">Back to home</a>
-      </div>
-    </header>
+      </select>
+    </ui-field>
+  </ui-card>
 
-    <section class="mt-8">
-      <h1 class="text-heading-lg text-ink">Start sending</h1>
-      <p class="mt-2 text-body text-muted">
-        Send your approved emails from your own inbox — paced safely to protect your deliverability.
-      </p>
+  @if (loadingPlan()) {
+    <ui-card class="mt-6"><ui-skeleton [lines]="3" /></ui-card>
+  }
 
-      <!-- List picker -->
+  <!-- Send plan -->
+  @if (plan(); as p) {
+    @if (!p.hasMailbox) {
       <div class="mt-6">
-        <label for="list" class="block text-sm font-medium text-ink">Pick a list</label>
-        <select id="list" name="list" [(ngModel)]="selectedListId" (ngModelChange)="loadPlan()"
-          class="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
-          <option value="">Choose a saved list…</option>
-          @for (l of lists(); track l.id) {
-            <option [value]="l.id">{{ l.name }}</option>
-          }
-        </select>
+        <ui-empty-state
+          icon="mail"
+          title="No mailbox connected"
+          message="We send from your own inbox. Connect Gmail or Outlook to start."
+        >
+          <a routerLink="/mailboxes">
+            <button ui-button variant="primary" iconLeft="mail">Connect a mailbox</button>
+          </a>
+        </ui-empty-state>
       </div>
+    } @else if (p.needsAddress) {
+      <div class="mt-6">
+        <ui-empty-state
+          icon="map-pin"
+          title="Add your mailing address"
+          message="It’s legally required in every email. Add it in Settings to send."
+        >
+          <a routerLink="/settings">
+            <button ui-button variant="primary" iconLeft="map-pin">Add your address</button>
+          </a>
+        </ui-empty-state>
+      </div>
+    } @else if (p.leadCount === 0) {
+      <div class="mt-6">
+        <ui-empty-state
+          icon="pen-line"
+          title="No approved emails yet"
+          message="Write and approve emails for this list before sending."
+        >
+          <a routerLink="/draft">
+            <button ui-button variant="primary" iconLeft="pen-line">Write emails</button>
+          </a>
+        </ui-empty-state>
+      </div>
+    } @else {
+      <ui-card class="mt-6" title="Your send plan">
+        <p class="text-body text-ink">
+          Sending <span class="font-medium">{{ p.todayCount }}</span> today@if (
+            p.laterCount > 0
+          ) {, the remaining
+            <span class="font-medium">{{ p.laterCount }}</span> over the next days}.
+        </p>
+        <p class="mt-1 text-sm text-muted">
+          We pace sends and stay within each inbox’s safe daily limit so your domain stays
+          healthy.
+        </p>
 
-      @if (message(); as m) {
-        <p class="mt-4 text-sm"
-          [class.text-muted]="m.kind === 'info'"
-          [class.text-warning]="m.kind === 'warn'"
-          [class.text-danger]="m.kind === 'error'"
-          role="status">{{ m.text }}</p>
-      }
+        <ul class="mt-4 space-y-1.5 text-sm">
+          @for (mb of p.capacity.mailboxes; track mb.mailboxId) {
+            <li class="flex items-center justify-between gap-2">
+              <span class="truncate text-ink">{{ mb.email }}</span>
+              <span class="flex items-center gap-2 text-muted">
+                {{ mb.usedToday }}/{{ mb.effectiveCap }} today
+                @if (mb.warmupState === 'new') {
+                  <ui-status-badge status="warming" text="Warming up" />
+                }
+              </span>
+            </li>
+          }
+        </ul>
 
-      @if (loadingPlan()) {
-        <div class="mt-6 h-28 w-full animate-pulse rounded-lg bg-line"></div>
-      }
+        <div class="mt-5 flex flex-wrap items-center gap-3">
+          <button
+            ui-button
+            variant="primary"
+            iconLeft="send"
+            [loading]="starting()"
+            (click)="start()"
+          >
+            Start sending
+          </button>
+          <span class="text-sm text-muted">Each send uses 1 credit.</span>
+        </div>
+      </ui-card>
 
-      <!-- Send plan -->
-      @if (plan(); as p) {
-        @if (!p.hasMailbox) {
-          <div class="mt-6 rounded-lg border border-line bg-surface p-4">
-            <p class="text-sm text-ink">No mailbox connected yet. We send from your own inbox.</p>
-            <a routerLink="/mailboxes" class="mt-2 inline-block text-sm font-medium text-accent hover:text-accent-strong">
-              Connect a mailbox →
-            </a>
+      <!-- What's next -->
+      <div
+        class="mt-6 flex flex-col gap-3 rounded-lg bg-accent-soft p-4 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="flex items-start gap-3">
+          <ui-icon name="inbox" [size]="18" class="mt-0.5 shrink-0 text-accent" />
+          <div>
+            <p class="text-sm font-medium text-ink">After you send: watch your inbox</p>
+            <p class="text-sm text-muted">Replies land in a threaded inbox you can act on.</p>
           </div>
-        } @else if (p.needsAddress) {
-          <div class="mt-6 rounded-lg border border-line bg-surface p-4">
-            <p class="text-sm text-ink">Add your mailing address before sending — it’s legally required in every email.</p>
-            <a routerLink="/settings" class="mt-2 inline-block text-sm font-medium text-accent hover:text-accent-strong">
-              Add your address in Settings →
-            </a>
-          </div>
-        } @else if (p.leadCount === 0) {
-          <div class="mt-6 rounded-lg border border-line bg-surface p-4">
-            <p class="text-sm text-ink">No approved emails in this list yet.</p>
-            <a routerLink="/draft" class="mt-2 inline-block text-sm font-medium text-accent hover:text-accent-strong">
-              Write &amp; approve emails →
-            </a>
-          </div>
-        } @else {
-          <div class="mt-6 rounded-lg border border-line bg-surface p-4">
-            <h2 class="text-heading-sm text-ink">Your send plan</h2>
-            <p class="mt-2 text-body text-ink">
-              Sending <span class="font-medium">{{ p.todayCount }}</span> today@if (p.laterCount > 0) {,
-              the remaining <span class="font-medium">{{ p.laterCount }}</span> over the next days}.
-            </p>
-            <p class="mt-1 text-sm text-muted">
-              We pace sends and stay within each inbox’s safe daily limit so your domain stays healthy.
-            </p>
+        </div>
+        <a routerLink="/inbox" class="shrink-0">
+          <button ui-button variant="secondary" iconRight="arrow-right">Open inbox</button>
+        </a>
+      </div>
+    }
+  }
 
-            <!-- Mailbox capacity -->
-            <ul class="mt-3 space-y-1 text-sm">
-              @for (mb of p.capacity.mailboxes; track mb.mailboxId) {
-                <li class="flex items-center justify-between gap-2 text-muted">
-                  <span class="truncate text-ink">{{ mb.email }}</span>
-                  <span>
-                    {{ mb.usedToday }}/{{ mb.effectiveCap }} today
-                    @if (mb.warmupState === 'new') { <span class="text-warning">· warming up</span> }
-                  </span>
-                </li>
-              }
-            </ul>
-
-            <button type="button" (click)="start()" [disabled]="starting()"
-              class="mt-4 rounded-md bg-accent px-5 py-3 text-heading-sm text-white transition-colors duration-200 hover:bg-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:opacity-60">
-              {{ starting() ? 'Starting…' : 'Start sending' }}
-            </button>
-            <span class="ml-3 text-sm text-muted">Each send uses 1 credit.</span>
-          </div>
+  <!-- Existing campaigns -->
+  @if (campaigns().length > 0) {
+    <ui-card class="mt-8" title="Your campaigns">
+      <ul class="space-y-2">
+        @for (c of campaigns(); track c.id) {
+          <li
+            class="flex items-center justify-between gap-3 rounded-lg border border-line bg-canvas p-3"
+          >
+            <div class="min-w-0">
+              <a
+                [routerLink]="['/campaigns', c.id]"
+                class="text-sm font-medium text-accent hover:text-accent-strong"
+              >
+                Campaign · {{ c.created_at | date: 'MMM d, h:mm a' }}
+              </a>
+              <p class="mt-0.5 text-xs text-muted">
+                {{ c.counts.sent }} sent · {{ c.counts.queued }} queued ·
+                {{ c.counts.replied }} replied
+              </p>
+            </div>
+            <ui-status-badge [status]="c.status" />
+          </li>
         }
-      }
-
-      <!-- Existing campaigns -->
-      @if (campaigns().length > 0) {
-        <section class="mt-10">
-          <h2 class="text-heading-sm text-ink">Your campaigns</h2>
-          <ul class="mt-3 space-y-2">
-            @for (c of campaigns(); track c.id) {
-              <li class="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface p-3">
-                <div class="min-w-0">
-                  <a [routerLink]="['/campaigns', c.id]" class="text-sm font-medium text-accent hover:text-accent-strong">
-                    Campaign · {{ c.created_at | date: 'MMM d, h:mm a' }}
-                  </a>
-                  <p class="mt-0.5 text-xs text-muted">
-                    {{ c.counts.sent }} sent · {{ c.counts.queued }} queued · {{ c.counts.replied }} replied
-                  </p>
-                </div>
-                <span class="shrink-0 text-xs"
-                  [class.text-positive]="c.status === 'active'"
-                  [class.text-warning]="c.status === 'paused'">{{ c.status }}</span>
-              </li>
-            }
-          </ul>
-        </section>
-      }
-    </section>
-  </div>
-</main>
+      </ul>
+    </ui-card>
+  }
+</div>

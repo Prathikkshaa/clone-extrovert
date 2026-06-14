@@ -1,30 +1,47 @@
-// Campaign monitor (File 10).
+// Campaign monitor (File 10; File 16 shell + kit).
 // WHY: shows a live, per-lead view of a running campaign — each lead's step states
 // (queued/sent/replied/bounced/stopped), today's send count vs the safe cap, and
 // pause/resume. Paused campaigns explain the next step (top up / reconnect) calmly.
+// Status changes go through toasts; a load failure shows a calm empty state.
 import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
-import { RouterLink } from '@angular/router';
-import { APP_NAME } from '@extrovertai/shared';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CampaignsApiService, type CampaignDetail } from '../../core/campaigns.service';
+import { Button } from '../../ui/button/button';
+import { Card } from '../../ui/card/card';
+import { EmptyState } from '../../ui/empty-state/empty-state';
+import { Icon } from '../../ui/icon/icon';
+import { PageHeader } from '../../ui/page-header/page-header';
+import { Skeleton } from '../../ui/skeleton/skeleton';
+import { StatusBadge } from '../../ui/status-badge/status-badge';
+import { ToastService } from '../../ui/toast/toast.service';
 
 const POLL_MS = 4000;
 
 @Component({
   selector: 'app-campaign',
-  imports: [RouterLink, DatePipe],
+  imports: [
+    RouterLink,
+    DatePipe,
+    Button,
+    Card,
+    EmptyState,
+    Icon,
+    PageHeader,
+    Skeleton,
+    StatusBadge,
+  ],
   templateUrl: './campaign.html',
 })
 export class Campaign implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly api = inject(CampaignsApiService);
+  private readonly toast = inject(ToastService);
 
-  protected readonly appName = APP_NAME;
   protected readonly detail = signal<CampaignDetail | null>(null);
   protected readonly loading = signal(true);
   protected readonly pausing = signal(false);
-  protected readonly error = signal<string | null>(null);
+  protected readonly loadFailed = signal(false);
 
   private campaignId = '';
   private pollTimer: ReturnType<typeof setInterval> | null = null;
@@ -49,12 +66,8 @@ export class Campaign implements OnDestroy {
     this.setStatus('active');
   }
 
-  stepClass(state: string): string {
-    if (state === 'sent') return 'text-positive';
-    if (state === 'replied') return 'text-positive';
-    if (state === 'bounced') return 'text-danger';
-    if (state === 'stopped') return 'text-muted';
-    return 'text-muted'; // queued
+  stepLabel(stepOrder: number): string {
+    return stepOrder === 1 ? 'Email' : 'Follow-up ' + (stepOrder - 1);
   }
 
   private setStatus(status: 'paused' | 'active'): void {
@@ -63,10 +76,11 @@ export class Campaign implements OnDestroy {
       next: () => {
         this.pausing.set(false);
         this.load(false);
+        this.toast.success(status === 'paused' ? 'Campaign paused.' : 'Campaign resumed.');
       },
       error: () => {
         this.pausing.set(false);
-        this.error.set('Could not update the campaign. Please try again.');
+        this.toast.error('Could not update the campaign. Please try again.');
       },
     });
   }
@@ -83,7 +97,7 @@ export class Campaign implements OnDestroy {
       },
       error: () => {
         this.loading.set(false);
-        this.error.set('Could not load this campaign.');
+        this.loadFailed.set(true);
         this.stopPolling();
       },
     });
