@@ -18,9 +18,13 @@ module.exports = {
         line: 'var(--color-line)',
         accent: 'var(--color-accent)',
         'accent-strong': 'var(--color-accent-strong)',
+        'accent-soft': 'var(--color-accent-soft)',
         positive: 'var(--color-positive)',
+        'positive-soft': 'var(--color-positive-soft)',
         warning: 'var(--color-warning)',
+        'warning-soft': 'var(--color-warning-soft)',
         danger: 'var(--color-danger)',
+        'danger-soft': 'var(--color-danger-soft)',
       },
       borderRadius: {
         md: 'var(--radius-md)',

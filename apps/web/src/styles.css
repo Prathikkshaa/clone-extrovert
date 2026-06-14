@@ -19,11 +19,17 @@
   /* Single accent — primary actions + positive states only (deep teal/green) */
   --color-accent: #0f766e;
   --color-accent-strong: #0b5d56; /* hover/active for accent */
+  --color-accent-soft: #e3f1ef; /* subtle accent tint (active nav, "what's next") */
 
   /* Semantic states */
   --color-positive: #15803d; /* replies / booked / healthy */
   --color-warning: #b45309; /* pending / warning */
   --color-danger: #b91c1c; /* bounce / error */
+
+  /* Soft semantic tints — badge/banner backgrounds (text uses the strong token). */
+  --color-positive-soft: #e7f4ea;
+  --color-warning-soft: #f7ecd9;
+  --color-danger-soft: #f9e6e6;
 
   /* Radius */
   --radius-md: 8px;
@@ -39,18 +45,39 @@
   --space-12: 3rem;
 }
 
-/* Dark mode is a token swap only (no component changes). Values are a calm
- * starting point; tuned in a later polish pass. Activate with
- * <html data-theme="dark"> or the `dark` class. */
+/* Dark mode is a token swap only (no component changes). Every semantic token
+ * below is tuned for contrast on the dark canvas. Activate with
+ * <html data-theme="dark"> or the `dark` class (set by ThemeModeService). */
 [data-theme='dark'],
 .dark {
-  --color-ink: #f4f4f0;
-  --color-canvas: #18181a;
-  --color-surface: #232325;
-  --color-muted: #a3a39c;
-  --color-line: #34343a;
+  --color-ink: #f4f4f0; /* warm off-white text */
+  --color-canvas: #18181a; /* warm near-black background */
+  --color-surface: #232325; /* raised cards/panels on canvas */
+  --color-muted: #a3a39c; /* secondary text (AA on canvas + surface) */
+  --color-line: #34343a; /* hairline borders */
+
+  /* Accent lightened so teal stays legible on dark and as white-text button bg. */
   --color-accent: #2dd4bf;
-  --color-accent-strong: #14b8a6;
+  --color-accent-strong: #5eead4; /* brighter hover/active on dark */
+  --color-accent-soft: #173f3b; /* dark teal tint for active nav / "what's next" */
+
+  /* Semantic states — lightened for contrast on dark surfaces. */
+  --color-positive: #4ade80; /* replies / booked / healthy */
+  --color-warning: #fbbf24; /* pending / warning */
+  --color-danger: #f87171; /* bounce / error */
+
+  --color-positive-soft: #16331f;
+  --color-warning-soft: #3a2c12;
+  --color-danger-soft: #3a1d1d;
+}
+
+/* Smooth the light/dark token swap. Colour-only transition keeps it calm (§7,
+ * 150–250ms); the reduced-motion block below neutralises it. */
+*,
+*::before,
+*::after {
+  transition: background-color 200ms ease, color 200ms ease,
+    border-color 200ms ease, fill 200ms ease, stroke 200ms ease;
 }
 
 html,
