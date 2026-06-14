@@ -1,110 +1,127 @@
-<main class="min-h-screen bg-canvas text-ink px-4 py-10">
-  <div class="mx-auto max-w-3xl">
-    <header class="flex items-center justify-between">
-      <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
-      <div class="flex items-center gap-3">
-        @if (balance() !== null) {
-          <span class="rounded-full border border-line bg-surface px-3 py-1 text-sm font-medium text-ink"
-            [class.text-danger]="balance()! <= 0" title="Credit balance">{{ balance() }} credits</span>
-        }
-        <a routerLink="/home" class="text-sm text-accent hover:text-accent-strong">Back to home</a>
-      </div>
-    </header>
+<div class="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+  <ui-page-header
+    title="Inbox"
+    subtitle="Replies from your leads, newest first. Open one to reply."
+    [breadcrumb]="[{ label: 'Home', link: '/home' }, { label: 'Inbox' }]"
+  >
+    <a actions routerLink="/dashboard">
+      <button ui-button variant="secondary" iconLeft="layout-dashboard">Dashboard</button>
+    </a>
+  </ui-page-header>
 
-    <section class="mt-8">
-      <h1 class="text-heading-lg text-ink">Inbox</h1>
-      <p class="mt-2 text-body text-muted">Replies from your leads, newest first. Open one to reply.</p>
-
-      @if (message(); as m) {
-        <p class="mt-4 text-sm"
-          [class.text-muted]="m.kind === 'info'"
-          [class.text-warning]="m.kind === 'warn'"
-          [class.text-danger]="m.kind === 'error'"
-          role="status">{{ m.text }}</p>
+  <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-[18rem_1fr]">
+    <!-- Conversation list -->
+    <div>
+      @if (loadingList()) {
+        <div class="space-y-2">
+          @for (i of [1, 2, 3]; track i) {
+            <ui-card><ui-skeleton [lines]="2" /></ui-card>
+          }
+        </div>
+      } @else if (conversations().length === 0) {
+        <ui-empty-state
+          icon="inbox"
+          title="No replies yet"
+          message="When a lead replies, the conversation shows up here."
+        />
+      } @else {
+        <ul class="space-y-2">
+          @for (c of conversations(); track c.leadId) {
+            <li>
+              <button
+                type="button"
+                (click)="select(c.leadId)"
+                class="w-full rounded-lg border bg-surface p-3 text-left transition-colors duration-200 hover:bg-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                [class.border-accent]="selectedLeadId() === c.leadId"
+                [class.border-line]="selectedLeadId() !== c.leadId"
+              >
+                <div class="flex items-center justify-between gap-2">
+                  <span class="truncate text-sm font-medium text-ink">{{ c.name || c.email }}</span>
+                  <ui-status-badge [status]="c.label" />
+                </div>
+                <p class="mt-1 truncate text-xs text-muted">{{ c.snippet }}</p>
+                <p class="mt-1 text-xs text-muted">{{ c.lastAt | date: 'MMM d, h:mm a' }}</p>
+              </button>
+            </li>
+          }
+        </ul>
       }
+    </div>
 
-      <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-[18rem_1fr]">
-        <!-- Conversation list -->
-        <div>
-          @if (loadingList()) {
-            <div class="space-y-2">
-              @for (i of [1,2,3]; track i) { <div class="h-16 animate-pulse rounded-lg bg-line"></div> }
-            </div>
-          } @else if (conversations().length === 0) {
-            <p class="text-sm text-muted">No replies yet. When a lead replies, it shows up here.</p>
-          } @else {
-            <ul class="space-y-2">
-              @for (c of conversations(); track c.leadId) {
-                <li>
-                  <button type="button" (click)="select(c.leadId)"
-                    class="w-full rounded-lg border bg-surface p-3 text-left transition-colors hover:bg-canvas"
-                    [class.border-accent]="selectedLeadId() === c.leadId"
-                    [class.border-line]="selectedLeadId() !== c.leadId">
-                    <div class="flex items-center justify-between gap-2">
-                      <span class="truncate text-sm font-medium text-ink">{{ c.name || c.email }}</span>
-                      <span class="shrink-0 text-xs" [class]="labelClass(c.label)">{{ c.label }}</span>
-                    </div>
-                    <p class="mt-1 truncate text-xs text-muted">{{ c.snippet }}</p>
-                    <p class="mt-1 text-xs text-muted">{{ c.lastAt | date: 'MMM d, h:mm a' }}</p>
-                  </button>
-                </li>
-              }
-            </ul>
-          }
-        </div>
+    <!-- Thread + reply -->
+    <div>
+      @if (loadingThread()) {
+        <ui-card><ui-skeleton [lines]="6" /></ui-card>
+      } @else if (thread(); as t) {
+        <ui-card>
+          <div class="flex items-center justify-between gap-2">
+            <p class="text-body font-medium text-ink">{{ t.name || t.email }}</p>
+            <span class="text-xs text-muted">{{ t.email }}</span>
+          </div>
 
-        <!-- Thread + reply -->
-        <div>
-          @if (loadingThread()) {
-            <div class="h-48 w-full animate-pulse rounded-lg bg-line"></div>
-          } @else if (thread(); as t) {
-            <div class="rounded-lg border border-line bg-surface p-4">
-              <div class="flex items-center justify-between gap-2">
-                <p class="text-body font-medium text-ink">{{ t.name || t.email }}</p>
-                <span class="text-xs text-muted">{{ t.email }}</span>
-              </div>
-
-              <ul class="mt-4 space-y-3">
-                @for (m of t.messages; track m.id) {
-                  <li class="rounded-md border border-line p-3"
-                    [class.bg-canvas]="m.direction === 'inbound'"
-                    [class.bg-surface]="m.direction === 'outbound'">
-                    <div class="flex items-center justify-between gap-2 text-xs text-muted">
-                      <span>{{ m.direction === 'inbound' ? (t.name || 'Them') : 'You' }}</span>
-                      <span>{{ m.at | date: 'MMM d, h:mm a' }}</span>
-                    </div>
-                    @if (m.subject) { <p class="mt-1 text-sm font-medium text-ink">{{ m.subject }}</p> }
-                    <p class="mt-1 whitespace-pre-wrap text-sm text-ink">{{ m.body }}</p>
-                  </li>
+          <ul class="mt-4 space-y-3">
+            @for (m of t.messages; track m.id) {
+              <li
+                class="rounded-md border border-line p-3"
+                [class.bg-canvas]="m.direction === 'inbound'"
+                [class.bg-surface]="m.direction === 'outbound'"
+              >
+                <div class="flex items-center justify-between gap-2 text-xs text-muted">
+                  <span>{{ m.direction === 'inbound' ? t.name || 'Them' : 'You' }}</span>
+                  <span>{{ m.at | date: 'MMM d, h:mm a' }}</span>
+                </div>
+                @if (m.subject) {
+                  <p class="mt-1 text-sm font-medium text-ink">{{ m.subject }}</p>
                 }
-              </ul>
+                <p class="mt-1 whitespace-pre-wrap text-sm text-ink">{{ m.body }}</p>
+              </li>
+            }
+          </ul>
 
-              <!-- Reply composer -->
-              <div class="mt-4 border-t border-line pt-4">
-                <div class="flex items-center justify-between">
-                  <label for="reply" class="text-sm font-medium text-ink">Your reply</label>
-                  <button type="button" (click)="draftReply()" [disabled]="drafting()"
-                    class="rounded-md border border-line px-3 py-1.5 text-sm text-ink hover:bg-canvas disabled:opacity-60">
-                    {{ drafting() ? 'Drafting…' : 'Draft reply (AI)' }}
-                  </button>
-                </div>
-                <textarea id="reply" name="reply" [(ngModel)]="replyBody" rows="6"
-                  placeholder="Write a reply, or let AI draft one for you to edit…"
-                  class="mt-2 w-full rounded-md border border-line bg-canvas px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"></textarea>
-                <div class="mt-2 flex items-center gap-3">
-                  <button type="button" (click)="sendReply()" [disabled]="sending()"
-                    class="rounded-md bg-accent px-4 py-2 text-sm text-white transition-colors hover:bg-accent-strong disabled:opacity-60">
-                    {{ sending() ? 'Sending…' : 'Send reply' }}
-                  </button>
-                  <span class="text-xs text-muted">Nothing sends until you press Send.</span>
-                </div>
-              </div>
+          <!-- Reply composer -->
+          <div class="mt-4 border-t border-line pt-4">
+            <div class="flex items-center justify-between">
+              <label for="reply" class="text-sm font-medium text-ink">Your reply</label>
+              <button
+                ui-button
+                variant="secondary"
+                size="sm"
+                iconLeft="sparkles"
+                [loading]="drafting()"
+                (click)="draftReply()"
+              >
+                Draft reply
+              </button>
             </div>
-          } @else {
-            <p class="text-sm text-muted">Pick a conversation to read it and reply.</p>
-          }
-        </div>
-      </div>
-    </section>
+            <textarea
+              id="reply"
+              name="reply"
+              [(ngModel)]="replyBody"
+              rows="6"
+              placeholder="Write a reply, or let AI draft one for you to edit…"
+              class="ui-textarea mt-2"
+            ></textarea>
+            <div class="mt-2 flex items-center gap-3">
+              <button
+                ui-button
+                variant="primary"
+                iconLeft="send"
+                [loading]="sending()"
+                (click)="sendReply()"
+              >
+                Send reply
+              </button>
+              <span class="text-xs text-muted">Nothing sends until you press Send.</span>
+            </div>
+          </div>
+        </ui-card>
+      } @else {
+        <ui-empty-state
+          icon="mail"
+          title="Pick a conversation"
+          message="Choose a reply on the left to read it and respond."
+        />
+      }
+    </div>
   </div>
-</main>
+</div>

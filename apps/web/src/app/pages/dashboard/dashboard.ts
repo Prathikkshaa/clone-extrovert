@@ -1,4 +1,4 @@
-// Dashboard (File 12).
+// Dashboard (File 12; File 16 shell + kit).
 // WHY: a calm, trustworthy overview answering one question at a glance — "is my
 // outreach working, and what needs my attention?" It LEADS with money-linked, reliable
 // numbers (meetings booked, replies) and demotes unreliable ones: opens are shown last,
@@ -6,26 +6,40 @@
 // deliverability health strip frames the safe-sending limits as protection.
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { APP_NAME } from '@extrovertai/shared';
 import {
   DashboardApiService,
   type CampaignStat,
   type DashboardSummary,
 } from '../../core/dashboard.service';
+import { Button } from '../../ui/button/button';
+import { Card } from '../../ui/card/card';
+import { EmptyState } from '../../ui/empty-state/empty-state';
+import { Icon } from '../../ui/icon/icon';
+import { PageHeader } from '../../ui/page-header/page-header';
+import { Skeleton } from '../../ui/skeleton/skeleton';
+import { StatusBadge } from '../../ui/status-badge/status-badge';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink],
+  imports: [
+    RouterLink,
+    Button,
+    Card,
+    EmptyState,
+    Icon,
+    PageHeader,
+    Skeleton,
+    StatusBadge,
+  ],
   templateUrl: './dashboard.html',
 })
 export class Dashboard {
   private readonly api = inject(DashboardApiService);
 
-  protected readonly appName = APP_NAME;
   protected readonly summary = signal<DashboardSummary | null>(null);
   protected readonly campaigns = signal<CampaignStat[] | null>(null);
   protected readonly loading = signal(true);
-  protected readonly error = signal<string | null>(null);
+  protected readonly loadFailed = signal(false);
 
   // Bounce rate as a friendly percentage string (1 decimal).
   protected readonly bouncePct = computed(() => {
@@ -63,7 +77,7 @@ export class Dashboard {
 
   private load(): void {
     this.loading.set(true);
-    this.error.set(null);
+    this.loadFailed.set(false);
     this.api.summary(30).subscribe({
       next: (s) => {
         this.summary.set(s);
@@ -73,7 +87,7 @@ export class Dashboard {
       },
       error: () => {
         this.loading.set(false);
-        this.error.set("Couldn't load your dashboard. Please try again.");
+        this.loadFailed.set(true);
       },
     });
   }

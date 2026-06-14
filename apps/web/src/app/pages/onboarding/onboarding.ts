@@ -1,36 +1,55 @@
-// Onboarding — the "wow in 60 seconds" website-to-profile flow (§7).
+// Onboarding — the "wow in 60 seconds" website-to-profile flow (§7; File 16 kit).
 // WHY: paste a URL → we read the site → show a prefilled, editable profile to
 // confirm. Always confirmable, never silently trusted; a clear manual path for
-// people without a website; failures degrade to manual with plain copy.
-import { Component, inject, signal } from '@angular/core';
+// people without a website; failures degrade to manual with plain copy. Renders
+// in the shell; errors go through toasts, the contextual result notice stays
+// inline. The "Save and continue" action removes the old dead-end (→ Home).
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { APP_NAME } from '@extrovertai/shared';
 import {
   CompanyProfileApiService,
   type CompanyProfile,
   type CrawlResult,
 } from '../../core/company-profile.service';
 import { ThemeService } from '../../core/theme.service';
+import { Button } from '../../ui/button/button';
+import { Card } from '../../ui/card/card';
+import { Field } from '../../ui/field/field';
+import { PageHeader } from '../../ui/page-header/page-header';
+import { Skeleton } from '../../ui/skeleton/skeleton';
+import { ToastService } from '../../ui/toast/toast.service';
 
 type Step = 'url' | 'loading' | 'review';
 
 @Component({
   selector: 'app-onboarding',
-  imports: [FormsModule],
+  imports: [FormsModule, Button, Card, Field, PageHeader, Skeleton],
   templateUrl: './onboarding.html',
 })
 export class Onboarding {
   private readonly api = inject(CompanyProfileApiService);
   private readonly theme = inject(ThemeService);
   private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
 
-  protected readonly appName = APP_NAME;
   protected readonly step = signal<Step>('url');
-  protected readonly error = signal<string | null>(null);
   protected readonly notice = signal<string | null>(null);
   protected readonly saving = signal(false);
   protected readonly isManual = signal(false);
+
+  protected readonly title = computed(() => {
+    switch (this.step()) {
+      case 'loading':
+        return 'Reading your site…';
+      case 'review':
+        return this.isManual()
+          ? 'Tell us about your business'
+          : 'Here’s what we found — does this look right?';
+      default:
+        return 'Set up your profile';
+    }
+  });
 
   // URL step
   protected url = '';
@@ -47,10 +66,9 @@ export class Onboarding {
   protected useBranding = false;
 
   readSite(): void {
-    this.error.set(null);
     this.notice.set(null);
     if (!this.url.trim()) {
-      this.error.set('Enter your website address (or choose “I don’t have a website”).');
+      this.toast.warn('Enter your website address (or choose “I don’t have a website”).');
       return;
     }
     this.step.set('loading');
@@ -70,14 +88,12 @@ export class Onboarding {
   }
 
   startManual(): void {
-    this.error.set(null);
     this.notice.set(null);
     this.isManual.set(true);
     this.step.set('review');
   }
 
   save(): void {
-    this.error.set(null);
     this.saving.set(true);
     const useBrand = this.useBranding && !!this.brandColor;
     this.api
@@ -98,11 +114,12 @@ export class Onboarding {
       .subscribe({
         next: (saved) => {
           this.theme.apply(saved);
+          this.toast.success('Profile saved.');
           void this.router.navigateByUrl('/home');
         },
         error: () => {
           this.saving.set(false);
-          this.error.set('Could not save your profile. Please try again.');
+          this.toast.error('Could not save your profile. Please try again.');
         },
       });
   }

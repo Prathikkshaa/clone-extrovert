@@ -1,134 +1,149 @@
-<main class="min-h-screen bg-canvas text-ink px-4 py-10">
-  <div class="mx-auto max-w-xl">
-    <header class="flex items-center justify-between">
-      <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
-      <a routerLink="/home" class="text-sm text-accent hover:text-accent-strong">Back to home</a>
-    </header>
+<div class="mx-auto max-w-2xl px-4 py-8 sm:px-6">
+  <ui-page-header
+    title="Settings"
+    subtitle="Appearance, theme, compliance, and booking."
+    [breadcrumb]="[{ label: 'Home', link: '/home' }, { label: 'Settings' }]"
+  />
 
-    <section class="mt-10">
-      <h1 class="text-heading-lg text-ink">Settings</h1>
+  @if (loading()) {
+    <ui-card class="mt-8"><ui-skeleton [lines]="4" /></ui-card>
+  } @else {
+    <!-- Appearance (light/dark/system) -->
+    <ui-card class="mt-8" title="Appearance">
+      <p class="text-sm text-muted">Choose how {{ appName }} looks. System follows your device.</p>
+      <div class="mt-4 inline-flex rounded-md border border-line p-1">
+        @for (opt of appearanceOptions; track opt.value) {
+          <button
+            type="button"
+            (click)="setAppearance(opt.value)"
+            class="rounded px-3 py-1.5 text-sm font-medium transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            [class.bg-accent]="themeMode.mode() === opt.value"
+            [class.text-white]="themeMode.mode() === opt.value"
+            [class.text-muted]="themeMode.mode() !== opt.value"
+            [class.hover:text-ink]="themeMode.mode() !== opt.value"
+          >
+            {{ opt.label }}
+          </button>
+        }
+      </div>
+    </ui-card>
 
-      @if (loading()) {
-        <p class="mt-4 text-sm text-muted">Loading…</p>
+    <!-- Brand theme -->
+    <ui-card class="mt-6" title="Theme">
+      @if (profile(); as p) {
+        <div class="flex items-center gap-3">
+          @if (p.logo_url) {
+            <img [src]="p.logo_url" alt="Your logo" class="h-8 w-8 rounded object-contain" />
+          }
+          <span class="inline-flex items-center gap-2 text-sm text-muted">
+            <span class="inline-block h-5 w-5 rounded bg-accent"></span>
+            Current accent
+          </span>
+          <span class="ml-auto text-sm font-medium text-ink">
+            {{ p.theme_source === 'fetched' ? 'Your branding' : appName + ' default' }}
+          </span>
+        </div>
+
+        <div class="mt-5 flex flex-wrap gap-3">
+          @if (p.brand_color) {
+            <button
+              ui-button
+              variant="primary"
+              [disabled]="saving() || p.theme_source === 'fetched'"
+              (click)="setTheme('fetched')"
+            >
+              Use my branding
+            </button>
+          }
+          <button
+            ui-button
+            variant="secondary"
+            [disabled]="saving() || p.theme_source === 'official'"
+            (click)="setTheme('official')"
+          >
+            Reset to {{ appName }} theme
+          </button>
+        </div>
       } @else {
-        <div class="mt-8 rounded-lg border border-line bg-surface p-6">
-          <h2 class="text-heading-sm text-ink">Theme</h2>
-
-          @if (profile(); as p) {
-            <div class="mt-3 flex items-center gap-3">
-              @if (p.logo_url) {
-                <img [src]="p.logo_url" alt="Your logo" class="h-8 w-8 rounded object-contain" />
-              }
-              <span class="inline-flex items-center gap-2 text-sm text-muted">
-                <span class="inline-block h-5 w-5 rounded bg-accent"></span>
-                Current accent
-              </span>
-              <span class="ml-auto text-sm font-medium text-ink">
-                {{ p.theme_source === 'fetched' ? 'Your branding' : appName + ' default' }}
-              </span>
-            </div>
-
-            <div class="mt-5 flex flex-wrap gap-3">
-              @if (p.brand_color) {
-                <button
-                  type="button"
-                  [disabled]="saving() || p.theme_source === 'fetched'"
-                  (click)="setTheme('fetched')"
-                  class="rounded-md bg-accent px-4 py-2 text-sm text-white transition-colors duration-200 hover:bg-accent-strong disabled:opacity-50"
-                >
-                  Use my branding
-                </button>
-              }
-              <button
-                type="button"
-                [disabled]="saving() || p.theme_source === 'official'"
-                (click)="setTheme('official')"
-                class="rounded-md border border-line px-4 py-2 text-sm text-ink transition-colors duration-200 hover:bg-canvas disabled:opacity-50"
-              >
-                Reset to {{ appName }} theme
-              </button>
-            </div>
-          } @else {
-            <p class="mt-3 text-sm text-muted">
-              No profile yet.
-              <a routerLink="/onboarding" class="font-medium text-accent hover:text-accent-strong">Set up your profile</a>.
-            </p>
-          }
-
-          @if (error()) {
-            <p class="mt-4 text-sm text-danger" role="alert">{{ error() }}</p>
-          }
-        </div>
-
-        <!-- Mailing address (legally required to send cold email) -->
-        <div class="mt-6 rounded-lg border border-line bg-surface p-6">
-          <h2 class="text-heading-sm text-ink">Mailing address</h2>
-          <p class="mt-1 text-sm text-muted">
-            Required by law in every cold email. Shown in your email footer, alongside an unsubscribe link.
-          </p>
-          <textarea name="address" [(ngModel)]="address" rows="3"
-            placeholder="Your Company, 123 Main St, City, State ZIP, Country"
-            class="mt-3 w-full rounded-md border border-line bg-canvas px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"></textarea>
-          <div class="mt-3 flex items-center gap-3">
-            <button type="button" (click)="saveAddress()" [disabled]="savingAddress()"
-              class="rounded-md bg-accent px-4 py-2 text-sm text-white transition-colors duration-200 hover:bg-accent-strong disabled:opacity-60">
-              {{ savingAddress() ? 'Saving…' : 'Save address' }}
-            </button>
-            @if (addressMsg(); as a) {
-              <span class="text-sm" [class.text-positive]="a.kind === 'info'" [class.text-warning]="a.kind === 'warn'">{{ a.text }}</span>
-            }
-          </div>
-        </div>
-
-        <!-- Cal.com booking link (File 13) — lets leads book meetings -->
-        <div class="mt-6 rounded-lg border border-line bg-surface p-6">
-          <div class="flex items-center justify-between">
-            <h2 class="text-heading-sm text-ink">Booking</h2>
-            @if (bookingConnected()) {
-              <span class="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-0.5 text-xs font-medium text-positive">
-                <span class="inline-block h-1.5 w-1.5 rounded-full bg-positive"></span>
-                Connected
-              </span>
-            } @else {
-              <span class="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-0.5 text-xs font-medium text-warning">
-                <span class="inline-block h-1.5 w-1.5 rounded-full bg-warning"></span>
-                Not connected
-              </span>
-            }
-          </div>
-          <p class="mt-1 text-sm text-muted">
-            Connect your Cal.com to let leads book meetings. Paste your booking link — we add it to
-            your outreach emails as a one-click way to grab a time. Bookings show up here and on
-            your dashboard automatically.
-          </p>
-          <input name="bookingUrl" type="url" [(ngModel)]="bookingUrl"
-            placeholder="https://cal.com/your-name/intro"
-            class="mt-3 w-full rounded-md border border-line bg-canvas px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent" />
-          <div class="mt-3 flex items-center gap-3">
-            <button type="button" (click)="saveBooking()" [disabled]="savingBooking()"
-              class="rounded-md bg-accent px-4 py-2 text-sm text-white transition-colors duration-200 hover:bg-accent-strong disabled:opacity-60">
-              {{ savingBooking() ? 'Saving…' : (bookingConnected() ? 'Update link' : 'Connect') }}
-            </button>
-            @if (bookingConnected()) {
-              <a [href]="bookingUrl" target="_blank" rel="noopener" class="text-sm text-accent hover:text-accent-strong">
-                Open my booking page
-              </a>
-            }
-            @if (bookingMsg(); as b) {
-              <span class="text-sm" [class.text-positive]="b.kind === 'info'" [class.text-warning]="b.kind === 'warn'">{{ b.text }}</span>
-            }
-          </div>
-          <p class="mt-3 text-xs text-muted">
-            New to Cal.com? Create a free account, connect your Google Calendar, then copy your event link here.
-          </p>
-        </div>
-
-        <div class="mt-6">
-          <a routerLink="/onboarding" class="text-sm text-accent hover:text-accent-strong">
-            Update profile from website
-          </a>
-        </div>
+        <p class="text-sm text-muted">
+          No profile yet.
+          <a routerLink="/onboarding" class="font-medium text-accent hover:text-accent-strong"
+            >Set up your profile</a
+          >.
+        </p>
       }
-    </section>
-  </div>
-</main>
+    </ui-card>
+
+    <!-- Mailing address (legally required to send cold email) -->
+    <ui-card class="mt-6" title="Mailing address">
+      <p class="text-sm text-muted">
+        Required by law in every cold email. Shown in your email footer, alongside an
+        unsubscribe link.
+      </p>
+      <textarea
+        name="address"
+        [(ngModel)]="address"
+        rows="3"
+        placeholder="Your Company, 123 Main St, City, State ZIP, Country"
+        class="ui-textarea mt-3"
+      ></textarea>
+      <div class="mt-3">
+        <button ui-button variant="primary" [loading]="savingAddress()" (click)="saveAddress()">
+          Save address
+        </button>
+      </div>
+    </ui-card>
+
+    <!-- Cal.com booking link (File 13) — lets leads book meetings -->
+    <ui-card class="mt-6" title="Booking">
+      <div header>
+        @if (bookingConnected()) {
+          <ui-status-badge status="connected" text="Connected" />
+        } @else {
+          <ui-status-badge status="pending" text="Not connected" />
+        }
+      </div>
+      <p class="text-sm text-muted">
+        Connect your Cal.com to let leads book meetings. Paste your booking link — we add it to
+        your outreach emails as a one-click way to grab a time. Bookings show up on your
+        dashboard automatically.
+      </p>
+      <input
+        name="bookingUrl"
+        type="url"
+        [(ngModel)]="bookingUrl"
+        placeholder="https://cal.com/your-name/intro"
+        class="ui-input mt-3"
+      />
+      <div class="mt-3 flex flex-wrap items-center gap-3">
+        <button ui-button variant="primary" [loading]="savingBooking()" (click)="saveBooking()">
+          {{ bookingConnected() ? 'Update link' : 'Connect' }}
+        </button>
+        @if (bookingConnected()) {
+          <a
+            [href]="bookingUrl"
+            target="_blank"
+            rel="noopener"
+            class="text-sm text-accent hover:text-accent-strong"
+          >
+            Open my booking page
+          </a>
+        }
+      </div>
+      <p class="mt-3 text-xs text-muted">
+        New to Cal.com? Create a free account, connect your Google Calendar, then copy your event
+        link here.
+      </p>
+    </ui-card>
+
+    <!-- Profile -->
+    <ui-card class="mt-6" title="Profile">
+      <p class="text-sm text-muted">Re-read your website to refresh what we know about you.</p>
+      <a routerLink="/onboarding" class="mt-3 inline-block">
+        <button ui-button variant="secondary" iconLeft="refresh-cw">
+          Update profile from website
+        </button>
+      </a>
+    </ui-card>
+  }
+</div>

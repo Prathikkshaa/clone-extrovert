@@ -1,36 +1,41 @@
-// Billing (File 14).
+// Billing (File 14; File 16 shell + kit).
 // WHY: the money-in screen — buy credits (Stripe-hosted checkout), see the CURRENT
 // balance, a SEGREGATED breakdown of where credits went (search/enrichment/draft/
 // send), recent ledger entries, and a calm low/zero-balance prompt. Card data never
 // touches us: "Buy" returns a Stripe URL we redirect to. Credits land via the webhook,
 // so after a successful return we briefly re-poll the balance (the grant may lag a
-// second or two) and show a pending note until it does.
+// second or two) and show a pending note until it does. Refit to the shell + kit.
 import { Component, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { APP_NAME } from '@extrovertai/shared';
 import {
   BillingApiService,
   type BillingSummary,
   type CreditPack,
 } from '../../core/billing.service';
+import { Button } from '../../ui/button/button';
+import { Card } from '../../ui/card/card';
+import { EmptyState } from '../../ui/empty-state/empty-state';
+import { PageHeader } from '../../ui/page-header/page-header';
+import { Skeleton } from '../../ui/skeleton/skeleton';
+import { ToastService } from '../../ui/toast/toast.service';
 
 const DEBIT_ACTIONS = ['search', 'enrichment', 'draft', 'send'] as const;
 const PENDING_POLLS = 5; // re-check the balance ~5× after a successful return
 
 @Component({
   selector: 'app-billing',
-  imports: [RouterLink],
+  imports: [Button, Card, EmptyState, PageHeader, Skeleton],
   templateUrl: './billing.html',
 })
 export class Billing {
   private readonly api = inject(BillingApiService);
+  private readonly toast = inject(ToastService);
 
-  protected readonly appName = APP_NAME;
   protected readonly summary = signal<BillingSummary | null>(null);
   protected readonly loading = signal(true);
-  protected readonly error = signal<string | null>(null);
+  protected readonly loadFailed = signal(false);
   protected readonly buyingPackId = signal<string | null>(null);
-  protected readonly notice = signal<{ kind: 'info' | 'warn' | 'pending'; text: string } | null>(null);
+  // Persistent note for the post-checkout return flow (pending grant / info).
+  protected readonly notice = signal<{ kind: 'info' | 'pending'; text: string } | null>(null);
 
   protected readonly actions = DEBIT_ACTIONS;
 
@@ -77,7 +82,6 @@ export class Billing {
 
   buy(pack: CreditPack): void {
     if (this.buyingPackId()) return;
-    this.notice.set(null);
     this.buyingPackId.set(pack.id);
     this.api.checkout(pack.id).subscribe({
       next: (res) => {
@@ -86,16 +90,15 @@ export class Billing {
           return;
         }
         this.buyingPackId.set(null);
-        this.notice.set({
-          kind: 'warn',
-          text: res.configured
+        this.toast.warn(
+          res.configured
             ? res.error
             : 'Billing isn’t switched on yet. Add your Stripe keys to enable buying credits.',
-        });
+        );
       },
       error: () => {
         this.buyingPackId.set(null);
-        this.notice.set({ kind: 'warn', text: 'Could not start checkout. Please try again.' });
+        this.toast.warn('Could not start checkout. Please try again.');
       },
     });
   }
@@ -105,6 +108,7 @@ export class Billing {
   }
 
   private load(done?: (s: BillingSummary) => void): void {
+    this.loadFailed.set(false);
     this.api.summary().subscribe({
       next: (s) => {
         this.summary.set(s);
@@ -113,7 +117,7 @@ export class Billing {
       },
       error: () => {
         this.loading.set(false);
-        this.error.set('Could not load your billing details. Please try again.');
+        this.loadFailed.set(true);
       },
     });
   }
@@ -123,7 +127,7 @@ export class Billing {
     const params = new URLSearchParams(window.location.search);
     const status = params.get('status');
     if (status === 'cancelled') {
-      this.notice.set({ kind: 'info', text: 'Checkout cancelled — you weren’t charged.' });
+      this.toast.info('Checkout cancelled — you weren’t charged.');
       this.clearQuery();
     } else if (status === 'success') {
       // The webhook grants the credits; it may lag a moment. Poll a few times.
@@ -144,7 +148,8 @@ export class Billing {
     window.setTimeout(() => {
       this.load((s) => {
         if (previousBalance === null || s.balance > previousBalance) {
-          this.notice.set({ kind: 'info', text: 'Credits added. You’re good to go.' });
+          this.notice.set(null);
+          this.toast.success('Credits added. You’re good to go.');
         } else {
           this.pollForGrant(previousBalance, attemptsLeft - 1);
         }
