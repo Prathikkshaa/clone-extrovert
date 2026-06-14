@@ -3,8 +3,8 @@
 > Updated continuously by the executing agent. On resume, read this first (see 16-ui-ux-revamp.md §0.2).
 
 ## Current status
-- Active phase: 3
-- Active task: home launchpad + first-run checklist + pipeline stepper
+- Active phase: 4
+- Active task: per-screen layout pass (all screens onto kit + shell)
 - State: in-progress   <!-- not-started | in-progress | done | blocked -->
 - Last updated: 2026-06-15
 - Blocker (if any): none
@@ -13,7 +13,7 @@
 - [x] Phase 0 — Foundation: icons, dark/light tokens + ThemeModeService, ui/ + layout/ scaffolding
 - [x] Phase 1 — Component kit (Button, PageHeader, Card, EmptyState, StatusBadge, Skeleton, Field, Toast, ConfirmDialog)
 - [x] Phase 2 — App shell + route restructure (Sidebar, Topbar, breadcrumb/back) + dark-mode toggle wired
-- [ ] Phase 3 — Home launchpad + first-run checklist + pipeline stepper
+- [x] Phase 3 — Home launchpad + first-run checklist + pipeline stepper
 - [ ] Phase 4 — Per-screen layout pass (all 15 screens onto the kit + shell + next-step CTAs)
 - [ ] Phase 5 — Visual polish (icons everywhere, type/spacing/density, micro-interactions, responsive drawer + mobile nav, a11y)
 - [ ] Phase 6 — Full visual verification sweep + fixes
@@ -89,4 +89,25 @@
   (517kB vs 500kB) — dominated by Angular core + @supabase/supabase-js pulled in eagerly by
   the route guards; File 16 adds only ThemeModeService (~2KB) to the eager path, so this is not
   a revamp regression. It's a warning (build passes); left as-is (code-splitting supabase is
-  out of scope/risky). Commit: <pending>.
+  out of scope/risky). Commit: b8ab61b.
+- Phase 3: **DONE.** (1) **pipeline-stepper** (`ui/pipeline-stepper/`): input `current`
+  (find|enrich|write|send); renders the 4 ordered steps with completed=check+accent,
+  current=accent+ring, todo=muted; connectors fill accent for done legs; each step links to
+  its screen. (2) **Home → launchpad** (`pages/home/*` rebuilt): a "Getting started" checklist
+  computed from REAL state — (a) mailbox connected (mailboxes.list), (b) company profile set
+  (company-profile.services), (c) mailing address (me.physical_address), (d) credits>0
+  (dashboard.summary.creditBalance), (e) first leads (lists.length). Completed items show a
+  green check + strike-through; incomplete show icon+hint+chevron and link to the fix. A
+  computed `nextStep` (first incomplete) drives the "what's next" banner + primary CTA; when
+  all done, a "You're all set" card + the returning-user view. A 3-stat row (meetings/positive
+  replies/credits) links to dashboard/inbox/billing. The pipeline-stepper overview sits at the
+  bottom. Uses the shell + `ui-page-header` (title "Home", breadcrumb [Home]) + kit (card,
+  button, skeleton, icon). Replaced the old 10-button grid. (3) home.ts trimmed to the new
+  data sources (dropped the old HttpClient/ThemeService/credits wiring — the shell applies the
+  brand theme now). **Verify:** build + lint clean. Browser-verified (temp preview :4300,
+  restored) at desktop 1280, light + dark: real account renders the "You're all set" + stats
+  (0/0/89) + pipeline; simulated partial accounts (via Angular debug `ng.applyChanges`) render
+  the checklist with correct checks/strike-through and the "what's next" banner correctly
+  tracking the first incomplete step (mailing address @ 3/5, company profile @ 2/5); breadcrumb
+  "Home" shows in the topbar (ui-page-header→BreadcrumbService working); no console errors.
+  Commit: <pending>.

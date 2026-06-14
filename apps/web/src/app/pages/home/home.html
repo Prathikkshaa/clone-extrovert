@@ -1,88 +1,167 @@
-<div class="px-4 py-8 text-ink">
-  <div class="mx-auto max-w-xl">
-    <section>
-      <h1 class="text-heading-lg text-ink">Welcome</h1>
-      @if (email) {
-        <p class="mt-2 text-body text-muted">You're signed in as {{ email }}.</p>
-      }
+<div class="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+  <ui-page-header
+    title="Home"
+    [subtitle]="email ? 'Signed in as ' + email : 'Welcome'"
+    [breadcrumb]="[{ label: 'Home' }]"
+  >
+    <a actions routerLink="/search">
+      <button ui-button variant="primary" iconLeft="search">Find leads</button>
+    </a>
+  </ui-page-header>
 
-      <div class="mt-8 rounded-lg border border-line bg-surface p-6">
-        <h2 class="text-heading-sm text-ink">Your profile</h2>
-        @if (profile(); as p) {
-          <dl class="mt-3 space-y-2 text-sm">
-            <div class="flex justify-between">
-              <dt class="text-muted">Plan</dt>
-              <dd class="text-ink">{{ p.plan }}</dd>
-            </div>
-            <div class="flex justify-between">
-              <dt class="text-muted">Mode</dt>
-              <dd class="text-ink">{{ p.mode }}</dd>
-            </div>
-            <div class="flex justify-between">
-              <dt class="text-muted">Daily send cap</dt>
-              <dd class="text-ink">{{ p.daily_send_cap }}</dd>
-            </div>
-          </dl>
-        } @else if (loadError()) {
-          <p class="mt-3 text-sm text-danger" role="alert">{{ loadError() }}</p>
-        } @else {
-          <p class="mt-3 text-sm text-muted">Loading your profile…</p>
-        }
-      </div>
-
-      @if (!company() || !company()?.services) {
-        <div class="mt-6 rounded-lg border border-line bg-surface p-4">
-          <p class="text-sm text-ink">Set up your company profile so we can write in your voice.</p>
-          <a routerLink="/onboarding" class="mt-2 inline-block text-sm font-medium text-accent hover:text-accent-strong">
-            Set up your profile →
-          </a>
+  <!-- Getting started: shown until every step is done -->
+  @if (loading()) {
+    <ui-card class="mt-8">
+      <ui-skeleton [lines]="5" [height]="20" />
+    </ui-card>
+  } @else if (!allDone()) {
+    <ui-card class="mt-8">
+      <div class="mb-4 flex items-center gap-3">
+        <span
+          class="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft text-accent"
+        >
+          <ui-icon name="rocket" [size]="20" />
+        </span>
+        <div>
+          <h2 class="text-heading-sm text-ink">Getting started</h2>
+          <p class="text-sm text-muted">
+            {{ doneCount() }} of {{ checklist().length }} done — finish setup to start
+            reaching out.
+          </p>
         </div>
-      }
+      </div>
 
-      <div class="mt-6 flex flex-wrap gap-3">
-        <a
-          routerLink="/search"
-          class="inline-block rounded-md bg-accent px-4 py-2.5 text-heading-sm text-white transition-colors duration-200 hover:bg-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+      <ul class="divide-y divide-line">
+        @for (item of checklist(); track item.key) {
+          <li>
+            <a
+              [routerLink]="item.link"
+              class="group flex items-center gap-3 py-3 transition-colors duration-200"
+            >
+              <span
+                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+                [class.bg-positive-soft]="item.done"
+                [class.text-positive]="item.done"
+                [class.border]="!item.done"
+                [class.border-line]="!item.done"
+                [class.text-muted]="!item.done"
+              >
+                @if (item.done) {
+                  <ui-icon name="check" [size]="16" />
+                } @else {
+                  <ui-icon [name]="item.icon" [size]="16" />
+                }
+              </span>
+              <span class="min-w-0 flex-1">
+                <span
+                  class="block text-sm font-medium"
+                  [class.text-muted]="item.done"
+                  [class.line-through]="item.done"
+                  [class.text-ink]="!item.done"
+                  >{{ item.label }}</span
+                >
+                @if (!item.done) {
+                  <span class="block text-sm text-muted">{{ item.hint }}</span>
+                }
+              </span>
+              @if (!item.done) {
+                <ui-icon
+                  name="chevron-right"
+                  [size]="18"
+                  class="shrink-0 text-muted transition-transform duration-200 group-hover:translate-x-0.5"
+                />
+              }
+            </a>
+          </li>
+        }
+      </ul>
+    </ui-card>
+  } @else {
+    <!-- All set: returning-user view leads with stats -->
+    <ui-card class="mt-8">
+      <div class="flex items-center gap-3">
+        <span
+          class="flex h-9 w-9 items-center justify-center rounded-lg bg-positive-soft text-positive"
         >
-          Find leads
-        </a>
-        <a
-          routerLink="/enrich"
-          class="inline-block rounded-md border border-line px-4 py-2.5 text-heading-sm text-ink transition-colors duration-200 hover:bg-surface"
-        >
-          Enrich leads
-        </a>
-        <a
-          routerLink="/send"
-          class="inline-block rounded-md border border-line px-4 py-2.5 text-heading-sm text-ink transition-colors duration-200 hover:bg-surface"
-        >
-          Start sending
-        </a>
-        <a
-          routerLink="/inbox"
-          class="inline-block rounded-md border border-line px-4 py-2.5 text-heading-sm text-ink transition-colors duration-200 hover:bg-surface"
-        >
-          Inbox
-        </a>
-        <a
-          routerLink="/draft"
-          class="inline-block rounded-md border border-line px-4 py-2.5 text-heading-sm text-ink transition-colors duration-200 hover:bg-surface"
-        >
-          Write emails
-        </a>
-        <a
-          routerLink="/mailboxes"
-          class="inline-block rounded-md border border-line px-4 py-2.5 text-heading-sm text-ink transition-colors duration-200 hover:bg-surface"
-        >
-          Connect a mailbox
-        </a>
-        <a
-          routerLink="/onboarding"
-          class="inline-block rounded-md border border-line px-4 py-2.5 text-heading-sm text-ink transition-colors duration-200 hover:bg-surface"
-        >
-          Set up profile
+          <ui-icon name="circle-check" [size]="20" />
+        </span>
+        <div>
+          <h2 class="text-heading-sm text-ink">You're all set</h2>
+          <p class="text-sm text-muted">
+            Everything's connected. Keep the pipeline moving.
+          </p>
+        </div>
+      </div>
+    </ui-card>
+  }
+
+  <!-- At-a-glance stats (when we have a summary) -->
+  @if (summary(); as s) {
+    <div class="mt-6 grid grid-cols-3 gap-3">
+      <a
+        routerLink="/dashboard"
+        class="rounded-lg border border-line bg-surface p-4 transition-colors duration-200 hover:bg-canvas"
+      >
+        <p class="text-2xl font-medium text-ink">{{ s.meetingsBooked }}</p>
+        <p class="mt-0.5 text-sm text-muted">Meetings booked</p>
+      </a>
+      <a
+        routerLink="/inbox"
+        class="rounded-lg border border-line bg-surface p-4 transition-colors duration-200 hover:bg-canvas"
+      >
+        <p class="text-2xl font-medium text-ink">{{ s.positiveReplies }}</p>
+        <p class="mt-0.5 text-sm text-muted">Positive replies</p>
+      </a>
+      <a
+        routerLink="/billing"
+        class="rounded-lg border border-line bg-surface p-4 transition-colors duration-200 hover:bg-canvas"
+      >
+        <p class="text-2xl font-medium text-ink">{{ s.creditBalance }}</p>
+        <p class="mt-0.5 text-sm text-muted">Credits left</p>
+      </a>
+    </div>
+  }
+
+  <!-- Pipeline overview -->
+  <ui-card class="mt-6" title="Your outreach pipeline">
+    <p class="-mt-2 mb-5 text-sm text-muted">
+      Find businesses, enrich them, write personalised emails, then send — one
+      step at a time.
+    </p>
+    <pipeline-stepper current="find" />
+    @if (nextStep(); as next) {
+      <div
+        class="mt-6 flex flex-col gap-3 rounded-md bg-accent-soft p-4 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="flex items-start gap-3">
+          <ui-icon name="sparkles" [size]="18" class="mt-0.5 shrink-0 text-accent" />
+          <div>
+            <p class="text-sm font-medium text-ink">Next: {{ next.label }}</p>
+            <p class="text-sm text-muted">{{ next.hint }}</p>
+          </div>
+        </div>
+        <a [routerLink]="next.link" class="shrink-0">
+          <button ui-button variant="primary" iconRight="arrow-right">
+            {{ next.label }}
+          </button>
         </a>
       </div>
-    </section>
-  </div>
+    } @else {
+      <div
+        class="mt-6 flex flex-col gap-3 rounded-md bg-accent-soft p-4 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="flex items-start gap-3">
+          <ui-icon name="search" [size]="18" class="mt-0.5 shrink-0 text-accent" />
+          <p class="text-sm font-medium text-ink">
+            Keep going — find more leads to fill your pipeline.
+          </p>
+        </div>
+        <a routerLink="/search" class="shrink-0">
+          <button ui-button variant="primary" iconRight="arrow-right">
+            Find leads
+          </button>
+        </a>
+      </div>
+    }
+  </ui-card>
 </div>

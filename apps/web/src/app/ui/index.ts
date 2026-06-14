@@ -19,3 +19,7 @@ export {
   ConfirmService,
   type ConfirmOptions,
 } from './confirm/confirm.service';
+export {
+  PipelineStepper,
+  type PipelineStep,
+} from './pipeline-stepper/pipeline-stepper';
