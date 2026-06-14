@@ -8,6 +8,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Shared form-control styling (File 16). WHY: ui-field wraps controls but the
+ * control itself needs consistent borders/focus across every screen. Apply
+ * .ui-input to inputs, .ui-textarea to textareas, .ui-select to selects. */
+@layer components {
+  .ui-input,
+  .ui-textarea,
+  .ui-select {
+    @apply w-full rounded-md border border-line bg-surface px-3 py-2 text-body text-ink
+      placeholder:text-muted transition-colors duration-200
+      focus:border-accent focus:outline-none focus-visible:ring-2
+      focus-visible:ring-accent focus-visible:ring-offset-1
+      focus-visible:ring-offset-canvas;
+  }
+  .ui-textarea {
+    @apply min-h-24 resize-y leading-relaxed;
+  }
+}
+
 :root {
   /* Core palette */
   --color-ink: #1a1a18; /* warm near-black text */
@@ -95,6 +113,36 @@ body {
   font-weight: 400;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Kit micro-interactions (File 16). Subtle, 150–250ms (§7). The reduced-motion
+ * block below neutralises these. */
+@keyframes ui-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.ui-toast {
+  animation: ui-toast-in 200ms ease-out;
+}
+
+@keyframes ui-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.ui-dialog {
+  animation: ui-dialog-in 180ms ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
