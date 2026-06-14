@@ -1,37 +1,6 @@
-<main class="min-h-screen bg-canvas text-ink px-4 py-10">
+<div class="px-4 py-8 text-ink">
   <div class="mx-auto max-w-xl">
-    <header class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        @if (company()?.logo_url) {
-          <img [src]="company()!.logo_url" alt="Your logo" class="h-7 w-7 rounded object-contain" />
-        }
-        <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
-      </div>
-      <div class="flex items-center gap-3">
-        @if (balance() !== null) {
-          <a
-            routerLink="/billing"
-            class="rounded-full border border-line bg-surface px-3 py-1 text-sm font-medium text-ink hover:bg-canvas"
-            [class.text-danger]="balance()! <= 0"
-            title="Credit balance — buy more"
-          >
-            {{ balance() }} credits
-          </a>
-        }
-        <a routerLink="/billing" class="text-sm text-accent hover:text-accent-strong">Billing</a>
-        <a routerLink="/dashboard" class="text-sm text-accent hover:text-accent-strong">Dashboard</a>
-        <a routerLink="/settings" class="text-sm text-accent hover:text-accent-strong">Settings</a>
-        <button
-          type="button"
-          (click)="logout()"
-          class="rounded-md border border-line px-3 py-1.5 text-sm text-ink transition-colors duration-200 hover:bg-surface"
-        >
-          Log out
-        </button>
-      </div>
-    </header>
-
-    <section class="mt-10">
+    <section>
       <h1 class="text-heading-lg text-ink">Welcome</h1>
       @if (email) {
         <p class="mt-2 text-body text-muted">You're signed in as {{ email }}.</p>
@@ -116,4 +85,4 @@
       </div>
     </section>
   </div>
-</main>
+</div>

@@ -3,8 +3,8 @@
 > Updated continuously by the executing agent. On resume, read this first (see 16-ui-ux-revamp.md §0.2).
 
 ## Current status
-- Active phase: 2
-- Active task: app shell + route restructure + dark-mode toggle
+- Active phase: 3
+- Active task: home launchpad + first-run checklist + pipeline stepper
 - State: in-progress   <!-- not-started | in-progress | done | blocked -->
 - Last updated: 2026-06-15
 - Blocker (if any): none
@@ -12,7 +12,7 @@
 ## Phase checklist
 - [x] Phase 0 — Foundation: icons, dark/light tokens + ThemeModeService, ui/ + layout/ scaffolding
 - [x] Phase 1 — Component kit (Button, PageHeader, Card, EmptyState, StatusBadge, Skeleton, Field, Toast, ConfirmDialog)
-- [ ] Phase 2 — App shell + route restructure (Sidebar, Topbar, breadcrumb/back) + dark-mode toggle wired
+- [x] Phase 2 — App shell + route restructure (Sidebar, Topbar, breadcrumb/back) + dark-mode toggle wired
 - [ ] Phase 3 — Home launchpad + first-run checklist + pipeline stepper
 - [ ] Phase 4 — Per-screen layout pass (all 15 screens onto the kit + shell + next-step CTAs)
 - [ ] Phase 5 — Visual polish (icons everywhere, type/spacing/density, micro-interactions, responsive drawer + mobile nav, a11y)
@@ -65,4 +65,28 @@
   removed; launch.json restored) in BOTH light + dark: every component renders correctly,
   badge tones map right, inputs styled, confirm dialog opens with aria-modal + focus on
   Cancel + ESC closes, toasts render with role=alert + correct text, icons render; no console
-  errors. Commit: <pending>.
+  errors. Commit: adf475e.
+- Phase 2: **DONE.** Built the persistent shell in `layout/`: `app-shell` (Shell — flex
+  sidebar + (topbar over router-outlet), mounts ui-toast-host + ui-confirm-dialog, applies
+  the user's brand accent once for the whole authed area, owns the mobile drawer state);
+  `app-sidebar` (grouped nav — Workflow: Find leads/Enrich/Write/Send · Manage: Inbox(+badge)/
+  Dashboard · pinned Billing/Settings; lucide icons; routerLinkActive teal-soft highlight;
+  off-canvas drawer < md, slides over a backdrop, closes on nav-click); `app-topbar` (history
+  back + breadcrumb from BreadcrumbService; credits chip via CreditsApiService, red at ≤0,
+  links /billing, refreshed on NavigationEnd; dark/light toggle via ThemeModeService sun/moon;
+  notifications bell placeholder; account menu — email + Settings/Mailboxes/Log out, click-
+  outside close). New `NavBadgeService` for the inbox unread count (set by the Inbox screen in
+  Phase 4; badge hidden at 0). **Route restructure** (`app.routes.ts`): all authed screens are
+  now children of one shell parent route guarded once by `authGuard` (children dropped their
+  own guard); landing/login/signup stay outside the shell; every path preserved; lazy loading
+  kept. Removed home's duplicated header/back chrome as the no-double-chrome proof (home gets
+  fully rebuilt in Phase 3). **Verify:** build + lint clean. Browser-verified (temp preview
+  :4300, authGuard temporarily lifted then restored, launch.json restored) at desktop 1280 +
+  mobile 375, light + dark: grouped sidebar renders, active route highlights teal, account
+  menu opens with the 3 items, credits chip shows real balance (89), dark toggle flips the
+  whole shell, mobile hamburger opens the drawer over a backdrop (sidebar x: -240→0), home has
+  no double chrome; no console errors. **Note:** pre-existing initial-bundle budget WARNING
+  (517kB vs 500kB) — dominated by Angular core + @supabase/supabase-js pulled in eagerly by
+  the route guards; File 16 adds only ThemeModeService (~2KB) to the eager path, so this is not
+  a revamp regression. It's a warning (build passes); left as-is (code-splitting supabase is
+  out of scope/risky). Commit: <pending>.

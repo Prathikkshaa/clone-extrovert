@@ -1,3 +1,6 @@
-// Layout / app-shell barrel (File 16). The persistent shell (sidebar, topbar,
-// breadcrumb/back, toast host) lands here in Phase 2. Placeholder for now.
-export {};
+// Layout / app-shell barrel (File 16). The persistent shell wrapping all
+// authenticated screens: Shell composes the Sidebar + Topbar + router-outlet and
+// mounts the toast host + confirm dialog.
+export { Shell } from './shell';
+export { Sidebar } from './sidebar';
+export { Topbar } from './topbar';
