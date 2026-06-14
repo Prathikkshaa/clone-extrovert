@@ -822,6 +822,37 @@ export type Database = {
           },
         ];
       };
+      stripe_events: {
+        Row: {
+          id: string;
+          type: string;
+          user_id: string | null;
+          credits: number | null;
+          created_at: string;
+        };
+        Insert: {
+          id: string;
+          type: string;
+          user_id?: string | null;
+          credits?: number | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          type?: string;
+          user_id?: string | null;
+          credits?: number | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'stripe_events_user_id_fkey';
+            columns: ['user_id'];
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;

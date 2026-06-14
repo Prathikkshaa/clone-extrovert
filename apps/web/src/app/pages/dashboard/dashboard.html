@@ -142,11 +142,8 @@
             <p class="mt-0.5 text-2xl font-medium text-ink">{{ s.creditBalance }}</p>
           </div>
           <div class="text-right">
-            <button type="button" (click)="topUp()"
-              class="rounded-md bg-accent px-4 py-2 text-sm text-white hover:bg-accent-strong">Top up</button>
-            @if (showTopUpNote()) {
-              <p class="mt-2 text-xs text-muted">Top-up opens in the next step (billing).</p>
-            }
+            <a routerLink="/billing"
+              class="inline-block rounded-md bg-accent px-4 py-2 text-sm text-white hover:bg-accent-strong">Top up</a>
           </div>
         </section>
 

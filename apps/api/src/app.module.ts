@@ -18,6 +18,7 @@ import { ComplianceApiModule } from './compliance/compliance.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { TrackingApiModule } from './tracking/tracking.module';
 import { BookingApiModule } from './booking/booking.module';
+import { BillingApiModule } from './billing/billing.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { BookingApiModule } from './booking/booking.module';
     DashboardModule,
     TrackingApiModule,
     BookingApiModule,
+    BillingApiModule,
   ],
 })
 export class AppModule {}

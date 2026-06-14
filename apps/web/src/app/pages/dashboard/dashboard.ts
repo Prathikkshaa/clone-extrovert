@@ -26,7 +26,6 @@ export class Dashboard {
   protected readonly campaigns = signal<CampaignStat[] | null>(null);
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
-  protected readonly showTopUpNote = signal(false);
 
   // Bounce rate as a friendly percentage string (1 decimal).
   protected readonly bouncePct = computed(() => {
@@ -48,11 +47,6 @@ export class Dashboard {
 
   reload(): void {
     this.load();
-  }
-
-  topUp(): void {
-    // Full billing/top-up is File 14; for now we surface an honest note (no broken link).
-    this.showTopUpNote.set(true);
   }
 
   healthLabel(status: string): string {

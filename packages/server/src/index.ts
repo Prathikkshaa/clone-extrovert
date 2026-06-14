@@ -46,3 +46,6 @@ export * from './tracking/tracking.module';
 export * from './booking/booking.util';
 export * from './booking/booking.service';
 export * from './booking/booking.module';
+export * from './stripe/stripe.util';
+export * from './stripe/stripe.service';
+export * from './stripe/stripe.module';

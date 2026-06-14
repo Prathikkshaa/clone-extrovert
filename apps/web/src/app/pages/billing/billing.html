@@ -1,0 +1,153 @@
+<main class="min-h-screen bg-canvas text-ink px-4 py-10">
+  <div class="mx-auto max-w-3xl">
+    <header class="flex items-center justify-between">
+      <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
+      <a routerLink="/home" class="text-sm text-accent hover:text-accent-strong">Home</a>
+    </header>
+
+    <div class="mt-6 flex items-end justify-between gap-3">
+      <div>
+        <h1 class="text-heading-lg text-ink">Billing</h1>
+        <p class="mt-1 text-sm text-muted">Buy credits and see where they go.</p>
+      </div>
+      <button type="button" (click)="reload()"
+        class="rounded-md border border-line px-3 py-1.5 text-sm text-ink hover:bg-surface">Refresh</button>
+    </div>
+
+    @if (notice(); as n) {
+      <div class="mt-6 rounded-lg border p-4 text-sm"
+        [class.border-line]="n.kind !== 'warn'"
+        [class.bg-surface]="true"
+        [class.text-ink]="n.kind === 'info'"
+        [class.text-warning]="n.kind === 'warn'"
+        [class.text-muted]="n.kind === 'pending'"
+        role="status">
+        {{ n.text }}
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="mt-8 space-y-3">
+        <div class="h-28 animate-pulse rounded-lg bg-line"></div>
+        <div class="h-40 animate-pulse rounded-lg bg-line"></div>
+      </div>
+    }
+
+    @if (error(); as e) {
+      <p class="mt-8 text-sm text-danger" role="alert">{{ e }}</p>
+    }
+
+    @if (summary(); as s) {
+      <!-- Balance + low/zero state -->
+      <section class="mt-8 rounded-lg border border-line bg-surface p-6">
+        <p class="text-sm text-muted">Current balance</p>
+        <p class="mt-1 text-4xl font-medium" [class.text-ink]="!isZero()" [class.text-danger]="isZero()">
+          {{ s.balance }} <span class="text-lg text-muted">credits</span>
+        </p>
+
+        @if (isZero()) {
+          <div class="mt-4 rounded-md border border-line bg-canvas p-4">
+            <p class="text-sm font-medium text-danger">You’re out of credits.</p>
+            <p class="mt-1 text-sm text-muted">
+              Searching, enriching, drafting, and sending are paused until you top up. Pick a pack below to keep going.
+            </p>
+          </div>
+        } @else if (isLow()) {
+          <div class="mt-4 rounded-md border border-line bg-canvas p-4">
+            <p class="text-sm font-medium text-warning">Running low.</p>
+            <p class="mt-1 text-sm text-muted">
+              You have {{ s.balance }} credits left. Top up so your campaigns don’t stop mid-flight.
+            </p>
+          </div>
+        }
+      </section>
+
+      <!-- Credit packs -->
+      <section class="mt-6">
+        <h2 class="text-heading-sm text-ink">Buy credits</h2>
+        @if (!s.billingConfigured) {
+          <p class="mt-1 text-sm text-muted">
+            Billing isn’t switched on yet. Once Stripe keys are added, you can buy credits here — securely on Stripe (we never see your card).
+          </p>
+        } @else {
+          <p class="mt-1 text-sm text-muted">Secure checkout on Stripe. We never see your card details.</p>
+        }
+        <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          @for (pack of s.packs; track pack.id) {
+            <div class="flex flex-col rounded-lg border border-line bg-surface p-5">
+              <p class="text-sm font-medium text-ink">{{ pack.label }}</p>
+              <p class="mt-2 text-3xl font-medium text-ink">{{ pack.credits }}</p>
+              <p class="text-xs text-muted">credits</p>
+              <p class="mt-3 text-sm text-ink">{{ price(pack) }}</p>
+              <p class="text-xs text-muted">{{ perCredit(pack) }}</p>
+              <button type="button" (click)="buy(pack)"
+                [disabled]="!s.billingConfigured || buyingPackId() !== null"
+                class="mt-4 rounded-md bg-accent px-4 py-2 text-sm text-white transition-colors duration-200 hover:bg-accent-strong disabled:opacity-50">
+                {{ buyingPackId() === pack.id ? 'Starting…' : 'Buy' }}
+              </button>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Segregated usage breakdown -->
+      <section class="mt-8 rounded-lg border border-line bg-surface p-6">
+        <div class="flex items-center justify-between">
+          <h2 class="text-heading-sm text-ink">Where your credits went</h2>
+          <span class="text-xs text-muted">Last {{ s.usage.windowDays }} days</span>
+        </div>
+        <dl class="mt-4 space-y-2 text-sm">
+          @for (action of actions; track action) {
+            <div class="flex items-center justify-between">
+              <dt class="text-muted">{{ reasonLabel(action) }}
+                <span class="text-xs">({{ s.creditCosts[action] }}/use)</span>
+              </dt>
+              <dd class="text-ink">{{ spend(action) }} credits</dd>
+            </div>
+          }
+          <div class="flex items-center justify-between border-t border-line pt-2">
+            <dt class="font-medium text-ink">Total spent</dt>
+            <dd class="font-medium text-ink">{{ s.usage.totalSpent }} credits</dd>
+          </div>
+          @if (s.usage.refunded > 0) {
+            <div class="flex items-center justify-between">
+              <dt class="text-muted">Refunded (failed actions)</dt>
+              <dd class="text-positive">+{{ s.usage.refunded }} credits</dd>
+            </div>
+          }
+          @if (s.usage.purchased > 0) {
+            <div class="flex items-center justify-between">
+              <dt class="text-muted">Bought</dt>
+              <dd class="text-positive">+{{ s.usage.purchased }} credits</dd>
+            </div>
+          }
+        </dl>
+        @if (s.usage.totalSpent === 0 && s.usage.purchased === 0) {
+          <p class="mt-3 text-sm text-muted">No credit activity in this window yet.</p>
+        }
+      </section>
+
+      <!-- Recent ledger -->
+      <section class="mt-6 rounded-lg border border-line bg-surface p-6">
+        <h2 class="text-heading-sm text-ink">Recent activity</h2>
+        @if (s.recent.length === 0) {
+          <p class="mt-3 text-sm text-muted">Nothing yet.</p>
+        } @else {
+          <ul class="mt-3 divide-y divide-line text-sm">
+            @for (entry of s.recent; track entry.created_at) {
+              <li class="flex items-center justify-between py-2">
+                <span class="text-muted">{{ reasonLabel(entry.reason) }}</span>
+                <span [class.text-positive]="entry.delta > 0" [class.text-ink]="entry.delta <= 0">
+                  {{ entry.delta > 0 ? '+' : '' }}{{ entry.delta }}
+                </span>
+              </li>
+            }
+          </ul>
+        }
+        <p class="mt-4 text-xs text-muted">
+          Balance always equals the sum of every entry — purchases, debits, and refunds.
+        </p>
+      </section>
+    }
+  </div>
+</main>

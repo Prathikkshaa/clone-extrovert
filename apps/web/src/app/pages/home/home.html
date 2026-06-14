@@ -9,14 +9,16 @@
       </div>
       <div class="flex items-center gap-3">
         @if (balance() !== null) {
-          <span
-            class="rounded-full border border-line bg-surface px-3 py-1 text-sm font-medium text-ink"
+          <a
+            routerLink="/billing"
+            class="rounded-full border border-line bg-surface px-3 py-1 text-sm font-medium text-ink hover:bg-canvas"
             [class.text-danger]="balance()! <= 0"
-            title="Credit balance"
+            title="Credit balance — buy more"
           >
             {{ balance() }} credits
-          </span>
+          </a>
         }
+        <a routerLink="/billing" class="text-sm text-accent hover:text-accent-strong">Billing</a>
         <a routerLink="/dashboard" class="text-sm text-accent hover:text-accent-strong">Dashboard</a>
         <a routerLink="/settings" class="text-sm text-accent hover:text-accent-strong">Settings</a>
         <button

@@ -11,7 +11,12 @@
 // reserving first.
 import { Injectable, Logger } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
-import { CREDIT_COSTS, CreditReason, type CreditAction } from '@extrovertai/shared';
+import {
+  CREDIT_COSTS,
+  CREDIT_DEBIT_ACTIONS,
+  CreditReason,
+  type CreditAction,
+} from '@extrovertai/shared';
 import { InsufficientCreditsError } from './billing.errors';
 
 export interface LedgerEntry {
@@ -20,6 +25,21 @@ export interface LedgerEntry {
   ref_id: string | null;
   created_at: string;
 }
+
+export interface UsageSummary {
+  windowDays: number;
+  // Credits SPENT per debit action over the window (positive numbers).
+  spendByAction: Record<CreditAction, number>;
+  totalSpent: number;
+  purchased: number; // credits bought in the window
+  refunded: number; // credits returned in the window
+  // Net ledger change over the window (= purchased − totalSpent + refunded). Proves
+  // the breakdown ties out with the ledger (the same rows produce both).
+  netChange: number;
+}
+
+// Cap the window scan so a very busy account can't load an unbounded set into memory.
+const USAGE_SCAN_CAP = 5000;
 
 @Injectable()
 export class BillingService {
@@ -109,6 +129,57 @@ export class BillingService {
       throw new Error(`Could not read ledger: ${error.message}`);
     }
     return data ?? [];
+  }
+
+  /**
+   * Segregated usage over a window, computed FROM the ledger so it always ties out
+   * with the balance (the same `credit_ledger` rows produce both). Answers "where did
+   * my credits go?" — spend split by action type, plus purchases/refunds and the net
+   * change (= purchased − spent + refunded). Scoped + capped by created_at.
+   */
+  async usageSummary(userId: string, days = 30): Promise<UsageSummary> {
+    const windowDays = Number.isFinite(days) && days > 0 ? Math.min(365, Math.floor(days)) : 30;
+    const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000).toISOString();
+
+    const { data, error } = await this.supabase
+      .getAdminClient()
+      .from('credit_ledger')
+      .select('delta, reason')
+      .eq('user_id', userId)
+      .gte('created_at', since)
+      .limit(USAGE_SCAN_CAP);
+    if (error) throw new Error(`Could not read usage: ${error.message}`);
+
+    const spendByAction = Object.fromEntries(
+      CREDIT_DEBIT_ACTIONS.map((a) => [a, 0]),
+    ) as Record<CreditAction, number>;
+    let totalSpent = 0;
+    let purchased = 0;
+    let refunded = 0;
+
+    for (const row of data ?? []) {
+      const reason = row.reason as string;
+      const delta = Number(row.delta) || 0;
+      if (reason === CreditReason.Purchase) {
+        purchased += delta;
+      } else if (reason === CreditReason.Refund) {
+        refunded += delta;
+      } else if ((CREDIT_DEBIT_ACTIONS as readonly string[]).includes(reason)) {
+        // Debits are stored negative; surface spend as a positive number.
+        const spent = Math.abs(delta);
+        spendByAction[reason as CreditAction] += spent;
+        totalSpent += spent;
+      }
+    }
+
+    return {
+      windowDays,
+      spendByAction,
+      totalSpent,
+      purchased,
+      refunded,
+      netChange: purchased - totalSpent + refunded,
+    };
   }
 
   /**
