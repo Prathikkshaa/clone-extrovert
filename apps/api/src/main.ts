@@ -8,7 +8,10 @@ import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule);
+  // rawBody: true captures the exact request bytes (alongside the parsed body) so the
+  // Cal.com webhook can HMAC-verify the unmodified payload (File 13). Re-parsing JSON
+  // would change key order/whitespace and break the signature.
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   // Allow the Angular dev app (and other local origins) to call the API with the
   // Supabase Bearer token. Tighten the allowed origins for production later.

@@ -79,11 +79,11 @@ export class UsersService {
     throw new InternalServerErrorException('Could not load or create your profile.');
   }
 
-  /** Update the caller's profile settings (mailing address + send mode). */
+  /** Update the caller's profile settings (mailing address + send mode + booking link). */
   async updateProfile(
     userId: string,
     email: string | null,
-    patch: { physical_address?: string; mode?: 'draft' | 'autonomous' },
+    patch: { physical_address?: string; mode?: 'draft' | 'autonomous'; booking_url?: string },
   ): Promise<UserProfile> {
     await this.getOrCreateProfile(userId, email); // ensure the row exists
     const update: Partial<UserProfile> = {};
@@ -91,6 +91,9 @@ export class UsersService {
       update.physical_address = patch.physical_address.trim() || null;
     }
     if (patch.mode !== undefined) update.mode = patch.mode;
+    if (patch.booking_url !== undefined) {
+      update.booking_url = this.normalizeBookingUrl(patch.booking_url);
+    }
 
     const { data, error } = await this.supabase
       .getAdminClient()
@@ -103,6 +106,24 @@ export class UsersService {
       throw new InternalServerErrorException('Could not update your profile.');
     }
     return data;
+  }
+
+  /**
+   * Normalize a pasted booking link: trim, drop to null when empty, add https:// when
+   * the user pasted a bare host (e.g. "cal.com/me/30min"), and reject anything that
+   * isn't an http(s) URL (we only ever surface a safe link in outreach).
+   */
+  private normalizeBookingUrl(value: string): string | null {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const withScheme = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+    try {
+      const url = new URL(withScheme);
+      if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+      return url.toString();
+    } catch {
+      return null;
+    }
   }
 
   /** One-time starter credits for a brand-new account. Never blocks signup. */

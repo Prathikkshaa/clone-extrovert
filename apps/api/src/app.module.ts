@@ -15,6 +15,9 @@ import { DraftingModule } from './drafting/drafting.module';
 import { CampaignsModule } from './campaigns/campaigns.module';
 import { InboxModule } from './inbox/inbox.module';
 import { ComplianceApiModule } from './compliance/compliance.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { TrackingApiModule } from './tracking/tracking.module';
+import { BookingApiModule } from './booking/booking.module';
 
 @Module({
   imports: [
@@ -34,6 +37,9 @@ import { ComplianceApiModule } from './compliance/compliance.module';
     CampaignsModule,
     InboxModule,
     ComplianceApiModule,
+    DashboardModule,
+    TrackingApiModule,
+    BookingApiModule,
   ],
 })
 export class AppModule {}

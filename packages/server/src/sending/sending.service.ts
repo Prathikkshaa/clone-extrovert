@@ -14,6 +14,8 @@ import { InsufficientCreditsError } from '../billing/billing.errors';
 import { MailboxSenderService } from '../mailbox/mailbox-sender.service';
 import { MailboxSendError, type OutboundEmail } from '../mailbox/mailbox.types';
 import { ComplianceService } from '../compliance/compliance.service';
+import { ClickTrackingService } from '../tracking/click-tracking.service';
+import { BookingService } from '../booking/booking.service';
 import { MailboxCapacityService } from './mailbox-capacity.service';
 import {
   FOLLOWUP_WAIT_DAYS,
@@ -57,6 +59,8 @@ export class SendingService {
     private readonly sender: MailboxSenderService,
     private readonly capacity: MailboxCapacityService,
     private readonly compliance: ComplianceService,
+    private readonly clickTracking: ClickTrackingService,
+    private readonly booking: BookingService,
   ) {}
 
   async processSend(userId: string, messageId: string): Promise<SendOutcome> {
@@ -96,12 +100,24 @@ export class SendingService {
     }
     const mailbox = pick.mailbox;
 
+    // --- Booking CTA: drop the user's Cal.com link in as the natural call-to-action.
+    // Added BEFORE click-tracking so the booking link is click-wrapped (a booking-link
+    // click is a strong engagement signal). No-op when the user hasn't set a link. ---
+    const withCta = await this.appendBookingCta(userId, msg.body ?? '');
+
+    // --- Click tracking: rewrite links to our redirect endpoint (trustworthy signal).
+    // Done BEFORE compliance so the unsubscribe link in the footer is never wrapped. ---
+    const tracked = this.clickTracking.wrapLinks(
+      { userId, leadId: lead.id, messageId },
+      withCta,
+    );
+
     // --- Compliance: append unsubscribe + physical address; block if no address ---
     const compliant = await this.compliance.applyCompliance(
       userId,
       lead.id,
       lead.email,
-      msg.body ?? '',
+      tracked,
     );
     if (!compliant.ok) {
       await this.setMessageError(messageId, 'Add your mailing address to send (legally required).');
@@ -294,5 +310,17 @@ export class SendingService {
   private ensureRe(subject: string | null): string {
     const s = (subject ?? '').trim();
     return /^re:/i.test(s) ? s : `Re: ${s}`;
+  }
+
+  /**
+   * Append the user's Cal.com booking link as a CTA, if they've set one. Idempotent —
+   * if the body already contains the link (e.g. the drafter wove it in), we don't add
+   * it twice. Returns the body unchanged when no link is configured.
+   */
+  private async appendBookingCta(userId: string, body: string): Promise<string> {
+    const link = await this.booking.bookingLink(userId);
+    if (!link) return body;
+    if (body.includes(link)) return body;
+    return `${body}\n\nPrefer to grab a time directly? ${link}`;
   }
 }

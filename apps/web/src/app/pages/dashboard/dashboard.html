@@ -1,0 +1,195 @@
+<main class="min-h-screen bg-canvas text-ink px-4 py-10">
+  <div class="mx-auto max-w-3xl">
+    <header class="flex items-center justify-between">
+      <p class="text-sm font-medium uppercase tracking-wide text-muted">{{ appName }}</p>
+      <a routerLink="/home" class="text-sm text-accent hover:text-accent-strong">Home</a>
+    </header>
+
+    <div class="mt-6 flex items-end justify-between gap-3">
+      <div>
+        <h1 class="text-heading-lg text-ink">Dashboard</h1>
+        <p class="mt-1 text-sm text-muted">Your outreach over the last 30 days.</p>
+      </div>
+      <button type="button" (click)="reload()"
+        class="rounded-md border border-line px-3 py-1.5 text-sm text-ink hover:bg-surface">Refresh</button>
+    </div>
+
+    @if (loading()) {
+      <div class="mt-8 grid grid-cols-3 gap-3">
+        <div class="h-24 animate-pulse rounded-lg bg-line"></div>
+        <div class="h-24 animate-pulse rounded-lg bg-line"></div>
+        <div class="h-24 animate-pulse rounded-lg bg-line"></div>
+      </div>
+    }
+
+    @if (error(); as e) {
+      <p class="mt-8 text-sm text-danger" role="alert">{{ e }}</p>
+    }
+
+    @if (summary(); as s) {
+      @if (s.isEmpty) {
+        <!-- Teaching empty state (§7) -->
+        <section class="mt-10 rounded-lg border border-line bg-surface p-8 text-center">
+          <p class="text-heading-sm text-ink">No results yet</p>
+          <p class="mx-auto mt-2 max-w-md text-sm text-muted">
+            Once you start sending, your meetings, replies, and link clicks show up here —
+            with no inflated numbers.
+          </p>
+          <a routerLink="/send"
+            class="mt-5 inline-block rounded-md bg-accent px-4 py-2 text-sm text-white hover:bg-accent-strong">
+            Start a campaign to see results here →
+          </a>
+        </section>
+      } @else {
+        <!-- 1) Headline: the goal + reliable reply signals (full emphasis) -->
+        <section class="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div class="rounded-lg border border-line bg-surface p-5">
+            <p class="text-sm text-muted">Meetings booked</p>
+            <p class="mt-2 text-4xl font-medium text-accent">{{ s.meetingsBooked }}</p>
+            <p class="mt-1 text-xs text-muted">The goal.</p>
+          </div>
+          <div class="rounded-lg border border-line bg-surface p-5">
+            <p class="text-sm text-muted">Positive replies</p>
+            <p class="mt-2 text-4xl font-medium text-positive">{{ s.positiveReplies }}</p>
+            <p class="mt-1 text-xs text-muted">People who want to talk.</p>
+          </div>
+          <div class="rounded-lg border border-line bg-surface p-5">
+            <p class="text-sm text-muted">Total replies</p>
+            <p class="mt-2 text-4xl font-medium text-ink">{{ s.totalReplies }}</p>
+            <p class="mt-1 text-xs text-muted">Every human response.</p>
+          </div>
+        </section>
+
+        <!-- Deliverability health strip — framed as protection -->
+        <section class="mt-6 rounded-lg border border-line bg-surface p-5">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <span class="inline-block h-2.5 w-2.5 rounded-full" [class]="healthDotClass(s.health.status)"></span>
+              <p class="text-heading-sm text-ink">Sending health</p>
+            </div>
+            <span class="text-sm font-medium"
+              [class.text-positive]="s.health.status === 'healthy'"
+              [class.text-warning]="s.health.status === 'warning'"
+              [class.text-danger]="s.health.status === 'danger'">
+              {{ healthLabel(s.health.status) }}
+            </span>
+          </div>
+          <p class="mt-1 text-xs text-muted">We protect your reputation so your emails keep landing in inboxes.</p>
+
+          <!-- Volume vs cap -->
+          <div class="mt-4">
+            <div class="flex items-center justify-between text-xs text-muted">
+              <span>Today’s sending</span>
+              <span><span class="text-ink font-medium">{{ s.health.volumeUsed }}</span> of {{ s.health.volumeCap }} safe limit</span>
+            </div>
+            <div class="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-line">
+              <div class="h-full rounded-full bg-accent" [style.width.%]="volumePct()"></div>
+            </div>
+          </div>
+
+          <!-- Rates -->
+          <div class="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+            <span class="text-muted">Bounce rate:
+              <span class="font-medium"
+                [class.text-positive]="s.health.status === 'healthy'"
+                [class.text-warning]="s.health.status === 'warning'"
+                [class.text-danger]="s.health.status === 'danger'">{{ bouncePct() }}</span>
+            </span>
+            <span class="text-muted">Spam complaints:
+              <span class="text-ink">not available yet</span>
+            </span>
+          </div>
+        </section>
+
+        <!-- 2) Activity -->
+        <section class="mt-6">
+          <h2 class="text-heading-sm text-ink">Activity</h2>
+          <div class="mt-3 grid grid-cols-3 gap-3">
+            <div class="rounded-lg border border-line bg-surface p-4">
+              <p class="text-xs text-muted">Emails sent</p>
+              <p class="mt-1 text-2xl font-medium text-ink">{{ s.emailsSent }}</p>
+            </div>
+            <div class="rounded-lg border border-line bg-surface p-4">
+              <p class="text-xs text-muted">Follow-ups pending</p>
+              <p class="mt-1 text-2xl font-medium text-ink">{{ s.followUpsPending }}</p>
+            </div>
+            <div class="rounded-lg border border-line bg-surface p-4">
+              <p class="text-xs text-muted">Bounces</p>
+              <p class="mt-1 text-2xl font-medium" [class.text-danger]="s.bounces > 0" [class.text-ink]="s.bounces === 0">{{ s.bounces }}</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3) Link clicks — trustworthy engagement -->
+        <section class="mt-6 flex items-center justify-between rounded-lg border border-line bg-surface p-4">
+          <div>
+            <p class="text-sm text-ink">Link clicks</p>
+            <p class="text-xs text-muted">A real engagement signal — someone clicked a link you sent.</p>
+          </div>
+          <p class="text-2xl font-medium text-ink">{{ s.linkClicks }}</p>
+        </section>
+
+        <!-- 4) Opens — LAST + muted + honest (we don't track them) -->
+        <section class="mt-3 flex items-center justify-between px-1">
+          <p class="text-xs text-muted">Opens</p>
+          <p class="text-xs text-muted italic">not tracked — open tracking is unreliable, so we don’t pretend to measure it</p>
+        </section>
+
+        <!-- Credit balance + top-up affordance (full billing is File 14) -->
+        <section class="mt-8 flex items-center justify-between rounded-lg border border-line bg-surface p-4">
+          <div>
+            <p class="text-sm text-muted">Credit balance</p>
+            <p class="mt-0.5 text-2xl font-medium text-ink">{{ s.creditBalance }}</p>
+          </div>
+          <div class="text-right">
+            <button type="button" (click)="topUp()"
+              class="rounded-md bg-accent px-4 py-2 text-sm text-white hover:bg-accent-strong">Top up</button>
+            @if (showTopUpNote()) {
+              <p class="mt-2 text-xs text-muted">Top-up opens in the next step (billing).</p>
+            }
+          </div>
+        </section>
+
+        <!-- Per-campaign drill-down (below the fold) -->
+        @if (campaigns(); as list) {
+          @if (list.length > 0) {
+            <section class="mt-8">
+              <h2 class="text-heading-sm text-ink">By campaign</h2>
+              <div class="mt-3 overflow-hidden rounded-lg border border-line">
+                <table class="w-full text-sm">
+                  <thead class="bg-surface text-left text-xs text-muted">
+                    <tr>
+                      <th class="px-3 py-2 font-medium">Campaign</th>
+                      <th class="px-3 py-2 font-medium text-right">Sent</th>
+                      <th class="px-3 py-2 font-medium text-right">Clicks</th>
+                      <th class="px-3 py-2 font-medium text-right">Replies</th>
+                      <th class="px-3 py-2 font-medium text-right">Bounces</th>
+                      <th class="px-3 py-2 font-medium text-right">Meetings</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (c of list; track c.campaignId) {
+                      <tr class="border-t border-line">
+                        <td class="px-3 py-2">
+                          <a [routerLink]="['/campaigns', c.campaignId]" class="text-accent hover:text-accent-strong">
+                            {{ c.name || 'Campaign' }}
+                          </a>
+                          <span class="ml-2 text-xs text-muted">{{ c.status }}</span>
+                        </td>
+                        <td class="px-3 py-2 text-right text-ink">{{ c.sent }}</td>
+                        <td class="px-3 py-2 text-right text-ink">{{ c.linkClicks }}</td>
+                        <td class="px-3 py-2 text-right text-positive">{{ c.replies }}</td>
+                        <td class="px-3 py-2 text-right" [class.text-danger]="c.bounces > 0" [class.text-ink]="c.bounces === 0">{{ c.bounces }}</td>
+                        <td class="px-3 py-2 text-right text-accent">{{ c.meetings }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          }
+        }
+      }
+    }
+  </div>
+</main>

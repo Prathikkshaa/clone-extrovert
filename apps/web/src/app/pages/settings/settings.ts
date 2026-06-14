@@ -34,6 +34,12 @@ export class Settings {
   protected readonly savingAddress = signal(false);
   protected readonly addressMsg = signal<{ kind: 'info' | 'warn'; text: string } | null>(null);
 
+  // Cal.com booking link (File 13) — the CTA dropped into outreach emails.
+  protected bookingUrl = '';
+  protected readonly bookingConnected = signal(false);
+  protected readonly savingBooking = signal(false);
+  protected readonly bookingMsg = signal<{ kind: 'info' | 'warn'; text: string } | null>(null);
+
   constructor() {
     this.api.get().subscribe({
       next: (p) => {
@@ -47,9 +53,13 @@ export class Settings {
       },
     });
     this.me.get().subscribe({
-      next: (m) => (this.address = m.physical_address ?? ''),
+      next: (m) => {
+        this.address = m.physical_address ?? '';
+        this.bookingUrl = m.booking_url ?? '';
+        this.bookingConnected.set(Boolean(m.booking_url));
+      },
       error: () => {
-        /* address is loaded best-effort */
+        /* address + booking link are loaded best-effort */
       },
     });
   }
@@ -70,6 +80,27 @@ export class Settings {
       error: () => {
         this.savingAddress.set(false);
         this.addressMsg.set({ kind: 'warn', text: 'Could not save. Please try again.' });
+      },
+    });
+  }
+
+  saveBooking(): void {
+    this.bookingMsg.set(null);
+    this.savingBooking.set(true);
+    this.me.update({ booking_url: this.bookingUrl.trim() }).subscribe({
+      next: (m) => {
+        this.bookingUrl = m.booking_url ?? '';
+        this.bookingConnected.set(Boolean(m.booking_url));
+        this.savingBooking.set(false);
+        this.bookingMsg.set(
+          m.booking_url
+            ? { kind: 'info', text: 'Connected. Your booking link will be added to outreach emails.' }
+            : { kind: 'info', text: 'Booking link removed.' },
+        );
+      },
+      error: () => {
+        this.savingBooking.set(false);
+        this.bookingMsg.set({ kind: 'warn', text: 'Could not save. Check the link and try again.' });
       },
     });
   }

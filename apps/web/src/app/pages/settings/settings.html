@@ -80,6 +80,49 @@
           </div>
         </div>
 
+        <!-- Cal.com booking link (File 13) — lets leads book meetings -->
+        <div class="mt-6 rounded-lg border border-line bg-surface p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-heading-sm text-ink">Booking</h2>
+            @if (bookingConnected()) {
+              <span class="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-0.5 text-xs font-medium text-positive">
+                <span class="inline-block h-1.5 w-1.5 rounded-full bg-positive"></span>
+                Connected
+              </span>
+            } @else {
+              <span class="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 py-0.5 text-xs font-medium text-warning">
+                <span class="inline-block h-1.5 w-1.5 rounded-full bg-warning"></span>
+                Not connected
+              </span>
+            }
+          </div>
+          <p class="mt-1 text-sm text-muted">
+            Connect your Cal.com to let leads book meetings. Paste your booking link — we add it to
+            your outreach emails as a one-click way to grab a time. Bookings show up here and on
+            your dashboard automatically.
+          </p>
+          <input name="bookingUrl" type="url" [(ngModel)]="bookingUrl"
+            placeholder="https://cal.com/your-name/intro"
+            class="mt-3 w-full rounded-md border border-line bg-canvas px-3 py-2 text-sm text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent" />
+          <div class="mt-3 flex items-center gap-3">
+            <button type="button" (click)="saveBooking()" [disabled]="savingBooking()"
+              class="rounded-md bg-accent px-4 py-2 text-sm text-white transition-colors duration-200 hover:bg-accent-strong disabled:opacity-60">
+              {{ savingBooking() ? 'Saving…' : (bookingConnected() ? 'Update link' : 'Connect') }}
+            </button>
+            @if (bookingConnected()) {
+              <a [href]="bookingUrl" target="_blank" rel="noopener" class="text-sm text-accent hover:text-accent-strong">
+                Open my booking page
+              </a>
+            }
+            @if (bookingMsg(); as b) {
+              <span class="text-sm" [class.text-positive]="b.kind === 'info'" [class.text-warning]="b.kind === 'warn'">{{ b.text }}</span>
+            }
+          </div>
+          <p class="mt-3 text-xs text-muted">
+            New to Cal.com? Create a free account, connect your Google Calendar, then copy your event link here.
+          </p>
+        </div>
+
         <div class="mt-6">
           <a routerLink="/onboarding" class="text-sm text-accent hover:text-accent-strong">
             Update profile from website

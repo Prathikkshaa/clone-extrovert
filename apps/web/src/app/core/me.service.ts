@@ -11,6 +11,7 @@ export interface MeProfile {
   mode: 'draft' | 'autonomous';
   daily_send_cap: number;
   physical_address: string | null;
+  booking_url: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -21,7 +22,11 @@ export class MeApiService {
   get(): Observable<MeProfile> {
     return this.http.get<MeProfile>(`${this.base}/me`);
   }
-  update(patch: { physical_address?: string; mode?: 'draft' | 'autonomous' }): Observable<MeProfile> {
+  update(patch: {
+    physical_address?: string;
+    mode?: 'draft' | 'autonomous';
+    booking_url?: string;
+  }): Observable<MeProfile> {
     return this.http.put<MeProfile>(`${this.base}/me`, patch);
   }
 }

@@ -1,4 +1,4 @@
-// DTO for updating the caller's profile (mailing address + send mode).
+// DTO for updating the caller's profile (mailing address + send mode + booking link).
 import { IsIn, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class UpdateMeDto {
@@ -10,4 +10,11 @@ export class UpdateMeDto {
   @IsOptional()
   @IsIn(['draft', 'autonomous'])
   mode?: 'draft' | 'autonomous';
+
+  // The user's Cal.com booking link (BYO for v1). Permissive here; the service
+  // normalizes it (adds https://, validates http(s)) and stores null when cleared.
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  booking_url?: string;
 }

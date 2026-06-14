@@ -31,6 +31,7 @@ export type Database = {
           mode: Database['public']['Enums']['user_mode'];
           daily_send_cap: number;
           physical_address: string | null;
+          booking_url: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -41,6 +42,7 @@ export type Database = {
           mode?: Database['public']['Enums']['user_mode'];
           daily_send_cap?: number;
           physical_address?: string | null;
+          booking_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -51,6 +53,7 @@ export type Database = {
           mode?: Database['public']['Enums']['user_mode'];
           daily_send_cap?: number;
           physical_address?: string | null;
+          booking_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -770,6 +773,8 @@ export type Database = {
           user_id: string;
           lead_id: string | null;
           message_id: string | null;
+          cal_uid: string | null;
+          cal_trigger: string | null;
           payload: Json;
           created_at: string;
           updated_at: string;
@@ -779,6 +784,8 @@ export type Database = {
           user_id: string;
           lead_id?: string | null;
           message_id?: string | null;
+          cal_uid?: string | null;
+          cal_trigger?: string | null;
           payload?: Json;
           created_at?: string;
           updated_at?: string;
@@ -788,6 +795,8 @@ export type Database = {
           user_id?: string;
           lead_id?: string | null;
           message_id?: string | null;
+          cal_uid?: string | null;
+          cal_trigger?: string | null;
           payload?: Json;
           created_at?: string;
           updated_at?: string;
