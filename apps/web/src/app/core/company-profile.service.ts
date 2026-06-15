@@ -25,6 +25,7 @@ export interface CrawlResult {
     accentFallback: boolean;
     crawlSource: string;
     extractionFailed: boolean;
+    logoCandidates?: string[];
   };
 }
 

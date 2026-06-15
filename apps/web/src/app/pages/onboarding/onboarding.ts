@@ -87,6 +87,12 @@ export class Onboarding implements OnDestroy {
   protected logoUrl: string | null = null;
   protected brandColor: string | null = null;
   protected useBranding = false;
+  /** Logo candidates from the crawl — shown as a single-select picker. */
+  protected readonly logoCandidates = signal<string[]>([]);
+
+  selectLogo(url: string): void {
+    this.logoUrl = url;
+  }
 
   readSite(): void {
     this.notice.set(null);
@@ -143,7 +149,6 @@ export class Onboarding implements OnDestroy {
 
   save(): void {
     this.saving.set(true);
-    const useBrand = this.useBranding && !!this.brandColor;
     this.api
       .save({
         website: this.website,
@@ -157,7 +162,9 @@ export class Onboarding implements OnDestroy {
           .filter(Boolean),
         logo_url: this.logoUrl,
         brand_color: this.brandColor,
-        theme_source: useBrand ? 'fetched' : 'official',
+        // Static default accent for now — we don't repaint the UI in the user's
+        // colour, so never persist 'fetched'.
+        theme_source: 'official',
       })
       .subscribe({
         next: (saved) => {
@@ -181,9 +188,15 @@ export class Onboarding implements OnDestroy {
     this.valueProp = p.value_prop ?? '';
     this.tone = p.tone ?? '';
     this.proofText = (p.proof_points ?? []).join('\n');
-    this.logoUrl = p.logo_url;
     this.brandColor = p.brand_color;
     this.useBranding = p.theme_source === 'fetched' && !!p.brand_color;
+    // Logo candidates: include the saved best guess + all crawl candidates.
+    const candidates = [
+      ...(res.meta.logoCandidates ?? []),
+      ...(p.logo_url ? [p.logo_url] : []),
+    ].filter((v, i, a) => a.indexOf(v) === i);
+    this.logoCandidates.set(candidates);
+    this.logoUrl = candidates[0] ?? p.logo_url;
     this.isManual.set(false);
 
     if (res.meta.extractionFailed) {

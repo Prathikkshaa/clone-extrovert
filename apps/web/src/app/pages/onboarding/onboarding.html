@@ -119,7 +119,13 @@
           ></textarea>
         </ui-field>
         <ui-field label="Your main promise" for="valueProp">
-          <input id="valueProp" name="valueProp" class="ui-input" [(ngModel)]="valueProp" />
+          <textarea
+            id="valueProp"
+            name="valueProp"
+            rows="3"
+            class="ui-textarea"
+            [(ngModel)]="valueProp"
+          ></textarea>
         </ui-field>
         <ui-field label="Tone of voice" for="tone">
           <input
@@ -140,35 +146,38 @@
           ></textarea>
         </ui-field>
 
-        <!-- Branding -->
-        @if (logoUrl || brandColor) {
+        <!-- Logo picker — we found a few images; pick your logo (single-select). -->
+        @if (logoCandidates().length > 0) {
           <div class="rounded-lg border border-line bg-canvas p-4">
-            <p class="text-heading-sm text-ink">Your branding</p>
-            <div class="mt-3 flex items-center gap-4">
-              @if (logoUrl) {
-                <img [src]="logoUrl" alt="Your logo" class="h-10 w-10 rounded object-contain" />
-              }
-              @if (brandColor) {
-                <span class="inline-flex items-center gap-2 text-sm text-muted">
-                  <span
-                    class="inline-block h-5 w-5 rounded"
-                    [style.background-color]="brandColor"
-                  ></span>
-                  accent {{ brandColor }}
-                </span>
+            <p class="text-heading-sm text-ink">Your logo</p>
+            <p class="mt-0.5 text-sm text-muted">We found a few images — pick your logo.</p>
+            <div
+              class="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4"
+              role="radiogroup"
+              aria-label="Choose your logo"
+            >
+              @for (candidate of logoCandidates(); track candidate) {
+                <button
+                  type="button"
+                  role="radio"
+                  [attr.aria-checked]="logoUrl === candidate"
+                  (click)="selectLogo(candidate)"
+                  class="relative flex aspect-square items-center justify-center overflow-hidden rounded-md border-2 bg-surface p-2 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  [class.border-accent]="logoUrl === candidate"
+                  [class.border-line]="logoUrl !== candidate"
+                  [class.hover:border-muted]="logoUrl !== candidate"
+                >
+                  <img [src]="candidate" alt="" class="max-h-full max-w-full object-contain" />
+                  @if (logoUrl === candidate) {
+                    <span
+                      class="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-white"
+                    >
+                      <ui-icon name="check" [size]="11" />
+                    </span>
+                  }
+                </button>
               }
             </div>
-            @if (brandColor) {
-              <label class="mt-3 flex items-center gap-2 text-sm text-ink">
-                <input
-                  type="checkbox"
-                  name="useBranding"
-                  [(ngModel)]="useBranding"
-                  class="accent-accent"
-                />
-                Use my branding
-              </label>
-            }
           </div>
         }
       </div>

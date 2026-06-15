@@ -8,15 +8,12 @@ import type { CompanyProfile } from './company-profile.service';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  /** Apply brand accent when the profile opts into 'fetched' branding. */
-  apply(profile: CompanyProfile | null): void {
-    const root = document.documentElement;
-    if (profile && profile.theme_source === 'fetched' && profile.brand_color) {
-      root.style.setProperty('--color-accent', profile.brand_color);
-      root.style.setProperty('--color-accent-strong', this.darken(profile.brand_color, 0.12));
-    } else {
-      this.reset();
-    }
+  /** Apply brand accent. DISABLED for now (master decision): we keep the static
+   *  default teal accent and never repaint the UI in the user's colour — brand
+   *  colours frequently fail contrast. The brand logo is still shown elsewhere.
+   *  Re-enable by restoring the brand-accent branch below. */
+  apply(_profile: CompanyProfile | null): void {
+    this.reset();
   }
 
   /** Revert to the official ExtrovertAI accent (remove the override). */

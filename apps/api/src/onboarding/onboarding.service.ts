@@ -29,6 +29,7 @@ export interface CrawlOutcome {
     accentFallback: boolean;
     crawlSource: string;
     extractionFailed: boolean;
+    logoCandidates: string[];
   };
 }
 
@@ -103,6 +104,7 @@ export class OnboardingService {
         accentFallback: accent.usedFallback,
         crawlSource: site.source,
         extractionFailed,
+        logoCandidates: branding.logos,
       },
     };
   }

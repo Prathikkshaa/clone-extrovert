@@ -20,7 +20,10 @@ export interface CrawlResult {
 }
 
 export interface SiteBranding {
+  /** Best single guess (logos[0]) — kept for callers that want one value. */
   logoUrl: string | null;
+  /** Ordered, de-duplicated logo candidates for the user to pick from. */
+  logos: string[];
   themeColor: string | null;
   title: string | null;
 }
@@ -75,7 +78,7 @@ export class CrawlService {
 
   /** Best-effort logo + accent color from the homepage HTML (no Firecrawl credit). */
   async fetchBranding(rawUrl: string): Promise<SiteBranding> {
-    const empty: SiteBranding = { logoUrl: null, themeColor: null, title: null };
+    const empty: SiteBranding = { logoUrl: null, logos: [], themeColor: null, title: null };
     const url = this.normalizeUrl(rawUrl);
     if (!url) return empty;
     try {
@@ -87,24 +90,43 @@ export class CrawlService {
       const html = await res.text();
       const $ = cheerio.load(html);
       const base = new URL(url);
-      const abs = (href: string | undefined): string | null => {
+      const abs = (href: string | undefined | null): string | null => {
         if (!href) return null;
         try {
-          return new URL(href, base).toString();
+          const u = new URL(href, base).toString();
+          return /^https?:/i.test(u) ? u : null; // skip data: / blob:
         } catch {
           return null;
         }
       };
-      const ogImage = $('meta[property="og:image"]').attr('content');
-      const icon =
-        $('link[rel="apple-touch-icon"]').attr('href') ??
-        $('link[rel~="icon"]').attr('href');
+
+      // Ordered candidates, best guess first. og:image is LAST on purpose — it's
+      // often a social-share banner, not the logo (the cause of wrong picks).
+      const candidates: string[] = [];
+      const push = (href: string | undefined | null): void => {
+        const a = abs(href);
+        if (a && !candidates.includes(a)) candidates.push(a);
+      };
+
+      // 1. <img> tags that look like a logo (alt/class/id/src mention logo/brand).
+      $('img').each((_, el) => {
+        const $el = $(el);
+        const hay = `${$el.attr('alt') ?? ''} ${$el.attr('class') ?? ''} ${$el.attr('id') ?? ''} ${$el.attr('src') ?? ''}`.toLowerCase();
+        if (/\blogo\b|brand/.test(hay)) push($el.attr('src') ?? $el.attr('data-src'));
+      });
+      // 2. Site icons (apple-touch-icon + favicons) — usually the real mark.
+      push($('link[rel="apple-touch-icon"]').attr('href'));
+      $('link[rel~="icon"]').each((_, el) => push($(el).attr('href')));
+      // 3. og:image (deprioritised).
+      push($('meta[property="og:image"]').attr('content'));
+
+      const logos = candidates.slice(0, 6);
       const themeColor = this.validHex($('meta[name="theme-color"]').attr('content'));
       const title =
         $('meta[property="og:site_name"]').attr('content') ??
         $('title').first().text().trim() ??
         null;
-      return { logoUrl: abs(ogImage) ?? abs(icon), themeColor, title: title || null };
+      return { logoUrl: logos[0] ?? null, logos, themeColor, title: title || null };
     } catch (err) {
       this.logger.warn(`Branding fetch failed: ${(err as Error).message}`);
       return empty;
