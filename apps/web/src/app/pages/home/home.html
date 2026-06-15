@@ -101,17 +101,63 @@
     <ui-card class="mt-8">
       <div class="flex items-center gap-3">
         <span
-          class="flex h-9 w-9 items-center justify-center rounded-lg bg-positive-soft text-positive"
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-positive-soft text-positive"
         >
           <ui-icon name="circle-check" [size]="20" />
         </span>
-        <div>
+        <div class="min-w-0 flex-1">
           <h2 class="text-heading-sm text-ink">You're all set</h2>
           <p class="text-sm text-muted">
             Everything's connected. Keep the pipeline moving.
           </p>
         </div>
+        <button
+          type="button"
+          class="shrink-0 text-sm font-medium text-accent transition-colors duration-200 hover:text-accent-strong"
+          (click)="toggleSetup()"
+          [attr.aria-expanded]="showSetup()"
+        >
+          {{ showSetup() ? 'Hide setup' : 'Review setup' }}
+        </button>
       </div>
+
+      <!-- Expandable review of everything that was set up -->
+      @if (showSetup()) {
+        <ul class="mt-4 divide-y divide-line border-t border-line">
+          @for (item of checklist(); track item.key) {
+            <li>
+              <a
+                [routerLink]="item.link"
+                class="group flex items-center gap-3 py-3 transition-colors duration-200"
+              >
+                <span
+                  class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+                  [class.bg-positive-soft]="item.done"
+                  [class.text-positive]="item.done"
+                  [class.border]="!item.done"
+                  [class.border-line]="!item.done"
+                  [class.text-muted]="!item.done"
+                >
+                  @if (item.done) {
+                    <ui-icon name="check" [size]="16" />
+                  } @else {
+                    <ui-icon [name]="item.icon" [size]="16" />
+                  }
+                </span>
+                <span class="min-w-0 flex-1">
+                  <span class="block text-sm font-medium text-ink">{{ item.label }}</span>
+                  <span class="block text-sm text-muted">{{ item.hint }}</span>
+                </span>
+                <ui-icon
+                  name="chevron-right"
+                  [size]="18"
+                  class="shrink-0 text-muted transition-transform duration-200 group-hover:translate-x-0.5"
+                />
+              </a>
+            </li>
+          }
+        </ul>
+      }
     </ui-card>
   }
 

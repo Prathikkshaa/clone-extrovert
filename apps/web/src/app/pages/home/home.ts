@@ -64,15 +64,23 @@ export class Home {
   protected readonly mailboxNeedsReconnect = signal(false);
   private readonly profileSet = signal<boolean | null>(null);
   private readonly addressSet = signal<boolean | null>(null);
+  private readonly bookingSet = signal<boolean | null>(null);
   private readonly hasCredits = signal<boolean | null>(null);
   private readonly hasLeads = signal<boolean | null>(null);
   protected readonly summary = signal<DashboardSummary | null>(null);
+
+  /** Lets returning users expand the (completed) setup checklist to review it. */
+  protected readonly showSetup = signal(false);
+  toggleSetup(): void {
+    this.showSetup.update((v) => !v);
+  }
 
   protected readonly loading = computed(
     () =>
       this.mailboxConnected() === null ||
       this.profileSet() === null ||
       this.addressSet() === null ||
+      this.bookingSet() === null ||
       this.hasCredits() === null ||
       this.hasLeads() === null,
   );
@@ -101,6 +109,14 @@ export class Home {
       link: '/settings',
       icon: 'map-pin',
       done: this.addressSet() === true,
+    },
+    {
+      key: 'booking',
+      label: 'Connect your booking link',
+      hint: 'Let leads book a meeting straight from your emails.',
+      link: '/settings',
+      icon: 'calendar',
+      done: this.bookingSet() === true,
     },
     {
       key: 'credits',
@@ -145,8 +161,14 @@ export class Home {
       error: () => this.profileSet.set(false),
     });
     this.me.get().subscribe({
-      next: (m) => this.addressSet.set(!!m.physical_address),
-      error: () => this.addressSet.set(false),
+      next: (m) => {
+        this.addressSet.set(!!m.physical_address);
+        this.bookingSet.set(!!m.booking_url);
+      },
+      error: () => {
+        this.addressSet.set(false);
+        this.bookingSet.set(false);
+      },
     });
     this.leads.getLists().subscribe({
       next: (lists) => this.hasLeads.set(lists.length > 0),
