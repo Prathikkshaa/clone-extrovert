@@ -157,13 +157,73 @@
       }
     }
   } @else if (!searched() && !loading()) {
-    <div class="mt-6">
-      <ui-empty-state
-        icon="search"
-        title="No leads yet"
-        message="Try an industry and a city, like “plumbers in Austin”."
-      />
-    </div>
+    @if (lists().length > 0) {
+      <!-- Saved lists — far more useful than a "no leads yet" placeholder. -->
+      <section class="mt-8">
+        <h2 class="text-heading-sm text-ink">Your saved lists</h2>
+        <p class="mt-1 text-sm text-muted">
+          Pick up where you left off — enrich, write, export, or remove a list.
+        </p>
+
+        <ul class="mt-4 space-y-3">
+          @for (l of lists(); track l.id) {
+            <li
+              class="flex flex-col gap-3 rounded-lg border border-line bg-surface p-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div class="min-w-0">
+                <p class="truncate text-body font-medium text-ink">{{ l.name }}</p>
+                <p class="mt-0.5 text-sm text-muted">
+                  {{ l.leadCount ?? 0 }} lead{{ l.leadCount === 1 ? '' : 's' }}
+                  @if ((l.enrichedCount ?? 0) > 0) {
+                    · {{ l.enrichedCount }} enriched
+                  }
+                  · saved {{ l.created_at | date: 'mediumDate' }}
+                </p>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
+                <a [routerLink]="['/enrich']" [queryParams]="{ list: l.id }">
+                  <button ui-button variant="secondary" size="sm" iconLeft="sparkles">
+                    Enrich
+                  </button>
+                </a>
+                <button
+                  ui-button
+                  variant="ghost"
+                  size="sm"
+                  iconLeft="download"
+                  [loading]="exportingId() === l.id"
+                  [disabled]="(l.leadCount ?? 0) === 0 || !!exportingId()"
+                  (click)="exportList(l)"
+                >
+                  Export CSV
+                </button>
+                <button
+                  ui-button
+                  variant="ghost"
+                  size="sm"
+                  iconLeft="trash-2"
+                  [loading]="deletingId() === l.id"
+                  [disabled]="!!deletingId()"
+                  (click)="deleteList(l)"
+                >
+                  Delete
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+        <p class="mt-4 text-sm text-muted">Exporting a list uses 1 credit.</p>
+      </section>
+    } @else {
+      <div class="mt-6">
+        <ui-empty-state
+          icon="search"
+          title="No leads yet"
+          message="Search an industry and a place above, like “construction in Texas”."
+        />
+      </div>
+    }
   }
 </div>
 

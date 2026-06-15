@@ -36,6 +36,7 @@ export const CREDIT_COSTS = {
   enrichment: 2,
   draft: 1,
   send: 1,
+  export: 1,
 } as const;
 
 export type CreditAction = keyof typeof CREDIT_COSTS;
@@ -46,6 +47,7 @@ export const CREDIT_DEBIT_ACTIONS: readonly CreditAction[] = [
   'enrichment',
   'draft',
   'send',
+  'export',
 ];
 
 /**

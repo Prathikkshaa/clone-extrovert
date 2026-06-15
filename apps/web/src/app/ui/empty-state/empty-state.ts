@@ -11,18 +11,21 @@ import type { IconName } from '../icon/icon-paths';
   imports: [Icon],
   template: `
     <div
-      class="mx-auto flex max-w-sm flex-col items-center px-6 py-12 text-center"
+      class="mx-auto flex w-full max-w-sm flex-col items-center px-4 py-10 text-center sm:px-6 sm:py-12"
     >
       <div
-        class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft text-accent"
+        class="mb-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent"
       >
         <ui-icon [name]="icon()" [size]="24" />
       </div>
-      <h3 class="text-heading-sm text-ink">{{ title() }}</h3>
+      <h3 class="text-balance text-heading-sm text-ink">{{ title() }}</h3>
       @if (message()) {
-        <p class="mt-1.5 text-body text-muted">{{ message() }}</p>
+        <p class="mt-1.5 text-pretty text-body text-muted">{{ message() }}</p>
       }
-      <div class="mt-5 flex flex-wrap items-center justify-center gap-2">
+      <!-- Actions collapse entirely (no dead space) when no CTA is projected. -->
+      <div
+        class="mt-5 flex flex-wrap items-center justify-center gap-2 empty:mt-0 empty:hidden"
+      >
         <ng-content />
       </div>
     </div>

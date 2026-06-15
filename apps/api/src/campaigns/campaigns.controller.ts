@@ -1,6 +1,6 @@
 // CampaignsController — launch + monitor outreach campaigns (File 10).
 // All routes require auth and are scoped to the caller.
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { SupabaseAuthGuard } from '../auth/supabase-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import type { AuthUser } from '../auth/auth-user.interface';
@@ -47,5 +47,10 @@ export class CampaignsController {
     @Body() dto: CampaignStatusDto,
   ): Promise<{ status: string }> {
     return this.campaigns.setStatus(user.id, id, dto.status);
+  }
+
+  @Delete(':id')
+  remove(@CurrentUser() user: AuthUser, @Param('id') id: string): Promise<{ deleted: true }> {
+    return this.campaigns.deleteCampaign(user.id, id);
   }
 }

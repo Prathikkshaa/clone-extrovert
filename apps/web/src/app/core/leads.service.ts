@@ -37,6 +37,14 @@ export interface LeadList {
   id: string;
   name: string;
   created_at: string;
+  leadCount?: number;
+  enrichedCount?: number;
+}
+
+export interface ExportResult {
+  filename: string;
+  csv: string;
+  rows: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -66,5 +74,13 @@ export class LeadsApiService {
       `${this.base}/leads/save-to-list`,
       input,
     );
+  }
+
+  deleteList(listId: string): Observable<{ deleted: true }> {
+    return this.http.delete<{ deleted: true }>(`${this.base}/lists/${listId}`);
+  }
+
+  exportList(listId: string): Observable<ExportResult> {
+    return this.http.post<ExportResult>(`${this.base}/lists/${listId}/export`, {});
   }
 }

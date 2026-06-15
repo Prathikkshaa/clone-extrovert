@@ -1,7 +1,7 @@
 // LeadsController — lead search + lists (master-context §2/§6).
 // WHY: the search endpoint is the first consumer of the credit gate. All routes
 // require auth and are scoped to the caller.
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { SupabaseAuthGuard } from '../auth/supabase-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import type { AuthUser } from '../auth/auth-user.interface';
@@ -36,6 +36,18 @@ export class LeadsController {
     @Param('id') id: string,
   ): Promise<EnrichedLeadCard[]> {
     return this.leads.getListLeads(user.id, id);
+  }
+
+  /** Delete a saved list (keeps the underlying leads). */
+  @Delete('lists/:id')
+  deleteList(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.leads.deleteList(user.id, id);
+  }
+
+  /** Export a list's leads as CSV (metered — one export credit). */
+  @Post('lists/:id/export')
+  exportList(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.leads.exportListCsv(user.id, id);
   }
 
   @Post('leads/save-to-list')

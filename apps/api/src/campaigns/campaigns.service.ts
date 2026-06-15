@@ -265,6 +265,25 @@ export class CampaignsService implements OnModuleInit, OnModuleDestroy {
     return { status };
   }
 
+  /** Delete a campaign and its messages. Stops sending by removing the queued
+   *  work; leads + drafts in the holding area are untouched. Scoped to the user. */
+  async deleteCampaign(userId: string, campaignId: string): Promise<{ deleted: true }> {
+    const admin = this.supabase.getAdminClient();
+    const owned = await admin
+      .from('campaigns')
+      .select('id')
+      .eq('id', campaignId)
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (!owned.data) throw new NotFoundException('Campaign not found.');
+
+    // Remove this campaign's messages first (they reference the campaign), then
+    // the campaign row. Any in-flight queued jobs become no-ops (message gone).
+    await admin.from('messages').delete().eq('campaign_id', campaignId);
+    await admin.from('campaigns').delete().eq('id', campaignId).eq('user_id', userId);
+    return { deleted: true };
+  }
+
   async onModuleDestroy(): Promise<void> {
     await this.queue?.close();
   }

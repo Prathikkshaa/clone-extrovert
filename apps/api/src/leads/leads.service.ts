@@ -34,6 +34,12 @@ export type LeadCard = Pick<
   | 'status'
 >;
 
+/** A saved list with at-a-glance counts for the find-leads list view. */
+export type ListSummary = Pick<Tables<'lists'>, 'id' | 'name' | 'created_at'> & {
+  leadCount: number;
+  enrichedCount: number;
+};
+
 /** A lead with its enrichment fields — the shape the File 08 enrich screen renders. */
 export type EnrichedLeadCard = Pick<
   Tables<'leads'>,
@@ -160,15 +166,120 @@ export class LeadsService {
     };
   }
 
-  async getLists(userId: string): Promise<Pick<Tables<'lists'>, 'id' | 'name' | 'created_at'>[]> {
-    const { data, error } = await this.supabase
-      .getAdminClient()
+  async getLists(userId: string): Promise<ListSummary[]> {
+    const admin = this.supabase.getAdminClient();
+    const { data, error } = await admin
       .from('lists')
       .select('id, name, created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
     if (error) throw new BadRequestException('Could not load your lists.');
-    return data ?? [];
+    const lists = data ?? [];
+    if (lists.length === 0) return [];
+
+    // Per-list lead counts + how many are already enriched — so the find-leads
+    // page can show each saved list with useful at-a-glance details.
+    const ids = lists.map((l) => l.id);
+    const { data: links } = await admin
+      .from('lead_list')
+      .select('list_id, leads(enrichment_status)')
+      .in('list_id', ids);
+    const counts = new Map<string, { total: number; enriched: number }>();
+    for (const row of (links ?? []) as {
+      list_id: string;
+      leads: { enrichment_status: string | null } | null;
+    }[]) {
+      const c = counts.get(row.list_id) ?? { total: 0, enriched: 0 };
+      c.total += 1;
+      if (row.leads?.enrichment_status === 'complete') c.enriched += 1;
+      counts.set(row.list_id, c);
+    }
+    return lists.map((l) => ({
+      ...l,
+      leadCount: counts.get(l.id)?.total ?? 0,
+      enrichedCount: counts.get(l.id)?.enriched ?? 0,
+    }));
+  }
+
+  /** Delete a saved list (and its lead links). The leads themselves are kept —
+   *  they may belong to other lists or campaigns. Scoped to the user. */
+  async deleteList(userId: string, listId: string): Promise<{ deleted: true }> {
+    const admin = this.supabase.getAdminClient();
+    const found = await admin
+      .from('lists')
+      .select('id')
+      .eq('id', listId)
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (!found.data) throw new NotFoundException('List not found.');
+    await admin.from('lead_list').delete().eq('list_id', listId);
+    const { error } = await admin.from('lists').delete().eq('id', listId).eq('user_id', userId);
+    if (error) throw new BadRequestException('Could not delete the list.');
+    return { deleted: true };
+  }
+
+  /** Export a list's leads as CSV. Metered as one `export` action. Returns the
+   *  filename + CSV text; the client triggers the download. */
+  async exportListCsv(
+    userId: string,
+    listId: string,
+  ): Promise<{ filename: string; csv: string; rows: number }> {
+    const admin = this.supabase.getAdminClient();
+    const list = await admin
+      .from('lists')
+      .select('id, name')
+      .eq('id', listId)
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (!list.data) throw new NotFoundException('List not found.');
+
+    const rows = await this.getListLeads(userId, listId);
+    if (rows.length === 0) throw new BadRequestException('This list has no leads to export.');
+
+    // Meter the export (refunded automatically if CSV building throws).
+    const csv = await this.billing.withCreditGate(userId, 'export', listId, async () =>
+      this.toCsv(rows),
+    );
+    const safeName = (list.data.name || 'leads').replace(/[^a-z0-9-_]+/gi, '-').toLowerCase();
+    return { filename: `${safeName}-leads.csv`, csv, rows: rows.length };
+  }
+
+  /** Build a CSV (with header row) from enriched lead cards. */
+  private toCsv(rows: EnrichedLeadCard[]): string {
+    const headers = [
+      'Name',
+      'Email',
+      'Phone',
+      'Website',
+      'Address',
+      'Rating',
+      'Reviews',
+      'Enrichment status',
+      'Why reach out',
+    ];
+    const cell = (v: unknown): string => {
+      const s = v == null ? '' : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const lines = [headers.join(',')];
+    for (const r of rows) {
+      lines.push(
+        [
+          r.name,
+          r.email,
+          r.phone,
+          r.website,
+          r.address,
+          r.rating,
+          r.review_count,
+          r.enrichment_status,
+          r.hook,
+        ]
+          .map(cell)
+          .join(','),
+      );
+    }
+    return lines.join('\n');
   }
 
   /** Leads in a list, with enrichment fields, scoped to the user (File 08 screen). */

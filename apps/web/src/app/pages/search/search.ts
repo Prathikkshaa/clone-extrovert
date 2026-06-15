@@ -4,8 +4,9 @@
 // the next page, and a sticky selection bar to save + jump straight to enriching
 // the leads you just picked (no manual list step). Behaviour preserved.
 import { Component, computed, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   LeadsApiService,
   type LeadCard,
@@ -25,7 +26,9 @@ import { ToastService } from '../../ui/toast/toast.service';
 @Component({
   selector: 'app-search',
   imports: [
+    DatePipe,
     FormsModule,
+    RouterLink,
     Button,
     Card,
     EmptyState,
@@ -66,13 +69,72 @@ export class Search {
   protected newListName = '';
   protected readonly saving = signal(false);
 
+  // per-list row actions (export/delete) on the saved-lists view
+  protected readonly exportingId = signal<string | null>(null);
+  protected readonly deletingId = signal<string | null>(null);
+
   constructor() {
+    this.loadLists();
+  }
+
+  private loadLists(): void {
     this.api.getLists().subscribe({
       next: (l) => this.lists.set(l),
       error: () => {
         /* lists are optional */
       },
     });
+  }
+
+  /** Download a list's leads as CSV (metered — spends one export credit). */
+  exportList(list: LeadList): void {
+    if (this.exportingId()) return;
+    this.exportingId.set(list.id);
+    this.api.exportList(list.id).subscribe({
+      next: (res) => {
+        this.exportingId.set(null);
+        this.downloadCsv(res.filename, res.csv);
+        this.toast.success(
+          `Exported ${res.rows} lead${res.rows === 1 ? '' : 's'} from “${list.name}”.`,
+        );
+      },
+      error: (err) => {
+        this.exportingId.set(null);
+        const msg =
+          err?.status === 402 || /credit/i.test(err?.error?.message ?? '')
+            ? 'Out of credits — top up to export. Nothing was charged.'
+            : 'Could not export this list. Please try again.';
+        this.toast.error(msg);
+      },
+    });
+  }
+
+  /** Delete a saved list (keeps the underlying leads). */
+  deleteList(list: LeadList): void {
+    if (this.deletingId()) return;
+    if (!confirm(`Delete the list “${list.name}”? The leads themselves are kept.`)) return;
+    this.deletingId.set(list.id);
+    this.api.deleteList(list.id).subscribe({
+      next: () => {
+        this.deletingId.set(null);
+        this.lists.update((ls) => ls.filter((l) => l.id !== list.id));
+        this.toast.success('List deleted.');
+      },
+      error: () => {
+        this.deletingId.set(null);
+        this.toast.error('Could not delete the list. Please try again.');
+      },
+    });
+  }
+
+  private downloadCsv(filename: string, csv: string): void {
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   find(): void {

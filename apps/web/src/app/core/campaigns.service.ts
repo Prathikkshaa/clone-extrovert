@@ -84,4 +84,7 @@ export class CampaignsApiService {
   setStatus(id: string, status: 'paused' | 'active'): Observable<{ status: string }> {
     return this.http.post<{ status: string }>(`${this.base}/campaigns/${id}/status`, { status });
   }
+  remove(id: string): Observable<{ deleted: true }> {
+    return this.http.delete<{ deleted: true }>(`${this.base}/campaigns/${id}`);
+  }
 }
