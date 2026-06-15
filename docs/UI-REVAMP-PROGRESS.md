@@ -165,7 +165,7 @@
   `npm run build` + `npm run lint` clean repo-wide; the app matches the §2 north star (persistent
   shell, consistent page-headers + primary action + next-step, pipeline stepper, Home launchpad,
   persisted OS-default dark/light, icons throughout, responsive + accessible, §7 throughout); no
-  backend/logic changes; no route paths broken; behaviour preserved. Commit: <pending>.
+  backend/logic changes; no route paths broken; behaviour preserved. Commit: 1d48af4.
 
 ## Deferred / notes
 - **Icons:** used the inline-SVG fallback (§3) not the lucide-angular package — it peer-caps at
