@@ -30,7 +30,25 @@ export class MailboxSenderService {
   async sendThroughMailbox(mailbox: MailboxRow, email: OutboundEmail): Promise<SendResult> {
     const provider = this.providerFor(mailbox);
     const accessToken = await this.freshAccessToken(mailbox, provider);
-    return provider.send(accessToken, email);
+    return provider.send(accessToken, this.applyTestRecipient(email));
+  }
+
+  /**
+   * Test mode: when TEST_EMAIL is set in the environment, divert EVERY outbound
+   * email to that single inbox instead of the real business address. This is the
+   * one choke point all sends pass through, so a single override covers campaigns,
+   * follow-ups, and replies — letting you dry-run the whole flow against your own
+   * inbox without ever emailing a real prospect. Unset TEST_EMAIL to send for real.
+   */
+  private applyTestRecipient(email: OutboundEmail): OutboundEmail {
+    const testEmail = process.env['TEST_EMAIL']?.trim();
+    if (!testEmail) return email;
+    if (testEmail.toLowerCase() === email.to.toLowerCase()) return email;
+    this.logger.log(`TEST_EMAIL active — diverting send for ${email.to} → ${testEmail}`);
+    const subject = email.subject?.startsWith('[TEST]')
+      ? email.subject
+      : `[TEST → ${email.to}] ${email.subject ?? ''}`;
+    return { ...email, to: testEmail, subject };
   }
 
   /** A fresh (refreshed-if-needed) access token for read operations (File 11 poller). */

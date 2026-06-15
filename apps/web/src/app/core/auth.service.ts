@@ -45,14 +45,50 @@ export class AuthService {
     return this.session()?.user.email ?? null;
   }
 
-  signUp(email: string, password: string): Promise<{ error: AuthError | null; needsConfirmation: boolean }> {
+  /** The user's display name (from auth metadata), reactive to session changes.
+   *  Falls back to the email's local-part so we always have something friendly. */
+  readonly displayName = computed<string | null>(() => {
+    const user = this.session()?.user;
+    if (!user) return null;
+    const meta = user.user_metadata as { full_name?: string } | undefined;
+    const name = meta?.full_name?.trim();
+    if (name) return name;
+    const email = user.email ?? '';
+    const local = email.split('@')[0] ?? '';
+    return local ? local.charAt(0).toUpperCase() + local.slice(1) : null;
+  });
+
+  /** First name only — for greetings ("Good morning, Sarah"). */
+  readonly firstName = computed<string | null>(() => {
+    const full = this.displayName();
+    return full ? (full.split(/\s+/)[0] ?? full) : null;
+  });
+
+  signUp(
+    email: string,
+    password: string,
+    fullName?: string,
+  ): Promise<{ error: AuthError | null; needsConfirmation: boolean }> {
+    const name = fullName?.trim();
     return this.supabase.auth
-      .signUp({ email, password })
+      .signUp({ email, password, options: name ? { data: { full_name: name } } : undefined })
       .then(({ data, error }) => ({
         error,
         // When email confirmation is enabled, signUp returns a user but no session.
         needsConfirmation: !error && data.user !== null && data.session === null,
       }));
+  }
+
+  /** Update the user's display name (Settings). Refreshes the local session so
+   *  derived signals (displayName/firstName) update immediately. */
+  async updateName(fullName: string): Promise<{ error: AuthError | null }> {
+    const { data, error } = await this.supabase.auth.updateUser({
+      data: { full_name: fullName.trim() },
+    });
+    if (!error && data.user) {
+      this.session.update((s) => (s ? { ...s, user: data.user } : s));
+    }
+    return { error };
   }
 
   signIn(email: string, password: string): Promise<{ error: AuthError | null }> {

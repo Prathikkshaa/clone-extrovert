@@ -1,16 +1,25 @@
 <main class="flex min-h-screen items-center justify-center bg-canvas px-4 text-ink">
   <section class="w-full max-w-sm">
-    <a routerLink="/" class="mb-6 flex items-center justify-center gap-2.5">
-      <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-white">
-        <ui-icon name="send" [size]="18" />
-      </span>
-      <span class="text-heading-sm text-ink">{{ appName }}</span>
+    <a routerLink="/" class="mb-6 flex items-center justify-center">
+      <ui-wordmark class="text-heading-md" />
     </a>
     <div class="rounded-lg border border-line bg-surface p-8">
       <h1 class="text-heading-md text-ink">Create your account</h1>
       <p class="mt-1 text-sm text-muted">Start reaching the right people with {{ appName }}.</p>
 
       <form (ngSubmit)="submit()" class="mt-6 space-y-4">
+        <ui-field label="Your name" for="fullName">
+          <input
+            id="fullName"
+            name="fullName"
+            type="text"
+            autocomplete="name"
+            class="ui-input"
+            placeholder="e.g. Sarah Chen"
+            [(ngModel)]="fullName"
+          />
+        </ui-field>
+
         <ui-field label="Email" for="email">
           <input
             id="email"

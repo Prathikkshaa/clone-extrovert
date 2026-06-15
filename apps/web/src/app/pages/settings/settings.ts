@@ -7,12 +7,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { APP_NAME } from '@extrovertai/shared';
 import {
   CompanyProfileApiService,
   type CompanyProfile,
 } from '../../core/company-profile.service';
+import { AuthService } from '../../core/auth.service';
 import { MeApiService } from '../../core/me.service';
+import { environment } from '../../../environments/environment';
 import { ThemeService } from '../../core/theme.service';
 import { BrandService } from '../../core/brand.service';
 import { ThemeModeService, type ThemeMode } from '../../core/theme-mode.service';
@@ -38,13 +39,19 @@ import { ToastService } from '../../ui/toast/toast.service';
 })
 export class Settings {
   private readonly api = inject(CompanyProfileApiService);
+  private readonly auth = inject(AuthService);
   private readonly me = inject(MeApiService);
   private readonly theme = inject(ThemeService);
   private readonly brand = inject(BrandService);
   protected readonly themeMode = inject(ThemeModeService);
   private readonly toast = inject(ToastService);
 
-  protected readonly appName = APP_NAME;
+  protected readonly appName = environment.appName;
+
+  // Display name (auth metadata) — used in greetings + email sign-offs.
+  protected fullName = this.auth.displayName() ?? '';
+  protected readonly savingName = signal(false);
+
   protected readonly profile = signal<CompanyProfile | null>(null);
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
@@ -91,6 +98,23 @@ export class Settings {
 
   setAppearance(mode: ThemeMode): void {
     this.themeMode.set(mode);
+  }
+
+  async saveName(): Promise<void> {
+    const name = this.fullName.trim();
+    if (!name) {
+      this.toast.warn('Enter your name.');
+      return;
+    }
+    this.savingName.set(true);
+    const { error } = await this.auth.updateName(name);
+    this.savingName.set(false);
+    if (error) {
+      this.toast.error('Could not save your name. Please try again.');
+      return;
+    }
+    this.fullName = this.auth.displayName() ?? name;
+    this.toast.success('Saved. We’ll use your name to personalise things.');
   }
 
   saveAddress(): void {

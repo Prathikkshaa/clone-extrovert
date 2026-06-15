@@ -5,22 +5,23 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { APP_NAME } from '@extrovertai/shared';
 import { AuthService } from '../../core/auth.service';
 import { Button } from '../../ui/button/button';
 import { Field } from '../../ui/field/field';
-import { Icon } from '../../ui/icon/icon';
+import { Wordmark } from '../../ui/wordmark/wordmark';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-signup',
-  imports: [FormsModule, RouterLink, Button, Field, Icon],
+  imports: [FormsModule, RouterLink, Button, Field, Wordmark],
   templateUrl: './signup.html',
 })
 export class Signup {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  protected readonly appName = APP_NAME;
+  protected readonly appName = environment.appName;
+  protected fullName = '';
   protected email = '';
   protected password = '';
   protected readonly error = signal<string | null>(null);
@@ -30,12 +31,20 @@ export class Signup {
   async submit(): Promise<void> {
     this.error.set(null);
     this.notice.set(null);
+    if (!this.fullName.trim()) {
+      this.error.set('Tell us your name so we can personalise things.');
+      return;
+    }
     if (!this.email || !this.password) {
       this.error.set('Enter an email and a password to create your account.');
       return;
     }
     this.loading.set(true);
-    const { error, needsConfirmation } = await this.auth.signUp(this.email, this.password);
+    const { error, needsConfirmation } = await this.auth.signUp(
+      this.email,
+      this.password,
+      this.fullName,
+    );
     this.loading.set(false);
     if (error) {
       this.error.set(this.friendly(error.message));

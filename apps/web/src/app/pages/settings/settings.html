@@ -8,8 +8,34 @@
   @if (loading()) {
     <ui-card class="mt-8"><ui-skeleton [lines]="4" /></ui-card>
   } @else {
+    <!-- Your name — personalises greetings + email sign-offs -->
+    <ui-card class="mt-8" title="Your name">
+      <p class="text-sm text-muted">
+        We use this to greet you and to sign off your outreach emails.
+      </p>
+      <div class="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <input
+          name="fullName"
+          type="text"
+          autocomplete="name"
+          [(ngModel)]="fullName"
+          placeholder="e.g. Sarah Chen"
+          class="ui-input sm:max-w-xs"
+        />
+        <button
+          ui-button
+          variant="primary"
+          class="shrink-0"
+          [loading]="savingName()"
+          (click)="saveName()"
+        >
+          Save name
+        </button>
+      </div>
+    </ui-card>
+
     <!-- Appearance (light/dark/system) -->
-    <ui-card class="mt-8" title="Appearance">
+    <ui-card class="mt-6" title="Appearance">
       <p class="text-sm text-muted">Choose how {{ appName }} looks. System follows your device.</p>
       <div class="mt-4 inline-flex rounded-md border border-line p-1">
         @for (opt of appearanceOptions; track opt.value) {

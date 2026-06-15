@@ -4,22 +4,22 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { APP_NAME } from '@extrovertai/shared';
 import { AuthService } from '../../core/auth.service';
 import { Button } from '../../ui/button/button';
 import { Field } from '../../ui/field/field';
-import { Icon } from '../../ui/icon/icon';
+import { Wordmark } from '../../ui/wordmark/wordmark';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, RouterLink, Button, Field, Icon],
+  imports: [FormsModule, RouterLink, Button, Field, Wordmark],
   templateUrl: './login.html',
 })
 export class Login {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  protected readonly appName = APP_NAME;
+  protected readonly appName = environment.appName;
   protected email = '';
   protected password = '';
   protected readonly error = signal<string | null>(null);

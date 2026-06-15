@@ -7,8 +7,8 @@
 // so the shell can close it.
 import { Component, computed, inject, input, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { APP_NAME } from '@extrovertai/shared';
 import { Icon } from '../ui/icon/icon';
+import { Wordmark } from '../ui/wordmark/wordmark';
 import type { IconName } from '../ui/icon/icon-paths';
 import { NavBadgeService } from '../core/nav-badge.service';
 import { BrandService } from '../core/brand.service';
@@ -22,22 +22,32 @@ interface NavItem {
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, RouterLinkActive, Icon],
+  imports: [RouterLink, RouterLinkActive, Icon, Wordmark],
   template: `
     <a
       routerLink="/home"
-      class="flex items-center gap-2.5 px-4 py-4 text-ink"
+      class="flex items-center px-4 py-4 text-ink"
       (click)="navigate.emit()"
     >
-      <span
-        class="flex h-7 w-7 items-center justify-center rounded-md bg-accent text-white"
-      >
-        <ui-icon name="send" [size]="16" />
-      </span>
-      <span class="text-heading-sm">{{ appName }}</span>
+      <ui-wordmark class="text-heading-sm" />
     </a>
 
     <nav class="flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-2">
+      <!-- Home: an explicit, always-present link to the dashboard/home, sitting
+           directly below the logo and above the workflow pipeline. -->
+      <div>
+        <a
+          #rlaHome="routerLinkActive"
+          routerLinkActive
+          routerLink="/home"
+          [class]="linkClass(rlaHome.isActive)"
+          (click)="navigate.emit()"
+        >
+          <ui-icon name="home" [size]="18" />
+          <span class="flex-1">Home</span>
+        </a>
+      </div>
+
       <div>
         <p class="px-3 pb-1.5 text-xs font-medium uppercase tracking-wide text-muted">
           Workflow
@@ -124,7 +134,6 @@ export class Sidebar {
   /** Emitted when a nav link is clicked so the shell can close the drawer. */
   readonly navigate = output<void>();
 
-  protected readonly appName = APP_NAME;
   private readonly badges = inject(NavBadgeService);
   protected readonly inboxUnread = this.badges.inboxUnread;
   protected readonly brand = inject(BrandService);

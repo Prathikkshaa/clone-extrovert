@@ -74,10 +74,11 @@ export class DraftingService {
     if (existing > 0) return { status: 'skipped', leadId, reason: 'already_drafted' };
 
     const profile = await this.loadProfile(userId);
+    const senderName = await this.senderName(userId);
 
     try {
       const messages = await this.billing.withCreditGate(userId, 'draft', leadId, () =>
-        this.generate(lead, profile),
+        this.generate(lead, profile, senderName),
       );
       await this.persist(leadId, messages);
       return { status: 'drafted', leadId, count: messages.length };
@@ -113,9 +114,10 @@ export class DraftingService {
     const lead = await this.loadLead(userId, leadId);
     if (!lead) return { ok: false, reason: 'not_found' };
     const profile = await this.loadProfile(userId);
+    const senderName = await this.senderName(userId);
     try {
       const body = await this.billing.withCreditGate(userId, 'draft', `reply:${leadId}`, () =>
-        this.generateReply(lead, profile, thread),
+        this.generateReply(lead, profile, thread, senderName),
       );
       return { ok: true, body };
     } catch (err) {
@@ -129,6 +131,7 @@ export class DraftingService {
     lead: LeadRow,
     profile: ProfileRow,
     thread: { direction: string; body: string | null }[],
+    senderName: string | null,
   ): Promise<string> {
     const convo = thread
       .filter((m) => (m.body ?? '').trim())
@@ -146,11 +149,14 @@ export class DraftingService {
           .filter(Boolean)
           .join('\n')
       : '(no sender profile — keep it natural and helpful, do not invent offerings)';
+    const signOff = senderName
+      ? `End with a sign-off using the sender's name, e.g. "Best,\n${senderName}".`
+      : 'End with a simple sign-off the user can edit (e.g. "Best,").';
     const body = await this.llm.complete({
       system:
         'You write a SHORT, warm, human reply to a B2B email, in the sender\'s voice. ' +
         'Respond directly to what they said. No filler, no hype. Only use facts given — never ' +
-        'invent results, prices, or commitments. End with a simple sign-off the user can edit. ' +
+        `invent results, prices, or commitments. ${signOff} ` +
         'Return ONLY the reply body text (no subject, no quotes).',
       prompt: `Sender:\n${profileBlock}\n\nConversation so far:\n${convo}\n\nWrite the sender's next reply.`,
       maxTokens: 400,
@@ -176,15 +182,21 @@ export class DraftingService {
 
   // --- generation ---
 
-  private async generate(lead: LeadRow, profile: ProfileRow): Promise<GeneratedMessage[]> {
+  private async generate(
+    lead: LeadRow,
+    profile: ProfileRow,
+    senderName: string | null,
+  ): Promise<GeneratedMessage[]> {
+    const signOffRule = senderName
+      ? `Sign off every message with the sender's real name: "Best,\\n${senderName}" (you may vary "Best," but always use the name).`
+      : 'Do NOT invent a sender name — end with a simple sign-off like "Best," that the user can personalize.';
     const parsed = await this.llm.extractJson<{ messages?: unknown }>({
       system:
         'You write short, human, specific B2B cold outreach. You ONLY use facts you are given. ' +
         'Never invent facts about the recipient, and never invent results, clients, or proof ' +
         'points the sender did not provide. No filler ("I hope this finds you well"), no hype, ' +
-        'no buzzwords. Plain words a 12-year-old understands. Do NOT invent a sender name — end ' +
-        'with a simple sign-off like "Best," that the user can personalize.',
-      prompt: this.buildPrompt(lead, profile),
+        `no buzzwords. Plain words a 12-year-old understands. ${signOffRule}`,
+      prompt: this.buildPrompt(lead, profile, senderName),
       maxTokens: 1100,
       temperature: 0.5,
     });
@@ -213,7 +225,7 @@ export class DraftingService {
     return messages;
   }
 
-  private buildPrompt(lead: LeadRow, profile: ProfileRow): string {
+  private buildPrompt(lead: LeadRow, profile: ProfileRow, senderName: string | null): string {
     const reviews = this.parseReviews(lead.reviews);
     const profileBlock = profile
       ? [
@@ -230,6 +242,7 @@ export class DraftingService {
 
     return [
       "SENDER (the person writing the email) — pitch THIS person's offer in their voice:",
+      senderName ? `Sender name (use in the sign-off): ${senderName}` : '',
       profileBlock,
       '',
       'RECIPIENT (the lead being contacted):',
@@ -301,6 +314,19 @@ export class DraftingService {
       .eq('user_id', userId)
       .maybeSingle();
     return (data as ProfileRow) ?? null;
+  }
+
+  /** The sender's display name (from auth metadata) for email sign-offs. Returns
+   *  null when unset so the model falls back to a plain "Best," sign-off. */
+  private async senderName(userId: string): Promise<string | null> {
+    try {
+      const { data } = await this.supabase.getAdminClient().auth.admin.getUserById(userId);
+      const meta = data.user?.user_metadata as { full_name?: string } | undefined;
+      const name = meta?.full_name?.trim();
+      return name && name.length > 0 ? name : null;
+    } catch {
+      return null;
+    }
   }
 
   // --- small helpers ---

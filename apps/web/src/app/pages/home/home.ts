@@ -6,7 +6,6 @@
 // read from existing services; nothing here changes behaviour.
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { APP_NAME } from '@extrovertai/shared';
 import { AuthService } from '../../core/auth.service';
 import { CompanyProfileApiService } from '../../core/company-profile.service';
 import { MeApiService } from '../../core/me.service';
@@ -46,8 +45,17 @@ export class Home {
   private readonly leads = inject(LeadsApiService);
   private readonly dashboard = inject(DashboardApiService);
 
-  protected readonly appName = APP_NAME;
   protected readonly email = this.auth.currentEmail();
+  protected readonly firstName = this.auth.firstName;
+
+  /** Time-of-day greeting, e.g. "Good morning, Sarah". Computed from the local
+   *  clock at load so it reads naturally for the user's actual time of day. */
+  protected readonly greeting = computed(() => {
+    const h = new Date().getHours();
+    const part = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+    const name = this.firstName();
+    return name ? `${part}, ${name}` : part;
+  });
 
   // Each source resolves to a boolean (or count); null = still loading.
   private readonly mailboxConnected = signal<boolean | null>(null);

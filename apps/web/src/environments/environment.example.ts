@@ -3,6 +3,7 @@
 // never put the service_role key here.
 export const environment = {
   production: false,
+  appName: 'ExtrovertAI',
   supabaseUrl: '',
   supabaseAnonKey: '',
   apiUrl: 'http://localhost:3000',
