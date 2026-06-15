@@ -84,23 +84,21 @@ interface NavItem {
     <!-- Brand: the user's fetched logo + name (fills the space above the
          pinned section and personalises the app — master-context §7). -->
     @if (brand.hasBrand()) {
-      <div class="px-3 pb-2">
-        <a
-          routerLink="/settings"
-          class="flex flex-col items-center gap-2 rounded-md border border-line bg-canvas px-3 py-3 transition-colors duration-200 hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          [title]="brand.name() ?? 'Your brand'"
-          (click)="navigate.emit()"
-        >
-          @if (brand.logoUrl(); as logo) {
-            <img [src]="logo" [alt]="brand.name() ?? ''" class="h-16 w-full object-contain" />
-          } @else {
-            <span
-              class="flex h-12 w-12 items-center justify-center rounded bg-accent-soft text-lg font-medium uppercase text-accent"
-              >{{ brandInitial() }}</span
-            >
-          }
-        </a>
-      </div>
+      <a
+        routerLink="/settings"
+        class="block px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        [title]="brand.name() ?? 'Your brand'"
+        (click)="navigate.emit()"
+      >
+        @if (brand.logoUrl(); as logo) {
+          <img [src]="logo" [alt]="brand.name() ?? ''" class="h-16 w-full object-contain" />
+        } @else {
+          <span
+            class="flex h-12 w-12 items-center justify-center rounded bg-accent-soft text-lg font-medium uppercase text-accent"
+            >{{ brandInitial() }}</span
+          >
+        }
+      </a>
     }
 
     <div class="border-t border-line px-3 py-3">
