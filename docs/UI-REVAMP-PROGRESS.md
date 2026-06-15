@@ -3,9 +3,9 @@
 > Updated continuously by the executing agent. On resume, read this first (see 16-ui-ux-revamp.md §0.2).
 
 ## Current status
-- Active phase: 7
+- Active phase: 7 (complete)
 - Active task: docs (README, CODE-MAP, PROGRESS) + final acceptance
-- State: in-progress   <!-- not-started | in-progress | done | blocked -->
+- State: done
 - Last updated: 2026-06-15
 - Blocker (if any): none
 
@@ -17,7 +17,7 @@
 - [x] Phase 4 — Per-screen layout pass (all 15 screens onto the kit + shell + next-step CTAs)
 - [x] Phase 5 — Visual polish (icons everywhere, type/spacing/density, micro-interactions, responsive drawer + mobile nav, a11y)
 - [x] Phase 6 — Full visual verification sweep + fixes
-- [ ] Phase 7 — Docs (README, CODE-MAP, PROGRESS) + final acceptance
+- [x] Phase 7 — Docs (README, CODE-MAP, PROGRESS) + final acceptance
 
 ## Phase notes (append per phase: what was done, decisions, deviations, commit hash)
 - Phase 0: **DONE.** (1) **Icons — fallback chosen (§3).** lucide-angular caps its peer
@@ -155,4 +155,24 @@
   cancel verified), onboarding (in-shell, no dead-end), settings (Appearance toggle persists +
   flips theme, all cards). Mobile topbar clean (breadcrumb collapses, chip one line, bell
   hidden). **No console errors on any screen.** Build + lint clean. No code fixes were needed —
-  the kit + shell held up across every screen. Commit: <pending>.
+  the kit + shell held up across every screen. Commit: 19bdd53.
+- Phase 7: **DONE.** Docs updated: `docs/CODE-MAP.md` (added the `app/layout/` shell +
+  `app/ui/` kit + ThemeMode/Breadcrumb/NavBadge services + the route restructure + a note that
+  all pages use the shell + kit), `README.md` (a "Web UI" bullet: shell/nav, kit location,
+  dark/light mode, icon set, launchpad/stepper), `docs/PROGRESS.md` (File 16 marked complete
+  with a phase summary; current-status line updated). This ledger finalised — all 7 phases done
+  with commit hashes; nothing deferred. **Definition of Done met:** all phases committed + pushed;
+  `npm run build` + `npm run lint` clean repo-wide; the app matches the §2 north star (persistent
+  shell, consistent page-headers + primary action + next-step, pipeline stepper, Home launchpad,
+  persisted OS-default dark/light, icons throughout, responsive + accessible, §7 throughout); no
+  backend/logic changes; no route paths broken; behaviour preserved. Commit: <pending>.
+
+## Deferred / notes
+- **Icons:** used the inline-SVG fallback (§3) not the lucide-angular package — it peer-caps at
+  Angular 13–21 and this repo is on 22. Revisit when lucide-angular ships Angular-22 support
+  (then `ui/icon` can swap to the package behind the same `ui-icon` API).
+- **Pre-existing bundle budget WARNING** (~520kB initial vs 500kB) is from Angular core +
+  @supabase/supabase-js loaded eagerly by the route guards — not a revamp regression (File 16
+  adds only ~2KB eager via ThemeModeService). Build still passes.
+- **Inbox unread badge** is wired (NavBadgeService, set by the Inbox screen to the conversation
+  count) — swap to a true unread count if/when the API exposes one.

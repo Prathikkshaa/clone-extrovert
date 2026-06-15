@@ -88,9 +88,15 @@
 
 ## apps/web (`src/`)
 - `main.ts` — `bootstrapApplication(App, appConfig)`.
-- `app/app.ts` — root shell (router-outlet only).
+- `app/app.ts` — root component; hosts the router-outlet and instantiates `ThemeModeService` at bootstrap so light/dark is applied before first paint (File 16).
 - `app/app.config.ts` — providers (router, etc.).
-- `app/app.routes.ts` — routes; all screens lazy-loaded via `loadComponent`. `/login` + `/signup` are `guestGuard`-only; `/home` is `authGuard`-only.
+- `app/app.routes.ts` — routes; all screens lazy-loaded via `loadComponent`. **File 16 restructure:** landing/`login`/`signup` are outside the shell (`guestGuard` for login/signup); every other screen is a **child of one shell parent route** (`layout/shell`) guarded once by `authGuard`. All paths preserved.
+
+### App shell + UI kit (File 16 — UI/UX revamp)
+- `app/layout/` — the persistent app shell wrapping all authenticated screens: `shell.ts` (`app-shell`: sidebar + topbar over the router-outlet; mounts `ui-toast-host` + `ui-confirm-dialog`; applies the brand accent once; owns the mobile drawer), `sidebar.ts` (`app-sidebar`: grouped nav Workflow/Manage/pinned, `routerLinkActive` teal highlight, Inbox unread badge, off-canvas drawer < md), `topbar.ts` (`app-topbar`: back + breadcrumb, credits chip, dark/light toggle, bell placeholder, account menu). Barrel: `layout/index.ts`.
+- `app/ui/` — the standalone component kit (token-themed, accessible), barrel `ui/index.ts`: `icon/` (`ui-icon` + `icon-paths.ts` — inline Lucide SVG paths, the §3 fallback since lucide-angular peer-caps at Angular 21), `button/` (`ui-button`), `card/`, `page-header/` (`ui-page-header` → pushes breadcrumb to `BreadcrumbService`), `empty-state/`, `status-badge/`, `skeleton/`, `field/` (+ `.ui-input/.ui-textarea/.ui-select` classes in styles.css), `toast/` (`ToastService` + `ui-toast-host`), `confirm/` (`ConfirmService` + `ui-confirm-dialog`), `pipeline-stepper/` (Find→Enrich→Write→Send).
+- `app/core/theme-mode.service.ts` — `ThemeModeService`: light/dark/system, persisted in localStorage, OS-default, toggles `<html data-theme>`. Orthogonal to `theme.service.ts` (brand accent). `app/core/breadcrumb.service.ts` — breadcrumb trail shared from page-headers to the topbar. `app/core/nav-badge.service.ts` — inbox unread count for the sidebar badge.
+- **All `app/pages/*` screens** now render inside `app-shell` (auth screens excepted) and use the `ui/` kit: a `ui-page-header` (title + subtitle + breadcrumb) with one primary action, kit cards/buttons/badges/empty-states/skeletons, `ToastService` for transient status, and a pipeline stepper + "what's next" CTA on the four workflow screens. Home is a launchpad (getting-started checklist + stats + pipeline). Behaviour/data wiring is unchanged from Files 01–15.
 - `app/app.config.ts` — providers: router + `provideHttpClient(withInterceptors([authInterceptor]))`.
 - `app/core/auth.service.ts` — `AuthService`: wraps the anon Supabase client, current `session` signal, signUp/signIn/signOut, access token.
 - `app/core/auth.guard.ts` — `authGuard` (require auth) + `guestGuard` (require signed-out); both await `AuthService.ready`.
