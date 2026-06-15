@@ -12,6 +12,7 @@ import { ToastHost } from '../ui/toast/toast-host';
 import { ConfirmDialog } from '../ui/confirm/confirm-dialog';
 import { CompanyProfileApiService } from '../core/company-profile.service';
 import { ThemeService } from '../core/theme.service';
+import { BrandService } from '../core/brand.service';
 
 @Component({
   selector: 'app-shell',
@@ -45,13 +46,17 @@ export class Shell {
 
   private readonly profiles = inject(CompanyProfileApiService);
   private readonly theme = inject(ThemeService);
+  private readonly brand = inject(BrandService);
 
   constructor() {
-    // Apply the user's brand accent once for the whole authenticated area
-    // (previously each screen re-fetched + re-applied it). Coexists with dark
-    // mode (ThemeModeService) — different tokens.
+    // Fetch the company profile once for the whole authenticated area: apply the
+    // brand accent (ThemeService) AND expose the brand (logo + name) to the
+    // sidebar via BrandService. Coexists with dark mode — different tokens.
     this.profiles.get().subscribe({
-      next: (company) => this.theme.apply(company),
+      next: (company) => {
+        this.theme.apply(company);
+        this.brand.set(company);
+      },
       error: () => {
         /* brand theme is optional */
       },

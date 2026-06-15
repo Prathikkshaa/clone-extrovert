@@ -14,6 +14,7 @@ import {
 } from '../../core/company-profile.service';
 import { MeApiService } from '../../core/me.service';
 import { ThemeService } from '../../core/theme.service';
+import { BrandService } from '../../core/brand.service';
 import { ThemeModeService, type ThemeMode } from '../../core/theme-mode.service';
 import { Button } from '../../ui/button/button';
 import { Card } from '../../ui/card/card';
@@ -39,6 +40,7 @@ export class Settings {
   private readonly api = inject(CompanyProfileApiService);
   private readonly me = inject(MeApiService);
   private readonly theme = inject(ThemeService);
+  private readonly brand = inject(BrandService);
   protected readonly themeMode = inject(ThemeModeService);
   private readonly toast = inject(ToastService);
 
@@ -67,6 +69,7 @@ export class Settings {
       next: (p) => {
         this.profile.set(p);
         this.theme.apply(p);
+        this.brand.set(p);
         this.loading.set(false);
       },
       error: () => {
@@ -148,6 +151,7 @@ export class Settings {
       .subscribe({
         next: (saved) => {
           this.profile.set(saved);
+          this.brand.set(saved);
           if (source === 'fetched') this.theme.apply(saved);
           else this.theme.reset();
           this.saving.set(false);

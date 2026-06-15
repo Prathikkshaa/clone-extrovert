@@ -11,6 +11,7 @@ import { APP_NAME } from '@extrovertai/shared';
 import { Icon } from '../ui/icon/icon';
 import type { IconName } from '../ui/icon/icon-paths';
 import { NavBadgeService } from '../core/nav-badge.service';
+import { BrandService } from '../core/brand.service';
 
 interface NavItem {
   label: string;
@@ -80,6 +81,28 @@ interface NavItem {
       </div>
     </nav>
 
+    <!-- Brand: the user's fetched logo + name (fills the space above the
+         pinned section and personalises the app — master-context §7). -->
+    @if (brand.hasBrand()) {
+      <div class="px-3 pb-2">
+        <a
+          routerLink="/settings"
+          class="flex flex-col items-center gap-2 rounded-md border border-line bg-canvas px-3 py-3 transition-colors duration-200 hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          [title]="brand.name() ?? 'Your brand'"
+          (click)="navigate.emit()"
+        >
+          @if (brand.logoUrl(); as logo) {
+            <img [src]="logo" [alt]="brand.name() ?? ''" class="h-16 w-full object-contain" />
+          } @else {
+            <span
+              class="flex h-12 w-12 items-center justify-center rounded bg-accent-soft text-lg font-medium uppercase text-accent"
+              >{{ brandInitial() }}</span
+            >
+          }
+        </a>
+      </div>
+    }
+
     <div class="border-t border-line px-3 py-3">
       @for (item of pinned; track item.link) {
         <a
@@ -106,6 +129,12 @@ export class Sidebar {
   protected readonly appName = APP_NAME;
   private readonly badges = inject(NavBadgeService);
   protected readonly inboxUnread = this.badges.inboxUnread;
+  protected readonly brand = inject(BrandService);
+
+  /** First letter for the monogram fallback when there's a name but no logo. */
+  protected brandInitial(): string {
+    return (this.brand.name() ?? '?').charAt(0);
+  }
 
   protected readonly workflow: NavItem[] = [
     { label: 'Find leads', link: '/search', icon: 'search' },

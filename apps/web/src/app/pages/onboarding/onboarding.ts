@@ -13,6 +13,7 @@ import {
   type CrawlResult,
 } from '../../core/company-profile.service';
 import { ThemeService } from '../../core/theme.service';
+import { BrandService } from '../../core/brand.service';
 import { Button } from '../../ui/button/button';
 import { Card } from '../../ui/card/card';
 import { Field } from '../../ui/field/field';
@@ -30,6 +31,7 @@ type Step = 'url' | 'loading' | 'review';
 export class Onboarding {
   private readonly api = inject(CompanyProfileApiService);
   private readonly theme = inject(ThemeService);
+  private readonly brand = inject(BrandService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
 
@@ -114,6 +116,7 @@ export class Onboarding {
       .subscribe({
         next: (saved) => {
           this.theme.apply(saved);
+          this.brand.set(saved);
           this.toast.success('Profile saved.');
           void this.router.navigateByUrl('/home');
         },
