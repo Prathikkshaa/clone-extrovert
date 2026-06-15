@@ -59,6 +59,9 @@ export class Home {
 
   // Each source resolves to a boolean (or count); null = still loading.
   private readonly mailboxConnected = signal<boolean | null>(null);
+  /** A connected mailbox has expired/revoked auth and must be reconnected before
+   *  sending. Surfaced as a prominent warning since it silently blocks sending. */
+  protected readonly mailboxNeedsReconnect = signal(false);
   private readonly profileSet = signal<boolean | null>(null);
   private readonly addressSet = signal<boolean | null>(null);
   private readonly hasCredits = signal<boolean | null>(null);
@@ -130,7 +133,11 @@ export class Home {
 
   constructor() {
     this.mailboxes.list().subscribe({
-      next: (list) => this.mailboxConnected.set(list.length > 0),
+      next: (list) => {
+        const active = list.filter((m) => m.status !== 'disconnected');
+        this.mailboxConnected.set(active.length > 0);
+        this.mailboxNeedsReconnect.set(active.some((m) => m.status === 'reauth_required'));
+      },
       error: () => this.mailboxConnected.set(false),
     });
     this.profiles.get().subscribe({

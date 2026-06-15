@@ -4,7 +4,7 @@
 // cancel/error handling (§7). Providers without configured credentials show as
 // "not set up yet" rather than a broken button. Status goes through toasts;
 // disconnect uses the accessible confirm dialog.
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   MailboxApiService,
@@ -34,6 +34,14 @@ export class Mailboxes {
   protected readonly mailboxes = signal<MailboxItem[]>([]);
   protected readonly connecting = signal(false);
 
+  // Active (usable) mailboxes vs disconnected history.
+  protected readonly active = computed(() =>
+    this.mailboxes().filter((m) => m.status !== 'disconnected'),
+  );
+  protected readonly history = computed(() =>
+    this.mailboxes().filter((m) => m.status === 'disconnected'),
+  );
+
   constructor() {
     this.readBanner();
     this.api.providers().subscribe({
@@ -59,13 +67,20 @@ export class Mailboxes {
     } else if (status === 'failed') {
       this.toast.error("We couldn't connect that mailbox. Please try again.");
     }
+    // Strip the ?mailbox=... param so a refresh or Back doesn't re-show the banner.
+    if (status) {
+      history.replaceState(history.state, '', window.location.pathname);
+    }
   }
 
   connect(provider: 'google' | 'microsoft'): void {
     this.connecting.set(true);
     this.api.connectUrl(provider).subscribe({
       next: ({ url }) => {
-        window.location.href = url;
+        // REPLACE (not assign) so the provider's consent page replaces this entry
+        // in history. After the round-trip lands back on /mailboxes, pressing Back
+        // returns to the page BEFORE connecting — never re-triggering OAuth.
+        window.location.replace(url);
       },
       error: (err) => {
         this.connecting.set(false);
@@ -73,6 +88,30 @@ export class Mailboxes {
           err?.error?.message ?? 'Could not start the connection. Please try again.',
         );
       },
+    });
+  }
+
+  /** Reconnect a disconnected mailbox — re-runs the provider's OAuth flow. The
+   *  callback updates the existing row back to 'connected'. */
+  reconnect(item: MailboxItem): void {
+    this.connect(item.provider === 'gmail' ? 'google' : 'microsoft');
+  }
+
+  /** Permanently remove a disconnected mailbox from the history list. */
+  async remove(item: MailboxItem): Promise<void> {
+    const ok = await this.confirm.ask({
+      title: `Remove ${item.email} from history?`,
+      message: 'This deletes it from your list. You can always connect it again later.',
+      confirmLabel: 'Remove',
+      danger: true,
+    });
+    if (!ok) return;
+    this.api.remove(item.id).subscribe({
+      next: () => {
+        this.refresh();
+        this.toast.success('Removed from your mailbox history.');
+      },
+      error: () => this.toast.error('Could not remove that mailbox. Please try again.'),
     });
   }
 

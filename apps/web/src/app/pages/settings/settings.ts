@@ -13,12 +13,14 @@ import {
 } from '../../core/company-profile.service';
 import { AuthService } from '../../core/auth.service';
 import { MeApiService } from '../../core/me.service';
+import { MailboxApiService, type MailboxItem } from '../../core/mailbox-api.service';
 import { environment } from '../../../environments/environment';
 import { ThemeService } from '../../core/theme.service';
 import { BrandService } from '../../core/brand.service';
 import { ThemeModeService, type ThemeMode } from '../../core/theme-mode.service';
 import { Button } from '../../ui/button/button';
 import { Card } from '../../ui/card/card';
+import { Icon } from '../../ui/icon/icon';
 import { PageHeader } from '../../ui/page-header/page-header';
 import { Skeleton } from '../../ui/skeleton/skeleton';
 import { StatusBadge } from '../../ui/status-badge/status-badge';
@@ -31,6 +33,7 @@ import { ToastService } from '../../ui/toast/toast.service';
     FormsModule,
     Button,
     Card,
+    Icon,
     PageHeader,
     Skeleton,
     StatusBadge,
@@ -40,6 +43,7 @@ import { ToastService } from '../../ui/toast/toast.service';
 export class Settings {
   private readonly api = inject(CompanyProfileApiService);
   private readonly auth = inject(AuthService);
+  private readonly mailboxApi = inject(MailboxApiService);
   private readonly me = inject(MeApiService);
   private readonly theme = inject(ThemeService);
   private readonly brand = inject(BrandService);
@@ -51,6 +55,9 @@ export class Settings {
   // Display name (auth metadata) — used in greetings + email sign-offs.
   protected fullName = this.auth.displayName() ?? '';
   protected readonly savingName = signal(false);
+
+  // Connected mailboxes (read-only summary; full management on /mailboxes).
+  protected readonly mailboxes = signal<MailboxItem[]>([]);
 
   protected readonly profile = signal<CompanyProfile | null>(null);
   protected readonly loading = signal(true);
@@ -84,6 +91,12 @@ export class Settings {
         this.loading.set(false);
       },
     });
+    this.mailboxApi.list().subscribe({
+      next: (m) => this.mailboxes.set(m.filter((x) => x.status !== 'disconnected')),
+      error: () => {
+        /* mailbox summary is best-effort */
+      },
+    });
     this.me.get().subscribe({
       next: (m) => {
         this.address = m.physical_address ?? '';
@@ -98,6 +111,10 @@ export class Settings {
 
   setAppearance(mode: ThemeMode): void {
     this.themeMode.set(mode);
+  }
+
+  protected providerLabel(provider: string): string {
+    return provider === 'gmail' ? 'Gmail' : provider === 'outlook' ? 'Outlook' : provider;
   }
 
   async saveName(): Promise<void> {

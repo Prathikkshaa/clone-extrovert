@@ -9,11 +9,13 @@ import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { LeadsApiService, type LeadList } from '../../core/leads.service';
+import { MailboxApiService } from '../../core/mailbox-api.service';
 import {
   CampaignsApiService,
   type CampaignSummary,
   type SendPlan,
 } from '../../core/campaigns.service';
+import { ConfirmService } from '../../ui/confirm/confirm.service';
 import { Button } from '../../ui/button/button';
 import { Card } from '../../ui/card/card';
 import { EmptyState } from '../../ui/empty-state/empty-state';
@@ -46,6 +48,8 @@ import { ToastService } from '../../ui/toast/toast.service';
 export class Send {
   private readonly leadsApi = inject(LeadsApiService);
   private readonly api = inject(CampaignsApiService);
+  private readonly mailboxApi = inject(MailboxApiService);
+  private readonly confirm = inject(ConfirmService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
 
@@ -55,6 +59,9 @@ export class Send {
   protected readonly loadingPlan = signal(false);
   protected readonly starting = signal(false);
   protected readonly campaigns = signal<CampaignSummary[]>([]);
+  protected readonly deletingId = signal<string | null>(null);
+  /** A connected mailbox has expired auth — blocks sending until reconnected. */
+  protected readonly mailboxNeedsReconnect = signal(false);
 
   /** Whether the loaded plan is ready to send. */
   protected readonly canSend = computed(() => {
@@ -66,6 +73,13 @@ export class Send {
     this.leadsApi.getLists().subscribe({
       next: (l) => this.lists.set(l),
       error: () => this.toast.error('Could not load your lists.'),
+    });
+    this.mailboxApi.list().subscribe({
+      next: (list) =>
+        this.mailboxNeedsReconnect.set(list.some((m) => m.status === 'reauth_required')),
+      error: () => {
+        /* best-effort */
+      },
     });
     this.refreshCampaigns();
   }
@@ -105,6 +119,29 @@ export class Send {
       error: () => {
         this.starting.set(false);
         this.toast.error('Could not start sending. Please try again.');
+      },
+    });
+  }
+
+  async deleteCampaign(c: CampaignSummary): Promise<void> {
+    if (this.deletingId()) return;
+    const ok = await this.confirm.ask({
+      title: 'Delete this campaign?',
+      message: 'Stops any pending sends and removes it from your list. This can’t be undone.',
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!ok) return;
+    this.deletingId.set(c.id);
+    this.api.remove(c.id).subscribe({
+      next: () => {
+        this.deletingId.set(null);
+        this.campaigns.update((list) => list.filter((x) => x.id !== c.id));
+        this.toast.success('Campaign deleted.');
+      },
+      error: () => {
+        this.deletingId.set(null);
+        this.toast.error('Could not delete the campaign. Please try again.');
       },
     });
   }

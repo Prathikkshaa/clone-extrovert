@@ -19,6 +19,26 @@
 
   <pipeline-stepper current="send" class="mt-6" />
 
+  <!-- Mailbox needs reconnection — blocks sending, so warn before they try. -->
+  @if (mailboxNeedsReconnect()) {
+    <div
+      class="mt-6 flex flex-col gap-3 rounded-lg border border-warning/40 bg-warning-soft p-4 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div class="flex items-start gap-3">
+        <ui-icon name="triangle-alert" [size]="20" class="mt-0.5 shrink-0 text-warning" />
+        <div>
+          <p class="text-sm font-medium text-ink">Reconnect your mailbox to send</p>
+          <p class="text-sm text-muted">
+            A connected mailbox’s authorization expired. Sends are paused until it’s reconnected.
+          </p>
+        </div>
+      </div>
+      <a routerLink="/mailboxes" class="shrink-0">
+        <button ui-button variant="primary" iconLeft="refresh-cw">Reconnect</button>
+      </a>
+    </div>
+  }
+
   <!-- List picker -->
   <ui-card class="mt-6">
     <ui-field label="Pick a list" for="list">
@@ -158,7 +178,20 @@
                 {{ c.counts.replied }} replied
               </p>
             </div>
-            <ui-status-badge [status]="c.status" />
+            <div class="flex shrink-0 items-center gap-2">
+              <ui-status-badge [status]="c.status" />
+              <button
+                ui-button
+                variant="ghost"
+                size="sm"
+                iconLeft="trash-2"
+                [loading]="deletingId() === c.id"
+                [disabled]="!!deletingId()"
+                (click)="deleteCampaign(c)"
+              >
+                Delete
+              </button>
+            </div>
           </li>
         }
       </ul>

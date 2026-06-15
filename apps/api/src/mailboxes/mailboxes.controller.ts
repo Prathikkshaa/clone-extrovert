@@ -34,13 +34,20 @@ export class MailboxesController {
     return this.mailboxes.listMailboxes(user.id);
   }
 
-  /** Disconnect a mailbox. */
+  /** Disconnect a mailbox (soft — kept in history, tokens wiped). */
   @Delete(':id')
   async disconnect(
     @CurrentUser() user: AuthUser,
     @Param('id') id: string,
   ): Promise<{ ok: true }> {
     await this.mailboxes.disconnect(user.id, id);
+    return { ok: true };
+  }
+
+  /** Permanently remove a mailbox from history (hard delete). */
+  @Delete(':id/permanent')
+  async remove(@CurrentUser() user: AuthUser, @Param('id') id: string): Promise<{ ok: true }> {
+    await this.mailboxes.remove(user.id, id);
     return { ok: true };
   }
 }

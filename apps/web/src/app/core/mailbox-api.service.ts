@@ -41,4 +41,9 @@ export class MailboxApiService {
   disconnect(id: string): Observable<{ ok: boolean }> {
     return this.http.delete<{ ok: boolean }>(`${this.base}/${id}`);
   }
+
+  /** Permanently remove a disconnected mailbox from history. */
+  remove(id: string): Observable<{ ok: boolean }> {
+    return this.http.delete<{ ok: boolean }>(`${this.base}/${id}/permanent`);
+  }
 }

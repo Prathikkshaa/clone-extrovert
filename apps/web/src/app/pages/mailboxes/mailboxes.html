@@ -17,41 +17,40 @@
       >
         Connect Gmail
       </button>
-      <button
-        ui-button
-        variant="secondary"
-        iconLeft="mail"
-        [disabled]="!providers().microsoft || connecting()"
-        (click)="connect('microsoft')"
-      >
-        Connect Outlook
-      </button>
+      <div class="relative">
+        <button
+          ui-button
+          variant="secondary"
+          iconLeft="mail"
+          class="w-full"
+          [disabled]="true"
+        >
+          Connect Outlook
+        </button>
+        <span
+          class="pointer-events-none absolute -right-1.5 -top-2 rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white shadow-sm"
+        >
+          Coming soon
+        </span>
+      </div>
     </div>
-    @if (!providers().google || !providers().microsoft) {
-      <p class="mt-3 text-xs text-muted">
-        @if (!providers().google && !providers().microsoft) {
-          Mailbox connections aren’t set up on this server yet.
-        } @else if (!providers().google) {
-          Gmail isn’t set up on this server yet.
-        } @else {
-          Outlook isn’t set up on this server yet.
-        }
-      </p>
+    @if (!providers().google) {
+      <p class="mt-3 text-xs text-muted">Gmail isn’t set up on this server yet.</p>
     }
   </ui-card>
 
   <!-- Connected mailboxes -->
   <div class="mt-8">
     <h2 class="text-heading-sm text-ink">Connected mailboxes</h2>
-    @if (mailboxes().length === 0) {
+    @if (active().length === 0) {
       <p class="mt-3 text-sm text-muted">No mailboxes connected yet.</p>
     } @else {
       <ul class="mt-3 space-y-3">
-        @for (m of mailboxes(); track m.id) {
+        @for (m of active(); track m.id) {
           <li
-            class="flex items-center justify-between gap-3 rounded-lg border border-line bg-surface p-4"
+            class="flex flex-col gap-3 rounded-lg border border-line bg-surface p-4 sm:flex-row sm:items-center sm:justify-between"
           >
-            <div class="flex items-center gap-3">
+            <div class="flex min-w-0 items-center gap-3">
               <span
                 class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent"
               >
@@ -62,13 +61,25 @@
                 <p class="text-xs text-muted">{{ providerLabel(m.provider) }}</p>
               </div>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3 sm:shrink-0 sm:justify-end">
               @if (m.status === 'connected') {
                 <ui-status-badge status="connected" text="Connected" />
               } @else if (m.status === 'reauth_required') {
                 <ui-status-badge status="reauth_required" text="Reconnect needed" />
               } @else {
                 <ui-status-badge [status]="m.status" />
+              }
+              @if (m.status === 'reauth_required') {
+                <button
+                  ui-button
+                  variant="primary"
+                  size="sm"
+                  iconLeft="refresh-cw"
+                  [loading]="connecting()"
+                  (click)="reconnect(m)"
+                >
+                  Reconnect
+                </button>
               }
               <button
                 ui-button
@@ -85,4 +96,54 @@
       </ul>
     }
   </div>
+
+  <!-- Previously connected (history) — reconnect or remove from the list -->
+  @if (history().length > 0) {
+    <div class="mt-8">
+      <h2 class="text-heading-sm text-ink">Previously connected</h2>
+      <p class="mt-1 text-sm text-muted">
+        Disconnected mailboxes. Reconnect one in a click, or remove it for good.
+      </p>
+      <ul class="mt-3 space-y-3">
+        @for (m of history(); track m.id) {
+          <li
+            class="flex flex-col gap-3 rounded-lg border border-line bg-canvas p-4 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div class="flex min-w-0 items-center gap-3">
+              <span
+                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface text-muted"
+              >
+                <ui-icon name="mail" [size]="18" />
+              </span>
+              <div class="min-w-0">
+                <p class="truncate text-body text-muted">{{ m.email }}</p>
+                <p class="text-xs text-muted">{{ providerLabel(m.provider) }} · disconnected</p>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 sm:shrink-0 sm:justify-end">
+              <button
+                ui-button
+                variant="secondary"
+                size="sm"
+                iconLeft="refresh-cw"
+                [loading]="connecting()"
+                (click)="reconnect(m)"
+              >
+                Reconnect
+              </button>
+              <button
+                ui-button
+                variant="ghost"
+                size="sm"
+                iconLeft="trash-2"
+                (click)="remove(m)"
+              >
+                Remove
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+  }
 </div>

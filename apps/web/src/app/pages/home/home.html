@@ -9,6 +9,26 @@
     </a>
   </ui-page-header>
 
+  <!-- Mailbox needs reconnection: blocks sending, so surface it prominently. -->
+  @if (mailboxNeedsReconnect()) {
+    <div
+      class="mt-6 flex flex-col gap-3 rounded-lg border border-warning/40 bg-warning-soft p-4 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div class="flex items-start gap-3">
+        <ui-icon name="triangle-alert" [size]="20" class="mt-0.5 shrink-0 text-warning" />
+        <div>
+          <p class="text-sm font-medium text-ink">A mailbox needs reconnecting</p>
+          <p class="text-sm text-muted">
+            Its authorization expired — reconnect it so your emails keep sending.
+          </p>
+        </div>
+      </div>
+      <a routerLink="/mailboxes" class="shrink-0">
+        <button ui-button variant="primary" iconLeft="refresh-cw">Reconnect</button>
+      </a>
+    </div>
+  }
+
   <!-- Getting started: shown until every step is done -->
   @if (loading()) {
     <ui-card class="mt-8">

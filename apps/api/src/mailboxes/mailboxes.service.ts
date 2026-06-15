@@ -147,8 +147,33 @@ export class MailboxesService {
     return data ?? [];
   }
 
-  /** Disconnect (delete) a mailbox owned by the user. */
+  /** Disconnect a mailbox owned by the user. Soft-disconnect: the row is KEPT
+   *  (as history the user can reconnect) but its tokens are wiped and its status
+   *  set to 'disconnected', so it can never be used to send until reconnected. */
   async disconnect(userId: string, id: string): Promise<void> {
+    const { data, error } = await this.supabase
+      .getAdminClient()
+      .from('mailboxes')
+      .update({
+        status: 'disconnected',
+        access_token_encrypted: null,
+        refresh_token_encrypted: null,
+        token_expires_at: null,
+      })
+      .eq('id', id)
+      .eq('user_id', userId)
+      .select('id');
+
+    if (error) {
+      throw new BadRequestException('Could not disconnect that mailbox.');
+    }
+    if (!data || data.length === 0) {
+      throw new NotFoundException('Mailbox not found.');
+    }
+  }
+
+  /** Permanently remove a mailbox from the user's history (hard delete). */
+  async remove(userId: string, id: string): Promise<void> {
     const { data, error } = await this.supabase
       .getAdminClient()
       .from('mailboxes')
@@ -158,7 +183,7 @@ export class MailboxesService {
       .select('id');
 
     if (error) {
-      throw new BadRequestException('Could not disconnect that mailbox.');
+      throw new BadRequestException('Could not remove that mailbox.');
     }
     if (!data || data.length === 0) {
       throw new NotFoundException('Mailbox not found.');
