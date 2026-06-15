@@ -15,6 +15,7 @@ import { BreadcrumbService } from '../core/breadcrumb.service';
 import { ThemeModeService } from '../core/theme-mode.service';
 import { CreditsApiService } from '../core/credits.service';
 import { ThemeService } from '../core/theme.service';
+import { NotificationsService } from '../core/notifications.service';
 
 @Component({
   selector: 'app-topbar',
@@ -79,7 +80,7 @@ import { ThemeService } from '../core/theme.service';
       <button
         type="button"
         class="rounded-md p-2 text-muted transition-colors duration-200 hover:bg-canvas hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        (click)="themeMode.toggle()"
+        (click)="toggleTheme($event)"
         [attr.aria-label]="
           themeMode.resolved() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
         "
@@ -87,13 +88,83 @@ import { ThemeService } from '../core/theme.service';
         <ui-icon [name]="themeMode.resolved() === 'dark' ? 'sun' : 'moon'" [size]="18" />
       </button>
 
-      <button
-        type="button"
-        class="hidden rounded-md p-2 text-muted transition-colors duration-200 hover:bg-canvas hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:block"
-        aria-label="Notifications"
-      >
-        <ui-icon name="bell" [size]="18" />
-      </button>
+      <!-- Notifications -->
+      <div class="relative">
+        <button
+          type="button"
+          class="relative rounded-md p-2 text-muted transition-colors duration-200 hover:bg-canvas hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          (click)="toggleNotif($event)"
+          [attr.aria-expanded]="notifOpen()"
+          aria-haspopup="menu"
+          aria-label="Notifications"
+        >
+          <ui-icon name="bell" [size]="18" />
+          @if (notifications.unreadCount() > 0) {
+            <span
+              class="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold leading-none text-white"
+              >{{ notifications.unreadCount() }}</span
+            >
+          }
+        </button>
+        @if (notifOpen()) {
+          <div
+            class="absolute right-0 z-30 mt-2 w-80 max-w-[90vw] rounded-lg border border-line bg-surface shadow-lg"
+            role="menu"
+          >
+            <div class="flex items-center justify-between border-b border-line px-3 py-2.5">
+              <p class="text-sm font-medium text-ink">Notifications</p>
+              @if (notifications.items().length > 0) {
+                <button
+                  type="button"
+                  class="text-xs font-medium text-muted transition-colors duration-200 hover:text-ink"
+                  (click)="clearAllNotif()"
+                >
+                  Clear all
+                </button>
+              }
+            </div>
+            @if (notifications.items().length === 0) {
+              <div class="flex flex-col items-center gap-2 px-4 py-8 text-center">
+                <ui-icon name="bell-off" [size]="22" class="text-muted" />
+                <p class="text-sm text-muted">You’re all caught up.</p>
+              </div>
+            } @else {
+              <ul class="max-h-96 overflow-y-auto py-1">
+                @for (n of notifications.items(); track n.id) {
+                  <li class="group flex items-start gap-3 px-3 py-2.5 hover:bg-canvas">
+                    <span
+                      class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+                      [class.bg-danger-soft]="n.kind === 'critical'"
+                      [class.text-danger]="n.kind === 'critical'"
+                      [class.bg-warning-soft]="n.kind === 'warning'"
+                      [class.text-warning]="n.kind === 'warning'"
+                    >
+                      <ui-icon [name]="n.icon" [size]="15" />
+                    </span>
+                    <a
+                      [routerLink]="n.link"
+                      class="min-w-0 flex-1"
+                      (click)="closeNotif()"
+                    >
+                      <p class="text-sm font-medium text-ink">{{ n.title }}</p>
+                      <p class="text-xs text-muted">{{ n.body }}</p>
+                      <p class="mt-0.5 text-[11px] text-muted">{{ timeAgo(n.createdAt) }}</p>
+                    </a>
+                    <button
+                      type="button"
+                      class="shrink-0 rounded p-1 text-muted opacity-0 transition-opacity duration-200 hover:text-ink focus:opacity-100 group-hover:opacity-100"
+                      (click)="dismissNotif(n.id, $event)"
+                      aria-label="Dismiss notification"
+                    >
+                      <ui-icon name="x" [size]="14" />
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        }
+      </div>
 
       <div class="relative">
         <button
@@ -161,25 +232,64 @@ export class Topbar {
   private readonly credits = inject(CreditsApiService);
   private readonly brandTheme = inject(ThemeService);
   protected readonly themeMode = inject(ThemeModeService);
+  protected readonly notifications = inject(NotificationsService);
 
   protected readonly crumbs = this.breadcrumbs.crumbs;
   protected readonly email = signal<string | null>(this.auth.currentEmail());
   protected readonly balance = signal<number | null>(null);
   protected readonly accountOpen = signal(false);
+  protected readonly notifOpen = signal(false);
 
   /** Asks the shell to open the mobile nav drawer. */
   readonly toggleMenu = output<void>();
 
   constructor() {
     this.loadBalance();
-    // Refresh the credit chip and email after each navigation (cheap, and keeps
-    // the chip honest after a paid action without a full reload).
+    this.notifications.refresh();
+    // Refresh the credit chip, email and notifications after each navigation
+    // (cheap, and keeps them honest after a paid action without a full reload).
     this.router.events
       .pipe(filter((e) => e instanceof NavigationEnd))
       .subscribe(() => {
         this.email.set(this.auth.currentEmail());
         this.loadBalance();
+        this.notifications.refresh();
       });
+  }
+
+  /**
+   * Toggle dark/light with a circular "reveal" wipe from the clicked button using
+   * the View Transitions API (the wow moment). Falls back to an instant toggle
+   * when the API is unavailable or the user prefers reduced motion.
+   */
+  protected toggleTheme(event: MouseEvent): void {
+    const doc = document as Document & {
+      startViewTransition?: (cb: () => void) => { ready: Promise<void> };
+    };
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (!doc.startViewTransition || reduceMotion) {
+      this.themeMode.toggle();
+      return;
+    }
+    const x = event.clientX;
+    const y = event.clientY;
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y),
+    );
+    const transition = doc.startViewTransition(() => this.themeMode.toggle());
+    transition.ready.then(() => {
+      document.documentElement.animate(
+        {
+          clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`],
+        },
+        {
+          duration: 480,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          pseudoElement: '::view-transition-new(root)',
+        },
+      );
+    });
   }
 
   private loadBalance(): void {
@@ -198,12 +308,45 @@ export class Topbar {
   protected toggleAccount(event: Event): void {
     event.stopPropagation();
     this.accountOpen.update((v) => !v);
+    this.notifOpen.set(false);
   }
   protected closeAccount(): void {
     this.accountOpen.set(false);
   }
+
+  protected toggleNotif(event: Event): void {
+    event.stopPropagation();
+    this.notifOpen.update((v) => !v);
+    this.accountOpen.set(false);
+  }
+  protected closeNotif(): void {
+    this.notifOpen.set(false);
+  }
+  protected dismissNotif(id: string, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.notifications.dismiss(id);
+  }
+  protected clearAllNotif(): void {
+    this.notifications.clearAll();
+  }
+
+  /** Short relative time for a notification, e.g. "just now", "3h ago", "Jun 14". */
+  protected timeAgo(ts: number): string {
+    const diff = Date.now() - ts;
+    const min = Math.floor(diff / 60000);
+    if (min < 1) return 'just now';
+    if (min < 60) return `${min}m ago`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return `${hr}h ago`;
+    const day = Math.floor(hr / 24);
+    if (day < 7) return `${day}d ago`;
+    return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+
   protected onDocumentClick(): void {
     if (this.accountOpen()) this.accountOpen.set(false);
+    if (this.notifOpen()) this.notifOpen.set(false);
   }
 
   protected async logout(): Promise<void> {
