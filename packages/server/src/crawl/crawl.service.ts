@@ -134,8 +134,34 @@ export class CrawlService {
       };
     } catch (err) {
       this.logger.warn(`Firecrawl failed, falling back to fetch: ${(err as Error).message}`);
-      return { ok: false, text: '', source: 'none', error: (err as Error).message };
+      return { ok: false, text: '', source: 'none', error: this.describeFetchError(err) };
     }
+  }
+
+  /** Turn a raw fetch/network error into a calm, SPECIFIC message for the user
+   *  (master-context §7: never leak technical strings like "fetch failed"). The
+   *  real cause is inspected (DNS, refused, timeout, TLS) so we say what actually
+   *  went wrong rather than a vague generic. */
+  private describeFetchError(err: unknown): string {
+    const e = err as {
+      name?: string;
+      cause?: { code?: string };
+    };
+    const name = e?.name ?? '';
+    const code = e?.cause?.code ?? '';
+    if (name === 'TimeoutError' || name === 'AbortError') {
+      return 'That site took too long to respond. Check the address, or add your details by hand.';
+    }
+    if (code === 'ENOTFOUND' || code === 'EAI_AGAIN') {
+      return 'We couldn’t find a website at that address — check the spelling (e.g. example.com).';
+    }
+    if (code === 'ECONNREFUSED' || code === 'ECONNRESET') {
+      return 'That website refused the connection — it may be down right now.';
+    }
+    if (code.startsWith('CERT_') || code.includes('TLS') || code === 'DEPTH_ZERO_SELF_SIGNED_CERT') {
+      return 'That site has a security-certificate problem we couldn’t get past.';
+    }
+    return 'We couldn’t reach that website — it may be down or blocking us. You can add your details by hand instead.';
   }
 
   private async tryFetch(url: string): Promise<CrawlResult> {
@@ -158,7 +184,7 @@ export class CrawlService {
       }
       return { ok: true, text, source: 'fetch' };
     } catch (err) {
-      return { ok: false, text: '', source: 'none', error: (err as Error).message };
+      return { ok: false, text: '', source: 'none', error: this.describeFetchError(err) };
     }
   }
 

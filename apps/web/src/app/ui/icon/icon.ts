@@ -4,33 +4,41 @@
 // that inherits `currentColor`, so icons take the surrounding text colour and
 // theme tokens with no extra wiring. Decorative by default (aria-hidden); pass a
 // `label` to make it a labelled image for icon-only controls.
+//
+// Alignment: the HOST element (<ui-icon>) is the sized, centred box itself —
+// `inline-flex` + `vertical-align: middle` so the glyph centres both next to text
+// (inline contexts) and inside `items-center` flex rows (buttons, nav, badges).
+// (Earlier the host was a default `inline` wrapper around an inner span, which
+// blockified as a flex item and pushed icons to the top.)
 import { Component, computed, inject, input, ViewEncapsulation } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { ICON_PATHS, type IconName } from './icon-paths';
 
 @Component({
   selector: 'ui-icon',
-  // Encapsulation None so the svg sizing rule applies to the innerHTML-rendered
-  // SVG (which Angular would otherwise not tag with this component's scope).
+  // Encapsulation None so the global `ui-icon`/`ui-icon svg` rules style the host
+  // and the innerHTML-rendered SVG (which Angular would not otherwise scope).
   encapsulation: ViewEncapsulation.None,
-  template: `<span
-    class="ui-icon"
-    [style.width.px]="size()"
-    [style.height.px]="size()"
-    [attr.aria-hidden]="label() ? null : 'true'"
-    [attr.role]="label() ? 'img' : null"
-    [attr.aria-label]="label()"
-    [innerHTML]="svg()"
-  ></span>`,
+  template: '',
+  host: {
+    class: 'ui-icon',
+    '[style.width.px]': 'size()',
+    '[style.height.px]': 'size()',
+    '[attr.aria-hidden]': 'label() ? null : "true"',
+    '[attr.role]': 'label() ? "img" : null',
+    '[attr.aria-label]': 'label()',
+    '[innerHTML]': 'svg()',
+  },
   styles: `
-    .ui-icon {
+    ui-icon.ui-icon {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      vertical-align: middle;
       line-height: 0;
       flex-shrink: 0;
     }
-    .ui-icon svg {
+    ui-icon.ui-icon > svg {
       display: block;
       width: 100%;
       height: 100%;
