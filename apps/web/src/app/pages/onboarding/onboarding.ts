@@ -4,7 +4,7 @@
 // people without a website; failures degrade to manual with plain copy. Renders
 // in the shell; errors go through toasts, the contextual result notice stays
 // inline. The "Save and continue" action removes the old dead-end (→ Home).
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
@@ -17,18 +17,35 @@ import { BrandService } from '../../core/brand.service';
 import { Button } from '../../ui/button/button';
 import { Card } from '../../ui/card/card';
 import { Field } from '../../ui/field/field';
+import { Icon } from '../../ui/icon/icon';
 import { PageHeader } from '../../ui/page-header/page-header';
-import { Skeleton } from '../../ui/skeleton/skeleton';
+import type { IconName } from '../../ui/icon/icon-paths';
 import { ToastService } from '../../ui/toast/toast.service';
 
 type Step = 'url' | 'loading' | 'review';
 
+interface LoadingStep {
+  label: string;
+  icon: IconName;
+}
+
+// Friendly progress steps shown while the (single) crawl call runs. We don't have
+// real per-stage progress, so they advance on a gentle timer to feel alive.
+const LOADING_STEPS: LoadingStep[] = [
+  { label: 'Visiting your website', icon: 'search' },
+  { label: 'Reading your pages', icon: 'file-text' },
+  { label: 'Understanding your business', icon: 'sparkles' },
+  { label: 'Fetching your logo & colours', icon: 'palette' },
+  { label: 'Writing your profile', icon: 'pen-line' },
+];
+const STEP_INTERVAL_MS = 1100;
+
 @Component({
   selector: 'app-onboarding',
-  imports: [FormsModule, Button, Card, Field, PageHeader, Skeleton],
+  imports: [FormsModule, Button, Card, Field, Icon, PageHeader],
   templateUrl: './onboarding.html',
 })
-export class Onboarding {
+export class Onboarding implements OnDestroy {
   private readonly api = inject(CompanyProfileApiService);
   private readonly theme = inject(ThemeService);
   private readonly brand = inject(BrandService);
@@ -39,6 +56,10 @@ export class Onboarding {
   protected readonly notice = signal<string | null>(null);
   protected readonly saving = signal(false);
   protected readonly isManual = signal(false);
+
+  protected readonly loadingSteps = LOADING_STEPS;
+  protected readonly activeStep = signal(0);
+  private loadingTimer: ReturnType<typeof setInterval> | null = null;
 
   protected readonly title = computed(() => {
     switch (this.step()) {
@@ -74,9 +95,14 @@ export class Onboarding {
       return;
     }
     this.step.set('loading');
+    this.startLoadingAnimation();
     this.api.crawl(this.url).subscribe({
-      next: (res) => this.fillFromCrawl(res),
+      next: (res) => {
+        this.stopLoadingAnimation();
+        this.fillFromCrawl(res);
+      },
       error: (err) => {
+        this.stopLoadingAnimation();
         // Crawl failed → fall back to the manual path with a plain message.
         this.isManual.set(true);
         this.website = this.url;
@@ -87,6 +113,26 @@ export class Onboarding {
         this.step.set('review');
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.stopLoadingAnimation();
+  }
+
+  private startLoadingAnimation(): void {
+    this.activeStep.set(0);
+    this.stopLoadingAnimation();
+    this.loadingTimer = setInterval(() => {
+      // Advance, but hold on the last step until the real response lands.
+      this.activeStep.update((i) => Math.min(i + 1, LOADING_STEPS.length - 1));
+    }, STEP_INTERVAL_MS);
+  }
+
+  private stopLoadingAnimation(): void {
+    if (this.loadingTimer) {
+      clearInterval(this.loadingTimer);
+      this.loadingTimer = null;
+    }
   }
 
   startManual(): void {

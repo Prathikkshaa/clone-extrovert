@@ -36,10 +36,54 @@
     </ui-card>
   }
 
-  <!-- Step 2: loading (skeleton, not spinner) -->
+  <!-- Step 2: live progress while we read the site -->
   @if (step() === 'loading') {
     <ui-card class="mt-8" aria-live="polite">
-      <ui-skeleton [lines]="5" [height]="20" />
+      <div class="mb-6 flex items-center gap-3">
+        <span
+          class="relative flex h-11 w-11 items-center justify-center rounded-full bg-accent-soft text-accent"
+        >
+          <span class="absolute inset-0 animate-ping rounded-full bg-accent-soft opacity-60"></span>
+          <ui-icon [name]="loadingSteps[activeStep()].icon" [size]="22" class="relative" />
+        </span>
+        <div>
+          <p class="text-heading-sm text-ink">{{ loadingSteps[activeStep()].label }}…</p>
+          <p class="text-sm text-muted">Hang tight — building your profile from your site.</p>
+        </div>
+      </div>
+
+      <ul class="space-y-3">
+        @for (s of loadingSteps; track s.label; let i = $index) {
+          <li class="flex items-center gap-3">
+            <span
+              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors duration-300"
+              [class.bg-positive-soft]="i < activeStep()"
+              [class.text-positive]="i < activeStep()"
+              [class.bg-accent-soft]="i === activeStep()"
+              [class.text-accent]="i === activeStep()"
+              [class.border]="i > activeStep()"
+              [class.border-line]="i > activeStep()"
+              [class.text-muted]="i > activeStep()"
+            >
+              @if (i < activeStep()) {
+                <ui-icon name="check" [size]="14" />
+              } @else if (i === activeStep()) {
+                <ui-icon name="loader" [size]="14" class="animate-spin" />
+              } @else {
+                <ui-icon name="circle" [size]="8" />
+              }
+            </span>
+            <span
+              class="text-sm transition-colors duration-300"
+              [class.font-medium]="i === activeStep()"
+              [class.text-ink]="i <= activeStep()"
+              [class.text-muted]="i > activeStep()"
+            >
+              {{ s.label }}
+            </span>
+          </li>
+        }
+      </ul>
     </ui-card>
   }
 
