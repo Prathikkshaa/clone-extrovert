@@ -34,6 +34,8 @@ export type PlacesStatus = 'ok' | 'zero_results' | 'rate_limited' | 'error' | 'n
 export interface PlacesSearchResult {
   status: PlacesStatus;
   results: PlaceResult[];
+  /** Token to fetch the next page of results (undefined when there are no more). */
+  nextPageToken?: string;
   error?: string;
 }
 
@@ -77,6 +79,7 @@ const FIELD_MASK = [
   'places.websiteUri',
   'places.nationalPhoneNumber',
   'places.location',
+  'nextPageToken',
 ].join(',');
 
 @Injectable()
@@ -94,6 +97,8 @@ export class PlacesService {
     location: string;
     filters?: PlacesFilters;
     maxResults?: number;
+    /** Page token from a previous result to fetch the next page (≤60 total). */
+    pageToken?: string;
   }): Promise<PlacesSearchResult> {
     const apiKey = this.config.get<string>('GOOGLE_PLACES_API_KEY');
     if (!apiKey) {
@@ -112,6 +117,7 @@ export class PlacesService {
         body: JSON.stringify({
           textQuery,
           maxResultCount: Math.min(params.maxResults ?? 20, 20),
+          ...(params.pageToken ? { pageToken: params.pageToken } : {}),
         }),
         signal: AbortSignal.timeout(20000),
       });
@@ -122,6 +128,7 @@ export class PlacesService {
 
       const json = (await res.json()) as {
         places?: RawPlace[];
+        nextPageToken?: string;
         error?: { status?: string; message?: string };
       };
 
@@ -139,7 +146,11 @@ export class PlacesService {
 
       const all = (json.places ?? []).map((p) => this.toResult(p));
       const filtered = this.applyFilters(all, params.filters);
-      return { status: filtered.length ? 'ok' : 'zero_results', results: filtered };
+      return {
+        status: filtered.length ? 'ok' : 'zero_results',
+        results: filtered,
+        nextPageToken: json.nextPageToken,
+      };
     } catch (err) {
       this.logger.warn(`Places search failed: ${(err as Error).message}`);
       return { status: 'error', results: [], error: (err as Error).message };

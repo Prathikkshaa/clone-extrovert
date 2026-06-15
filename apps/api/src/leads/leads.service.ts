@@ -52,7 +52,14 @@ export type EnrichedLeadCard = Pick<
 >;
 
 export type SearchOutcome =
-  | { ok: true; cached: boolean; searchId: string; leads: LeadCard[]; count: number }
+  | {
+      ok: true;
+      cached: boolean;
+      searchId: string;
+      leads: LeadCard[];
+      count: number;
+      nextPageToken?: string;
+    }
   | { ok: false; reason: 'out_of_credits' | 'busy' | 'error'; message: string };
 
 const LEAD_CARD_COLUMNS = 'id,name,website,phone,address,rating,review_count,place_id,status';
@@ -73,7 +80,7 @@ export class LeadsService {
 
   async runSearch(
     userId: string,
-    input: { industry: string; location: string; filters?: PlacesFilters },
+    input: { industry: string; location: string; filters?: PlacesFilters; pageToken?: string },
   ): Promise<SearchOutcome> {
     if (!this.places.isConfigured()) {
       return { ok: false, reason: 'error', message: 'Lead search isn’t set up on this server yet.' };
@@ -98,22 +105,24 @@ export class LeadsService {
     const searchId = searchRow.data.id;
 
     const cacheKey = this.cacheKey(userId, input);
-    let results = await this.cache.getJson<PlaceResult[]>(cacheKey);
-    const cached = results !== null;
+    let page = await this.cache.getJson<{ results: PlaceResult[]; nextPageToken?: string }>(cacheKey);
+    const cached = page !== null;
 
     if (!cached) {
       try {
-        results = await this.billing.withCreditGate(userId, 'search', searchId, async () => {
+        page = await this.billing.withCreditGate(userId, 'search', searchId, async () => {
           const r = await this.places.search({
             industry: input.industry,
             location: input.location,
             filters,
+            pageToken: input.pageToken,
           });
           if (r.status === 'rate_limited') throw new BusyError();
           if (r.status === 'error' || r.status === 'not_configured') {
             throw new Error(r.error ?? 'Places search failed.');
           }
-          return r.results; // 'ok' or 'zero_results' (empty) — both count as a search
+          // 'ok' or 'zero_results' (empty) — both count as a search.
+          return { results: r.results, nextPageToken: r.nextPageToken };
         });
       } catch (err) {
         if (err instanceof InsufficientCreditsError) {
@@ -137,11 +146,18 @@ export class LeadsService {
           message: 'Something went wrong searching. Nothing was charged.',
         };
       }
-      await this.cache.setJson(cacheKey, results ?? [], CACHE_TTL_SECONDS);
+      await this.cache.setJson(cacheKey, page ?? { results: [] }, CACHE_TTL_SECONDS);
     }
 
-    const leads = await this.persistLeads(userId, searchId, results ?? []);
-    return { ok: true, cached, searchId, leads, count: leads.length };
+    const leads = await this.persistLeads(userId, searchId, page?.results ?? []);
+    return {
+      ok: true,
+      cached,
+      searchId,
+      leads,
+      count: leads.length,
+      nextPageToken: page?.nextPageToken,
+    };
   }
 
   async getLists(userId: string): Promise<Pick<Tables<'lists'>, 'id' | 'name' | 'created_at'>[]> {
@@ -282,11 +298,12 @@ export class LeadsService {
 
   private cacheKey(
     userId: string,
-    input: { industry: string; location: string; filters?: PlacesFilters },
+    input: { industry: string; location: string; filters?: PlacesFilters; pageToken?: string },
   ): string {
     const norm = (s: string): string => s.trim().toLowerCase().replace(/\s+/g, ' ');
     const f = input.filters ?? {};
-    return `places:${userId}:${norm(input.industry)}|${norm(input.location)}|${JSON.stringify(f)}`;
+    const page = input.pageToken ? `|p:${input.pageToken}` : '';
+    return `places:${userId}:${norm(input.industry)}|${norm(input.location)}|${JSON.stringify(f)}${page}`;
   }
 }
 

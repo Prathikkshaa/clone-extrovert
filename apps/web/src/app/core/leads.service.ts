@@ -23,7 +23,14 @@ export interface SearchFilters {
 }
 
 export type SearchResponse =
-  | { ok: true; cached: boolean; searchId: string; leads: LeadCard[]; count: number }
+  | {
+      ok: true;
+      cached: boolean;
+      searchId: string;
+      leads: LeadCard[];
+      count: number;
+      nextPageToken?: string;
+    }
   | { ok: false; reason: 'out_of_credits' | 'busy' | 'error'; message: string };
 
 export interface LeadList {
@@ -41,6 +48,7 @@ export class LeadsApiService {
     industry: string;
     location: string;
     filters?: SearchFilters;
+    pageToken?: string;
   }): Observable<SearchResponse> {
     return this.http.post<SearchResponse>(`${this.base}/leads/search`, input);
   }

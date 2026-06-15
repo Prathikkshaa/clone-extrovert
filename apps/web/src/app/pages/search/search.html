@@ -1,4 +1,4 @@
-<div class="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+<div class="mx-auto max-w-3xl px-4 py-8 sm:px-6" [class.pb-28]="selectedCount() > 0">
   <ui-page-header
     title="Find leads"
     subtitle="Search Google for businesses to reach out to."
@@ -45,12 +45,12 @@
 
     <div class="mt-4 flex flex-wrap gap-5">
       <label class="flex items-center gap-2 text-sm text-ink">
-        <input type="checkbox" name="noWebsite" [(ngModel)]="noWebsite" class="accent-accent" />
+        <input type="checkbox" name="noWebsite" [(ngModel)]="noWebsite" class="h-4 w-4 accent-accent" />
         No website
         <span class="text-muted">(great for selling web/marketing)</span>
       </label>
       <label class="flex items-center gap-2 text-sm text-ink">
-        <input type="checkbox" name="lowRating" [(ngModel)]="lowRating" class="accent-accent" />
+        <input type="checkbox" name="lowRating" [(ngModel)]="lowRating" class="h-4 w-4 accent-accent" />
         Low rating (≤ 4.0)
         <span class="text-muted">(improvement opportunity)</span>
       </label>
@@ -79,11 +79,112 @@
         />
       </div>
     } @else {
-      <!-- Save-to-list bar -->
-      <div
-        class="mt-6 flex flex-wrap items-center gap-3 rounded-lg border border-line bg-surface p-3"
-      >
+      <!-- Select-all row -->
+      <div class="mt-6 flex items-center justify-between">
+        <p class="text-sm text-muted">{{ results().length }} businesses</p>
+        <button
+          type="button"
+          class="text-sm font-medium text-accent transition-colors duration-200 hover:text-accent-strong"
+          (click)="selectedCount() === results().length ? clearSelection() : selectAll()"
+        >
+          {{ selectedCount() === results().length ? 'Clear all' : 'Select all' }}
+        </button>
+      </div>
+      @if (cached()) {
+        <p class="mt-1 text-xs text-muted">Cached results — no credit used.</p>
+      }
+
+      <ul class="mt-3 space-y-2">
+        @for (lead of results(); track lead.id) {
+          <li>
+            <label
+              class="flex cursor-pointer items-start gap-3 rounded-lg border bg-surface p-4 transition-colors duration-200"
+              [class.border-accent]="isSelected(lead.id)"
+              [class.bg-accent-soft]="isSelected(lead.id)"
+              [class.border-line]="!isSelected(lead.id)"
+              [class.hover:border-muted]="!isSelected(lead.id)"
+            >
+              <input
+                type="checkbox"
+                [checked]="isSelected(lead.id)"
+                (change)="toggle(lead.id)"
+                class="mt-0.5 h-5 w-5 shrink-0 accent-accent"
+                [attr.aria-label]="'Select ' + lead.name"
+              />
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center justify-between gap-2">
+                  <p class="truncate text-body font-medium text-ink">{{ lead.name }}</p>
+                  @if (lead.rating !== null) {
+                    <span class="shrink-0 text-sm text-muted"
+                      >★ {{ lead.rating }} ({{ lead.review_count ?? 0 }})</span
+                    >
+                  }
+                </div>
+                @if (lead.address) {
+                  <p class="mt-0.5 truncate text-sm text-muted">{{ lead.address }}</p>
+                }
+                <div class="mt-2 flex flex-wrap items-center gap-2 text-sm">
+                  @if (lead.website) {
+                    <ui-status-badge status="connected" text="Website" />
+                  } @else {
+                    <ui-status-badge status="pending" text="No website" />
+                  }
+                  @if (lead.phone) {
+                    <span class="text-muted">{{ lead.phone }}</span>
+                  }
+                </div>
+              </div>
+            </label>
+          </li>
+        }
+      </ul>
+
+      <!-- Load more (animated) -->
+      @if (canLoadMore()) {
+        <div class="mt-5 flex justify-center">
+          <button
+            ui-button
+            variant="secondary"
+            [loading]="loadingMore()"
+            (click)="loadMore()"
+          >
+            @if (!loadingMore()) {
+              <ui-icon name="chevron-down" [size]="18" class="animate-bounce" />
+            }
+            Load 20 more
+          </button>
+        </div>
+      }
+    }
+  } @else if (!searched()) {
+    <div class="mt-6">
+      <ui-empty-state
+        icon="search"
+        title="No leads yet"
+        message="Try an industry and a city, like “plumbers in Austin”."
+      />
+    </div>
+  }
+</div>
+
+<!-- Sticky selection bar — always reachable after picking businesses -->
+@if (selectedCount() > 0) {
+  <div
+    class="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur md:left-60"
+  >
+    <div class="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row sm:items-center">
+      <div class="flex items-center gap-3">
         <span class="text-sm font-medium text-ink">{{ selectedCount() }} selected</span>
+        <button
+          type="button"
+          class="text-sm text-muted transition-colors duration-200 hover:text-ink"
+          (click)="clearSelection()"
+        >
+          Clear
+        </button>
+      </div>
+
+      <div class="flex flex-1 flex-wrap items-center gap-2 sm:justify-end">
         <select
           name="targetList"
           [(ngModel)]="targetListId"
@@ -99,90 +200,23 @@
           <input
             name="newListName"
             [(ngModel)]="newListName"
-            placeholder="List name"
+            placeholder="List name (optional)"
             class="ui-input w-auto"
           />
         }
+        <button ui-button variant="ghost" [loading]="saving()" (click)="save()">
+          Save to list
+        </button>
         <button
           ui-button
           variant="primary"
-          size="sm"
+          iconRight="arrow-right"
           [loading]="saving()"
-          [disabled]="selectedCount() === 0"
-          (click)="save()"
+          (click)="saveAndEnrich()"
         >
-          Save to list
+          Save &amp; enrich
         </button>
-        @if (cached()) {
-          <span class="text-xs text-muted">Cached results — no credit used.</span>
-        }
       </div>
-
-      <ul class="mt-4 space-y-3">
-        @for (lead of results(); track lead.id) {
-          <li
-            class="flex items-start gap-3 rounded-lg border border-line bg-surface p-4 transition-colors duration-200"
-            [class.border-accent]="isSelected(lead.id)"
-          >
-            <input
-              type="checkbox"
-              [checked]="isSelected(lead.id)"
-              (change)="toggle(lead.id)"
-              class="mt-1 accent-accent"
-              [attr.aria-label]="'Select ' + lead.name"
-            />
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <p class="truncate text-body font-medium text-ink">{{ lead.name }}</p>
-                @if (lead.rating !== null) {
-                  <span class="shrink-0 text-sm text-muted"
-                    >★ {{ lead.rating }} ({{ lead.review_count ?? 0 }})</span
-                  >
-                }
-              </div>
-              @if (lead.address) {
-                <p class="mt-0.5 truncate text-sm text-muted">{{ lead.address }}</p>
-              }
-              <div class="mt-2 flex flex-wrap items-center gap-2 text-sm">
-                @if (lead.website) {
-                  <ui-status-badge status="connected" text="Website" />
-                } @else {
-                  <ui-status-badge status="pending" text="No website" />
-                }
-                @if (lead.phone) {
-                  <span class="text-muted">{{ lead.phone }}</span>
-                }
-              </div>
-            </div>
-          </li>
-        }
-      </ul>
-
-      <!-- What's next -->
-      <div
-        class="mt-6 flex flex-col gap-3 rounded-lg bg-accent-soft p-4 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <div class="flex items-start gap-3">
-          <ui-icon name="sparkles" [size]="18" class="mt-0.5 shrink-0 text-accent" />
-          <div>
-            <p class="text-sm font-medium text-ink">Next: enrich your saved list</p>
-            <p class="text-sm text-muted">
-              Find emails and a reason to reach out for each lead.
-            </p>
-          </div>
-        </div>
-        <a routerLink="/enrich" class="shrink-0">
-          <button ui-button variant="primary" iconRight="arrow-right">Enrich leads</button>
-        </a>
-      </div>
-    }
-  } @else if (!searched()) {
-    <div class="mt-6">
-      <ui-empty-state
-        icon="search"
-        title="No leads yet"
-        message="Try an industry and a city, like “plumbers in Austin”."
-      />
     </div>
-  }
-</div>
+  </div>
+}

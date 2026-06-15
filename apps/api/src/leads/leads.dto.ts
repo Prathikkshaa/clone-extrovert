@@ -41,6 +41,11 @@ export class SearchDto {
   @ValidateNested()
   @Type(() => FiltersDto)
   filters?: FiltersDto;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  pageToken?: string;
 }
 
 export class SaveToListDto {

@@ -1,11 +1,11 @@
 // Lead search screen (master-context §2/§7; File 16 shell + kit).
 // WHY: the core discovery screen — industry/location + buying-signal filters,
-// a metered "Search leads" action, results as selectable cards, and save-to-list.
-// Renders inside the app shell with a ui-page-header, the pipeline stepper, kit
-// states, and a "what's next → Enrich" step. Behaviour/data wiring unchanged.
+// a metered "Search leads" action, results as selectable cards, "Load more" for
+// the next page, and a sticky selection bar to save + jump straight to enriching
+// the leads you just picked (no manual list step). Behaviour preserved.
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import {
   LeadsApiService,
   type LeadCard,
@@ -26,7 +26,6 @@ import { ToastService } from '../../ui/toast/toast.service';
   selector: 'app-search',
   imports: [
     FormsModule,
-    RouterLink,
     Button,
     Card,
     EmptyState,
@@ -42,6 +41,7 @@ import { ToastService } from '../../ui/toast/toast.service';
 export class Search {
   private readonly api = inject(LeadsApiService);
   private readonly toast = inject(ToastService);
+  private readonly router = inject(Router);
 
   // form
   protected industry = '';
@@ -51,13 +51,14 @@ export class Search {
 
   // state
   protected readonly loading = signal(false);
+  protected readonly loadingMore = signal(false);
   protected readonly searched = signal(false);
   protected readonly cached = signal(false);
   protected readonly results = signal<LeadCard[]>([]);
   protected readonly selected = signal<Set<string>>(new Set());
   protected readonly selectedCount = computed(() => this.selected().size);
-  /** True once at least one lead has been saved (drives the next-step card). */
-  protected readonly savedAny = signal(false);
+  private readonly nextPageToken = signal<string | null>(null);
+  protected readonly canLoadMore = computed(() => !!this.nextPageToken());
 
   // save-to-list
   protected readonly lists = signal<LeadList[]>([]);
@@ -81,6 +82,19 @@ export class Search {
     }
     this.loading.set(true);
     this.selected.set(new Set());
+    this.results.set([]);
+    this.nextPageToken.set(null);
+    this.runSearch(null);
+  }
+
+  loadMore(): void {
+    const token = this.nextPageToken();
+    if (!token || this.loadingMore()) return;
+    this.loadingMore.set(true);
+    this.runSearch(token);
+  }
+
+  private runSearch(pageToken: string | null): void {
     this.api
       .search({
         industry: this.industry,
@@ -89,28 +103,39 @@ export class Search {
           noWebsite: this.noWebsite || undefined,
           maxRating: this.lowRating ? 4.0 : undefined,
         },
+        pageToken: pageToken ?? undefined,
       })
       .subscribe({
         next: (res) => {
           this.loading.set(false);
+          this.loadingMore.set(false);
           this.searched.set(true);
           if (res.ok) {
-            this.results.set(res.leads);
+            // Append for "load more", replace for a fresh search.
+            this.results.update((cur) =>
+              pageToken ? this.mergeLeads(cur, res.leads) : res.leads,
+            );
             this.cached.set(res.cached);
-            if (res.count === 0) {
+            this.nextPageToken.set(res.nextPageToken ?? null);
+            if (!pageToken && res.count === 0) {
               this.toast.info('No businesses matched. Try a broader area.');
             }
           } else {
-            this.results.set([]);
             this.toast.error(res.message);
           }
         },
         error: () => {
           this.loading.set(false);
+          this.loadingMore.set(false);
           this.searched.set(true);
           this.toast.error('Something went wrong — nothing was charged. Try again.');
         },
       });
+  }
+
+  private mergeLeads(current: LeadCard[], incoming: LeadCard[]): LeadCard[] {
+    const seen = new Set(current.map((l) => l.id));
+    return [...current, ...incoming.filter((l) => !seen.has(l.id))];
   }
 
   toggle(id: string): void {
@@ -124,38 +149,67 @@ export class Search {
     return this.selected().has(id);
   }
 
+  selectAll(): void {
+    this.selected.set(new Set(this.results().map((l) => l.id)));
+  }
+
+  clearSelection(): void {
+    this.selected.set(new Set());
+  }
+
+  /** Save selected to a list (new or existing) and stay on the page. */
   save(): void {
+    this.persist((listId) => {
+      this.toast.success('Saved to your list.');
+      this.refreshLists(listId);
+    });
+  }
+
+  /** Save selected, then jump straight to enriching that list. */
+  saveAndEnrich(): void {
+    this.persist((listId) => {
+      this.toast.success('Saved — let’s enrich them.');
+      void this.router.navigate(['/enrich'], { queryParams: { list: listId } });
+    });
+  }
+
+  private persist(onDone: (listId: string) => void): void {
     const leadIds = [...this.selected()];
     if (leadIds.length === 0) {
-      this.toast.warn('Select at least one lead first.');
+      this.toast.warn('Select at least one business first.');
       return;
     }
-    if (!this.targetListId && !this.newListName.trim()) {
-      this.toast.warn('Pick a list or name a new one.');
-      return;
-    }
+    const listName = this.targetListId
+      ? undefined
+      : this.newListName.trim() || this.defaultListName();
     this.saving.set(true);
     this.api
-      .saveToList({
-        listId: this.targetListId || undefined,
-        listName: this.targetListId ? undefined : this.newListName.trim(),
-        leadIds,
-      })
+      .saveToList({ listId: this.targetListId || undefined, listName, leadIds })
       .subscribe({
         next: (r) => {
           this.saving.set(false);
-          this.savedAny.set(true);
-          this.toast.success(
-            `Saved ${r.linked} lead${r.linked === 1 ? '' : 's'} to your list.`,
-          );
           this.selected.set(new Set());
           this.newListName = '';
-          this.api.getLists().subscribe({ next: (l) => this.lists.set(l) });
+          onDone(r.listId);
         },
         error: () => {
           this.saving.set(false);
           this.toast.error('Could not save to the list. Please try again.');
         },
       });
+  }
+
+  private defaultListName(): string {
+    const base = `${this.industry} in ${this.location}`.trim();
+    return base.length > 1 ? base : `Leads ${new Date().toLocaleDateString()}`;
+  }
+
+  private refreshLists(selectId: string): void {
+    this.api.getLists().subscribe({
+      next: (l) => {
+        this.lists.set(l);
+        this.targetListId = selectId;
+      },
+    });
   }
 }

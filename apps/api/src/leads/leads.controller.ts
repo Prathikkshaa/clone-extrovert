@@ -21,6 +21,7 @@ export class LeadsController {
       industry: dto.industry,
       location: dto.location,
       filters: dto.filters,
+      pageToken: dto.pageToken,
     });
   }
 

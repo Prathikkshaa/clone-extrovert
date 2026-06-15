@@ -7,7 +7,7 @@
 // (the inFlight set drives button-disable + polling — see PROGRESS notes).
 import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CREDIT_COSTS } from '@extrovertai/shared';
 import { LeadsApiService, type LeadList } from '../../core/leads.service';
 import {
@@ -49,6 +49,7 @@ export class Enrich implements OnDestroy {
   private readonly leadsApi = inject(LeadsApiService);
   private readonly api = inject(EnrichmentApiService);
   private readonly toast = inject(ToastService);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly costPer = CREDIT_COSTS.enrichment;
 
@@ -80,6 +81,12 @@ export class Enrich implements OnDestroy {
       next: (l) => this.lists.set(l),
       error: () => this.toast.error('Could not load your lists.'),
     });
+    // Carried over from "Save & enrich" on the Find-leads screen: open that list.
+    const listId = this.route.snapshot.queryParamMap.get('list');
+    if (listId) {
+      this.selectedListId = listId;
+      this.loadList();
+    }
   }
 
   ngOnDestroy(): void {
