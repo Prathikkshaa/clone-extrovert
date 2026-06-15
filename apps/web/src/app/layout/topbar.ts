@@ -40,7 +40,9 @@ import { ThemeService } from '../core/theme.service';
       <nav aria-label="Breadcrumb" class="min-w-0">
         <ol class="flex items-center gap-1.5 text-sm">
           @for (crumb of crumbs(); track $index; let last = $last) {
-            <li class="flex items-center gap-1.5 min-w-0">
+            <!-- On mobile only the current (last) crumb shows; the back arrow
+                 covers "up". Intermediate crumbs reveal from sm up. -->
+            <li class="items-center gap-1.5 min-w-0" [class.hidden]="!last" [class.sm:flex]="!last" [class.flex]="last">
               @if (!last && crumb.link) {
                 <a
                   [routerLink]="crumb.link"
@@ -53,7 +55,7 @@ import { ThemeService } from '../core/theme.service';
                 }}</span>
               }
               @if (!last) {
-                <ui-icon name="chevron-right" [size]="14" class="shrink-0 text-muted" />
+                <ui-icon name="chevron-right" [size]="14" class="hidden shrink-0 text-muted sm:block" />
               }
             </li>
           }
@@ -70,7 +72,7 @@ import { ThemeService } from '../core/theme.service';
           [class.text-danger]="balance()! <= 0"
           [class.border-danger]="balance()! <= 0"
           title="Credit balance — buy more"
-          >{{ balance() }} credits</a
+          ><span class="whitespace-nowrap">{{ balance() }} credits</span></a
         >
       }
 
@@ -87,7 +89,7 @@ import { ThemeService } from '../core/theme.service';
 
       <button
         type="button"
-        class="rounded-md p-2 text-muted transition-colors duration-200 hover:bg-canvas hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        class="hidden rounded-md p-2 text-muted transition-colors duration-200 hover:bg-canvas hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:block"
         aria-label="Notifications"
       >
         <ui-icon name="bell" [size]="18" />

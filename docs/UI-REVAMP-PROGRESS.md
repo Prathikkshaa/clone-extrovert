@@ -3,8 +3,8 @@
 > Updated continuously by the executing agent. On resume, read this first (see 16-ui-ux-revamp.md §0.2).
 
 ## Current status
-- Active phase: 4
-- Active task: per-screen layout pass (all screens onto kit + shell)
+- Active phase: 5
+- Active task: visual polish (icons, type/spacing, micro-interactions, responsive, a11y)
 - State: in-progress   <!-- not-started | in-progress | done | blocked -->
 - Last updated: 2026-06-15
 - Blocker (if any): none
@@ -14,7 +14,7 @@
 - [x] Phase 1 — Component kit (Button, PageHeader, Card, EmptyState, StatusBadge, Skeleton, Field, Toast, ConfirmDialog)
 - [x] Phase 2 — App shell + route restructure (Sidebar, Topbar, breadcrumb/back) + dark-mode toggle wired
 - [x] Phase 3 — Home launchpad + first-run checklist + pipeline stepper
-- [ ] Phase 4 — Per-screen layout pass (all 15 screens onto the kit + shell + next-step CTAs)
+- [x] Phase 4 — Per-screen layout pass (all 15 screens onto the kit + shell + next-step CTAs)
 - [ ] Phase 5 — Visual polish (icons everywhere, type/spacing/density, micro-interactions, responsive drawer + mobile nav, a11y)
 - [ ] Phase 6 — Full visual verification sweep + fixes
 - [ ] Phase 7 — Docs (README, CODE-MAP, PROGRESS) + final acceptance
@@ -111,3 +111,23 @@
   tracking the first incomplete step (mailing address @ 3/5, company profile @ 2/5); breadcrumb
   "Home" shows in the topbar (ui-page-header→BreadcrumbService working); no console errors.
   Commit: 423556d.
+- Phase 4: **DONE** (split 16.4a/b/c). Every screen now renders inside the shell (auth screens
+  excepted) with a `ui-page-header` (title + subtitle + breadcrumb), ONE primary action top-
+  right, kit states (skeleton/empty-state/status-badge/card), `ToastService` for transient
+  status (replacing per-screen inline `message` signals + per-screen credit chips), and a
+  "what's next" card / pipeline-stepper on the workflow screens. **16.4a** (be6d92e) — search,
+  enrich, draft, send, campaign: stepper find/enrich/write/send + next-step CTAs; preserved
+  enrich `inFlight` logic, draft keyboard queue + `busyGenerating` signal, send plan/caps,
+  campaign polling. **16.4b** (9bc4168) — inbox (feeds NavBadgeService inbox count), dashboard
+  (kit cards/badges, teaching empty state), mailboxes (Gmail primary/Outlook secondary,
+  Connected badges, disconnect via ConfirmService not window.confirm), onboarding (dynamic
+  per-step header, "Save and continue"→Home removes the dead-end), settings (added an
+  Appearance light/dark/system control wired to ThemeModeService + Theme/Address/Booking/
+  Profile cards, toast saves), billing (refit to kit; kept low/zero banners, packs, usage
+  breakdown, Stripe return/poll flow + a loadFailed empty state). **16.4c** (9800e27) — landing
+  (logo mark + ui-button CTAs), login/signup (ui-field + full-width ui-button, inline auth
+  error), shell-less. **Verify:** build + lint clean throughout. Browser-verified: Find leads
+  matches the north-star; settings appearance toggle persists + flips theme; home launchpad;
+  landing polished; billing's load-failure empty state renders. No console errors. **Deferred
+  to Phase 6 sweep:** logged-out login/signup visual (guest-guarded; session active in preview)
+  and full per-screen dark sweep. Commit: 9800e27.
