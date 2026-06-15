@@ -145,6 +145,25 @@ body {
   animation: ui-dialog-in 180ms ease-out;
 }
 
+/* Indeterminate progress bar — used on in-flight enrichment cards so the wait
+ * feels alive instead of a static skeleton. Neutralised by reduced-motion. */
+@keyframes enrich-bar {
+  0% {
+    width: 10%;
+    margin-left: 0;
+  }
+  50% {
+    width: 60%;
+  }
+  100% {
+    width: 10%;
+    margin-left: 90%;
+  }
+}
+.enrich-bar {
+  animation: enrich-bar 1.6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

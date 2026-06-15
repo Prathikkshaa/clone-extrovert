@@ -94,14 +94,21 @@
   @if (!loading() && leads().length > 0) {
     <ul class="mt-6 space-y-3">
       @for (lead of leads(); track lead.id) {
-        <li class="rounded-lg border border-line bg-surface p-4">
-          <div class="flex items-start gap-3">
+        <li>
+          <label
+            class="flex items-start gap-3 rounded-lg border bg-surface p-4 transition-colors duration-200"
+            [class.cursor-pointer]="lead.enrichment_status !== 'complete'"
+            [class.border-accent]="isSelected(lead.id)"
+            [class.bg-accent-soft]="isSelected(lead.id)"
+            [class.border-line]="!isSelected(lead.id)"
+            [class.hover:border-muted]="!isSelected(lead.id) && lead.enrichment_status !== 'complete'"
+          >
             <input
               type="checkbox"
               [checked]="isSelected(lead.id)"
               (change)="toggle(lead.id)"
               [disabled]="lead.enrichment_status === 'complete'"
-              class="mt-1 accent-accent disabled:opacity-40"
+              class="mt-0.5 h-5 w-5 shrink-0 accent-accent disabled:opacity-40"
               [attr.aria-label]="'Select ' + lead.name"
             />
             <div class="min-w-0 flex-1">
@@ -119,6 +126,7 @@
                     [href]="lead.website"
                     target="_blank"
                     rel="noopener"
+                    (click)="$event.stopPropagation()"
                     class="text-accent hover:text-accent-strong"
                     >Website</a
                   >
@@ -131,15 +139,58 @@
               @switch (lead.enrichment_status) {
                 @case ('pending') {
                   @if (isQueued(lead.id)) {
-                    <p class="mt-3 text-sm text-muted">Queued…</p>
+                    <div class="mt-3">
+                      <div
+                        class="flex items-center gap-3 rounded-md bg-accent-soft px-3 py-2.5"
+                        aria-label="Enriching"
+                      >
+                        <span
+                          class="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface text-accent"
+                        >
+                          <span
+                            class="absolute inset-0 animate-ping rounded-full bg-accent-soft opacity-60"
+                          ></span>
+                          <ui-icon name="sparkles" [size]="16" class="relative" />
+                        </span>
+                        <div class="min-w-0">
+                          <p class="text-sm font-medium text-ink">{{ enrichingLabel() }}…</p>
+                          <p class="truncate text-xs text-muted">
+                            Contact, reviews & your reason to reach out.
+                          </p>
+                        </div>
+                      </div>
+                      <div class="mt-2 h-1 w-full overflow-hidden rounded-full bg-accent-soft">
+                        <span class="enrich-bar block h-full rounded-full bg-accent"></span>
+                      </div>
+                    </div>
                   } @else {
                     <p class="mt-3 text-sm text-muted">Not enriched yet.</p>
                   }
                 }
                 @case ('in_progress') {
-                  <div class="mt-3" aria-label="Enriching">
-                    <p class="mb-2 text-sm text-muted">Enriching…</p>
-                    <ui-skeleton [lines]="2" />
+                  <div class="mt-3">
+                    <div
+                      class="flex items-center gap-3 rounded-md bg-accent-soft px-3 py-2.5"
+                      aria-label="Enriching"
+                    >
+                      <span
+                        class="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface text-accent"
+                      >
+                        <span
+                          class="absolute inset-0 animate-ping rounded-full bg-accent-soft opacity-60"
+                        ></span>
+                        <ui-icon name="sparkles" [size]="16" class="relative" />
+                      </span>
+                      <div class="min-w-0">
+                        <p class="text-sm font-medium text-ink">{{ enrichingLabel() }}…</p>
+                        <p class="truncate text-xs text-muted">
+                          Contact, reviews & your reason to reach out.
+                        </p>
+                      </div>
+                    </div>
+                    <div class="mt-2 h-1 w-full overflow-hidden rounded-full bg-accent-soft">
+                      <span class="enrich-bar block h-full rounded-full bg-accent"></span>
+                    </div>
                   </div>
                 }
                 @case ('failed') {
@@ -206,7 +257,7 @@
                 }
               }
             </div>
-          </div>
+          </label>
         </li>
       }
     </ul>

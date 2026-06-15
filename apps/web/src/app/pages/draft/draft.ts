@@ -21,6 +21,7 @@ import { Card } from '../../ui/card/card';
 import { EmptyState } from '../../ui/empty-state/empty-state';
 import { Field } from '../../ui/field/field';
 import { Icon } from '../../ui/icon/icon';
+import type { IconName } from '../../ui/icon/icon-paths';
 import { PageHeader } from '../../ui/page-header/page-header';
 import { PipelineStepper } from '../../ui/pipeline-stepper/pipeline-stepper';
 import { Skeleton } from '../../ui/skeleton/skeleton';
@@ -44,6 +45,23 @@ interface TodoLead {
 const POLL_MS = 3000;
 const GENERATE_TIMEOUT_MS = 90000;
 const STEP_LABELS: Record<number, string> = { 1: 'Email', 2: 'Follow-up 1', 3: 'Follow-up 2' };
+
+interface WritingStep {
+  label: string;
+  icon: IconName;
+}
+
+// Friendly progress steps shown while drafts generate. We don't have real
+// per-stage progress, so they advance on a gentle timer to feel alive — same
+// pattern as the onboarding "reading your site" UI.
+const WRITING_STEPS: WritingStep[] = [
+  { label: 'Studying each lead’s hook', icon: 'search' },
+  { label: 'Matching your voice', icon: 'sparkles' },
+  { label: 'Writing the first email', icon: 'pen-line' },
+  { label: 'Adding two follow-ups', icon: 'mail' },
+  { label: 'Polishing subject lines', icon: 'check' },
+];
+const WRITING_STEP_MS: number = 1400;
 
 @Component({
   selector: 'app-draft',
@@ -88,6 +106,12 @@ export class Draft implements OnDestroy {
 
   private generating = new Map<string, number>(); // leadId -> enqueued timestamp
   private pollTimer: ReturnType<typeof setInterval> | null = null;
+
+  // Animated "writing drafts" progress (see WRITING_STEPS).
+  protected readonly writingSteps = WRITING_STEPS;
+  protected readonly writingStep = signal(0);
+  protected readonly generatingCount = signal(0);
+  private writingTimer: ReturnType<typeof setInterval> | null = null;
 
   protected readonly current = computed<ReviewLead | null>(() => this.review()[this.index()] ?? null);
   protected readonly activeDraft = computed<DraftMessage | null>(
@@ -327,8 +351,26 @@ export class Draft implements OnDestroy {
   private startPolling(): void {
     this.stopPolling();
     this.busyGenerating.set(true);
+    this.generatingCount.set(this.generating.size);
+    this.startWritingAnimation();
     this.pollTimer = setInterval(() => this.poll(), POLL_MS);
     this.poll();
+  }
+
+  private startWritingAnimation(): void {
+    if (this.writingTimer) return;
+    this.writingStep.set(0);
+    this.writingTimer = setInterval(() => {
+      // Advance, but hold on the last step until generation actually lands.
+      this.writingStep.update((i) => Math.min(i + 1, WRITING_STEPS.length - 1));
+    }, WRITING_STEP_MS);
+  }
+
+  private stopWritingAnimation(): void {
+    if (this.writingTimer) {
+      clearInterval(this.writingTimer);
+      this.writingTimer = null;
+    }
   }
 
   private poll(): void {
@@ -351,7 +393,10 @@ export class Draft implements OnDestroy {
             changed = true;
           }
         }
-        if (changed) this.loadActive();
+        if (changed) {
+          this.generatingCount.set(this.generating.size);
+          this.loadActive();
+        }
         if (this.generating.size === 0) this.stopPolling();
       },
       error: () => {
@@ -384,6 +429,7 @@ export class Draft implements OnDestroy {
 
   private stopPolling(): void {
     this.busyGenerating.set(false);
+    this.stopWritingAnimation();
     if (this.pollTimer) {
       clearInterval(this.pollTimer);
       this.pollTimer = null;

@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { Queue, type ConnectionOptions } from 'bullmq';
 import {
   BillingService,
+  EnrichmentService as EnrichmentCoreService,
   SupabaseService,
   buildRedisConnection,
   ENRICHMENT_QUEUE,
@@ -59,6 +60,7 @@ export class EnrichmentApiService implements OnModuleInit, OnModuleDestroy {
     private readonly config: ConfigService,
     private readonly billing: BillingService,
     private readonly supabase: SupabaseService,
+    private readonly enrichment: EnrichmentCoreService,
   ) {}
 
   onModuleInit(): void {
@@ -112,13 +114,26 @@ export class EnrichmentApiService implements OnModuleInit, OnModuleDestroy {
         .eq('user_id', userId)
         .in('id', toEnqueue);
 
-      await this.queue.addBulk(
-        toEnqueue.map((leadId) => ({
-          name: 'enrich',
-          data: { userId, leadId },
-          opts: { removeOnComplete: true, removeOnFail: 100, attempts: 1 },
-        })),
-      );
+      // If a dedicated worker is consuming this queue, hand the jobs off to it.
+      // Otherwise (e.g. local dev running only web + api) there'd be no consumer
+      // and leads would sit at "queued" forever — so we process them inline.
+      const hasWorker = await this.hasQueueConsumer();
+      if (hasWorker) {
+        await this.queue.addBulk(
+          toEnqueue.map((leadId) => ({
+            name: 'enrich',
+            data: { userId, leadId },
+            opts: { removeOnComplete: true, removeOnFail: 100, attempts: 1 },
+          })),
+        );
+      } else {
+        this.logger.warn(
+          `No enrichment worker detected — processing ${toEnqueue.length} lead(s) inline.`,
+        );
+        // Fire-and-forget so the HTTP response returns immediately; the UI polls
+        // /enrichment/status for per-lead progress just as it would for the worker.
+        void this.processInline(userId, toEnqueue);
+      }
     }
 
     return {
@@ -130,6 +145,36 @@ export class EnrichmentApiService implements OnModuleInit, OnModuleDestroy {
       balance,
       reason: skipped > 0 ? 'partial_credits' : null,
     };
+  }
+
+  /** True when a BullMQ worker is registered against the enrichment queue. */
+  private async hasQueueConsumer(): Promise<boolean> {
+    if (!this.queue) return false;
+    try {
+      const workers = await this.queue.getWorkers();
+      return workers.length > 0;
+    } catch {
+      // If we can't tell, assume no worker and process inline — better to do the
+      // work than to leave leads stuck at "queued".
+      return false;
+    }
+  }
+
+  /**
+   * Inline enrichment fallback for when no worker is consuming the queue. Runs
+   * leads sequentially (one external-API-heavy job at a time) so we stay a polite
+   * neighbour to Places/Firecrawl/LLM, mirroring the worker's metering. Errors are
+   * swallowed per-lead: enrichLead persists a 'failed' status the UI surfaces.
+   */
+  private async processInline(userId: string, leadIds: string[]): Promise<void> {
+    for (const leadId of leadIds) {
+      try {
+        const outcome = await this.enrichment.enrichLead(userId, leadId);
+        this.logger.log(`Inline enrich ${leadId}: ${outcome.status}`);
+      } catch (err) {
+        this.logger.warn(`Inline enrich ${leadId} threw: ${(err as Error).message}`);
+      }
+    }
   }
 
   /** Current enrichment fields for the given leads (for the UI's progress poll). */

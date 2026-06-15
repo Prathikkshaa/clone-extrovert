@@ -41,18 +41,67 @@
       </select>
     </ui-field>
 
-    @if (selectedListId && (todo().length > 0 || busyGenerating())) {
+    @if (selectedListId && todo().length > 0 && !busyGenerating()) {
       <div class="mt-4 flex flex-wrap items-center gap-3 border-t border-line pt-4">
-        @if (todo().length > 0) {
-          <span class="text-sm text-muted">Each lead uses {{ costPer }} credit.</span>
-        }
-        @if (busyGenerating()) {
-          <span class="text-sm text-muted">Writing drafts…</span>
-          <ui-skeleton width="6rem" />
-        }
+        <span class="text-sm text-muted">Each lead uses {{ costPer }} credit.</span>
       </div>
     }
   </ui-card>
+
+  <!-- Live progress while drafts are written (innovative, not a bare skeleton) -->
+  @if (busyGenerating()) {
+    <ui-card class="mt-6" aria-live="polite">
+      <div class="mb-6 flex items-center gap-3">
+        <span
+          class="relative flex h-11 w-11 items-center justify-center rounded-full bg-accent-soft text-accent"
+        >
+          <span class="absolute inset-0 animate-ping rounded-full bg-accent-soft opacity-60"></span>
+          <ui-icon [name]="writingSteps[writingStep()].icon" [size]="22" class="relative" />
+        </span>
+        <div>
+          <p class="text-heading-sm text-ink">{{ writingSteps[writingStep()].label }}…</p>
+          <p class="text-sm text-muted">
+            Writing
+            {{ generatingCount() > 0 ? generatingCount() : '' }}
+            personalised {{ generatingCount() === 1 ? 'email set' : 'email sets' }} in your voice.
+          </p>
+        </div>
+      </div>
+
+      <ul class="space-y-3">
+        @for (s of writingSteps; track s.label; let i = $index) {
+          <li class="flex items-center gap-3">
+            <span
+              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors duration-300"
+              [class.bg-positive-soft]="i < writingStep()"
+              [class.text-positive]="i < writingStep()"
+              [class.bg-accent-soft]="i === writingStep()"
+              [class.text-accent]="i === writingStep()"
+              [class.border]="i > writingStep()"
+              [class.border-line]="i > writingStep()"
+              [class.text-muted]="i > writingStep()"
+            >
+              @if (i < writingStep()) {
+                <ui-icon name="check" [size]="14" />
+              } @else if (i === writingStep()) {
+                <ui-icon name="loader" [size]="14" class="animate-spin" />
+              } @else {
+                <ui-icon name="circle" [size]="8" />
+              }
+            </span>
+            <span
+              class="text-sm transition-colors duration-300"
+              [class.font-medium]="i === writingStep()"
+              [class.text-ink]="i <= writingStep()"
+              [class.text-muted]="i > writingStep()"
+            >
+              {{ s.label }}
+            </span>
+          </li>
+        }
+      </ul>
+    </ui-card>
+  }
 
   @if (loading()) {
     <div class="mt-6 space-y-3">

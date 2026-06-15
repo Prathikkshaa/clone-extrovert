@@ -28,6 +28,16 @@ import { ToastService } from '../../ui/toast/toast.service';
 const POLL_MS = 2500;
 // Safety cap so a hung job never leaves the buttons permanently disabled.
 const POLL_MAX_MS = 3 * 60 * 1000;
+// Friendly cycling labels shown on each in-flight card while enrichment runs.
+// We don't get real per-stage progress, so these advance on a gentle timer to
+// feel alive (mirrors the onboarding "reading your site" progress).
+const ENRICH_STEPS = [
+  'Finding the best contact',
+  'Pulling phone & details',
+  'Reading what reviews say',
+  'Writing your reason to reach out',
+];
+const ENRICH_STEP_MS = 1600;
 
 @Component({
   selector: 'app-enrich',
@@ -61,6 +71,10 @@ export class Enrich implements OnDestroy {
   protected readonly selected = signal<Set<string>>(new Set());
 
   private pollTimer: ReturnType<typeof setInterval> | null = null;
+  private labelTimer: ReturnType<typeof setInterval> | null = null;
+  // Index into ENRICH_STEPS; the cards read enrichingLabel() to show the stage.
+  private readonly enrichStep = signal(0);
+  protected readonly enrichingLabel = computed(() => ENRICH_STEPS[this.enrichStep()]);
   // Lead ids for the enrichment batch currently in flight (this session). Button
   // disable + polling key off THIS set — NOT the persisted 'pending' status: a
   // freshly-saved lead is 'pending' (never enriched) and must NOT disable the
@@ -91,6 +105,7 @@ export class Enrich implements OnDestroy {
 
   ngOnDestroy(): void {
     this.stopPolling();
+    this.stopLabelCycle();
   }
 
   loadList(): void {
@@ -212,7 +227,23 @@ export class Enrich implements OnDestroy {
     ids.forEach((id) => this.inFlight.add(id));
     this.working.set(true);
     this.pollDeadline = Date.now() + POLL_MAX_MS;
+    this.startLabelCycle();
     this.startPolling();
+  }
+
+  private startLabelCycle(): void {
+    if (this.labelTimer) return;
+    this.enrichStep.set(0);
+    this.labelTimer = setInterval(() => {
+      this.enrichStep.update((i) => (i + 1) % ENRICH_STEPS.length);
+    }, ENRICH_STEP_MS);
+  }
+
+  private stopLabelCycle(): void {
+    if (this.labelTimer) {
+      clearInterval(this.labelTimer);
+      this.labelTimer = null;
+    }
   }
 
   private startPolling(): void {
@@ -253,6 +284,7 @@ export class Enrich implements OnDestroy {
 
   private endBatch(): void {
     this.stopPolling();
+    this.stopLabelCycle();
     this.working.set(false);
   }
 
