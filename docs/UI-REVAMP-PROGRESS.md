@@ -3,8 +3,8 @@
 > Updated continuously by the executing agent. On resume, read this first (see 16-ui-ux-revamp.md §0.2).
 
 ## Current status
-- Active phase: 5
-- Active task: visual polish (icons, type/spacing, micro-interactions, responsive, a11y)
+- Active phase: 7
+- Active task: docs (README, CODE-MAP, PROGRESS) + final acceptance
 - State: in-progress   <!-- not-started | in-progress | done | blocked -->
 - Last updated: 2026-06-15
 - Blocker (if any): none
@@ -15,8 +15,8 @@
 - [x] Phase 2 — App shell + route restructure (Sidebar, Topbar, breadcrumb/back) + dark-mode toggle wired
 - [x] Phase 3 — Home launchpad + first-run checklist + pipeline stepper
 - [x] Phase 4 — Per-screen layout pass (all 15 screens onto the kit + shell + next-step CTAs)
-- [ ] Phase 5 — Visual polish (icons everywhere, type/spacing/density, micro-interactions, responsive drawer + mobile nav, a11y)
-- [ ] Phase 6 — Full visual verification sweep + fixes
+- [x] Phase 5 — Visual polish (icons everywhere, type/spacing/density, micro-interactions, responsive drawer + mobile nav, a11y)
+- [x] Phase 6 — Full visual verification sweep + fixes
 - [ ] Phase 7 — Docs (README, CODE-MAP, PROGRESS) + final acceptance
 
 ## Phase notes (append per phase: what was done, decisions, deviations, commit hash)
@@ -131,3 +131,28 @@
   landing polished; billing's load-failure empty state renders. No console errors. **Deferred
   to Phase 6 sweep:** logged-out login/signup visual (guest-guarded; session active in preview)
   and full per-screen dark sweep. Commit: 9800e27.
+- Phase 5: **DONE.** The polish layer was largely delivered by the kit + shell in Phases 0–4:
+  lucide icons in nav/buttons/badges/empty-states; consistent heading scale + spacing via the
+  §7 type tokens; micro-interactions (button `active:scale-[.98]` + 200ms transitions, skeleton
+  pulse, toast slide-in, drawer slide, theme transition) all reduced-motion-safe (global block);
+  focus-visible rings on every interactive element; ARIA on nav/menu/dialog/toast; tuned dark
+  tokens. This phase added the remaining **responsive topbar** work: breadcrumb collapses to the
+  current crumb on mobile (back arrow covers "up"), credits chip `whitespace-nowrap`, placeholder
+  bell hidden < sm to de-crowd. **Verify:** build + lint clean; browser-verified at 375px in light
+  + dark on a workflow screen (clean topbar, no overflow, full re-theme, no console errors). Commit: c3d048c.
+- Phase 6: **DONE — full sweep, no deviations to fix.** Walked the whole app in the preview
+  (live API + real data this session) at desktop 1280 + mobile 375. Verified each screen has:
+  the shell (authed), one clear primary action top-right, breadcrumb + active-nav, the
+  pipeline stepper / next-step where applicable, and correct empty/loading states. Screens
+  confirmed: landing (logo + CTAs), login (full-width submit btn — confirmed the `class="w-full"`
+  + host `[class]` merge works: 318px in a 384px card), signup; home launchpad (all-set + the
+  simulated checklist), search (north-star, light+dark, desktop+mobile), enrich (real enriched
+  cards — reviews split + teal hook callout), draft (keyboard review queue with hook + step
+  tabs + grounded email), send (full stepper + campaigns w/ status badges), campaign monitor
+  (count cards + paused-explanation + per-lead step badges + mailbox error + next-step), inbox
+  (empty states), dashboard (metrics + health strip + honest opens), mailboxes (Connect
+  Gmail/Outlook + Reconnect-needed badge + disconnect ConfirmService dialog: aria-modal + ESC
+  cancel verified), onboarding (in-shell, no dead-end), settings (Appearance toggle persists +
+  flips theme, all cards). Mobile topbar clean (breadcrumb collapses, chip one line, bell
+  hidden). **No console errors on any screen.** Build + lint clean. No code fixes were needed —
+  the kit + shell held up across every screen. Commit: <pending>.
