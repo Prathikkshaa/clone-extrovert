@@ -1,44 +1,40 @@
-<main class="min-h-screen bg-canvas text-ink flex items-center justify-center px-4">
+<main class="flex min-h-screen items-center justify-center bg-canvas px-4 text-ink">
   <section class="w-full max-w-sm">
+    <a routerLink="/" class="mb-6 flex items-center justify-center gap-2.5">
+      <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-white">
+        <ui-icon name="send" [size]="18" />
+      </span>
+      <span class="text-heading-sm text-ink">{{ appName }}</span>
+    </a>
     <div class="rounded-lg border border-line bg-surface p-8">
       <h1 class="text-heading-md text-ink">Log in</h1>
       <p class="mt-1 text-sm text-muted">Welcome back to {{ appName }}.</p>
 
       <form (ngSubmit)="submit()" class="mt-6 space-y-4">
-        <div>
-          <label for="email" class="block text-sm font-medium text-ink">Email</label>
+        <ui-field label="Email" for="email">
           <input
             id="email"
             name="email"
             type="email"
             autocomplete="email"
+            class="ui-input"
             [(ngModel)]="email"
-            class="mt-1 w-full rounded-md border border-line bg-canvas px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           />
-        </div>
+        </ui-field>
 
-        <div>
-          <label for="password" class="block text-sm font-medium text-ink">Password</label>
+        <ui-field label="Password" for="password" [error]="error()">
           <input
             id="password"
             name="password"
             type="password"
             autocomplete="current-password"
+            class="ui-input"
             [(ngModel)]="password"
-            class="mt-1 w-full rounded-md border border-line bg-canvas px-3 py-2 text-body text-ink focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           />
-        </div>
+        </ui-field>
 
-        @if (error()) {
-          <p class="text-sm text-danger" role="alert">{{ error() }}</p>
-        }
-
-        <button
-          type="submit"
-          [disabled]="loading()"
-          class="w-full rounded-md bg-accent px-4 py-2.5 text-heading-sm text-white transition-colors duration-200 hover:bg-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:opacity-60"
-        >
-          {{ loading() ? 'Logging in…' : 'Log in' }}
+        <button ui-button type="submit" variant="primary" class="w-full" [loading]="loading()">
+          Log in
         </button>
       </form>
 

@@ -5,10 +5,12 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { APP_NAME } from '@extrovertai/shared';
+import { Button } from '../../ui/button/button';
+import { Icon } from '../../ui/icon/icon';
 
 @Component({
   selector: 'app-landing',
-  imports: [RouterLink],
+  imports: [RouterLink, Button, Icon],
   templateUrl: './landing.html',
 })
 export class Landing {

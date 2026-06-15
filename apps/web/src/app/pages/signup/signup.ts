@@ -7,10 +7,13 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { APP_NAME } from '@extrovertai/shared';
 import { AuthService } from '../../core/auth.service';
+import { Button } from '../../ui/button/button';
+import { Field } from '../../ui/field/field';
+import { Icon } from '../../ui/icon/icon';
 
 @Component({
   selector: 'app-signup',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, Button, Field, Icon],
   templateUrl: './signup.html',
 })
 export class Signup {
