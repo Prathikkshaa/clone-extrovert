@@ -18,6 +18,18 @@ export { APP_NAME };
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.extrovertai.example/signup';
 export const SIGNUP_URL = APP_URL;
 
+/**
+ * PLACEHOLDER — the marketing site's own canonical origin (used by metadataBase,
+ * sitemap, robots, canonical URLs, and absolute OG image URLs). Set the real
+ * production domain at deploy time via NEXT_PUBLIC_SITE_URL.
+ * TODO(wiring): confirm the real marketing domain.
+ */
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://extrovertai.example').replace(/\/$/, '');
+
+/** One-line product description reused across metadata + JSON-LD (single source). */
+export const SITE_DESCRIPTION =
+  'Find local businesses worth reaching, write outreach that sounds like your best salesperson, and stay out of spam — one tool, pay for what you use.';
+
 /** Friction-reducing microcopy shown under primary CTAs (M00 §3). */
 export const CTA_MICROCOPY = 'No card needed · Free to start';
 

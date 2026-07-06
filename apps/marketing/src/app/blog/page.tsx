@@ -4,7 +4,11 @@ import { PageHero } from '@/components/page-hero';
 import { Reveal } from '@/components/reveal';
 import { PLACEHOLDER_POSTS } from './posts';
 
-export const metadata: Metadata = { title: 'Blog' };
+export const metadata: Metadata = {
+  title: 'Blog',
+  description:
+    'Practical playbooks on finding local business leads, writing cold email that lands, and booking meetings without a full-time sales motion.',
+};
 
 // Blog is the SEO/AEO content engine (M00 §9). M01 scaffolds only: the hub +
 // one placeholder post structure. Real posts + full SEO land in M04.

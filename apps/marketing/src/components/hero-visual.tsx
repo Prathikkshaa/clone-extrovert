@@ -65,7 +65,7 @@ export function HeroVisual({ children }: { children: ReactNode }) {
       <div
         data-parallax-glow
         aria-hidden
-        className="pointer-events-none absolute -inset-6 -z-10 rounded-[2rem] bg-accent-soft/70 blur-2xl transition-transform duration-300 ease-soft"
+        className="pointer-events-none absolute -inset-4 md:-inset-6 -z-10 rounded-[2rem] bg-accent-soft/70 blur-2xl transition-transform duration-300 ease-soft"
       />
       <div
         data-parallax-panel

@@ -1,8 +1,13 @@
 import type { Metadata } from 'next';
 import { PageHero } from '@/components/page-hero';
 import { Reveal } from '@/components/reveal';
+import { APP_NAME } from '@/lib/site';
 
-export const metadata: Metadata = { title: 'Terms of Service' };
+export const metadata: Metadata = {
+  title: 'Terms of Service',
+  description: `The terms for using ${APP_NAME}. Placeholder — replace with real legal text before launch.`,
+  robots: { index: false, follow: true }, // placeholder legal text — keep out of the index
+};
 
 // Legal STUB (M00 §8) — clearly marked. Real text is the user's/lawyer's job.
 export default function TermsPage() {
