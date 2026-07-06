@@ -1,0 +1,28 @@
+{
+  "name": "marketing",
+  "version": "0.0.0",
+  "private": true,
+  "description": "ExtrovertAI marketing site — Next.js (App Router), RSC-first, static-generated. Separate from apps/web (Angular); shares packages/shared.",
+  "scripts": {
+    "dev": "next dev -p 4321",
+    "build": "next build",
+    "start": "next start -p 4321",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^15.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "gsap": "^3.12.7",
+    "@extrovertai/shared": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17",
+    "typescript": "~5.7.3"
+  }
+}

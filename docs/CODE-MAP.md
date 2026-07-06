@@ -11,6 +11,14 @@
 | `apps/api` | `api` | NestJS HTTP API. |
 | `apps/worker` | `worker` | NestJS **standalone** background worker (BullMQ; processors added File 06+). |
 | `apps/web` | `web` | Angular + Tailwind frontend. |
+| `apps/marketing` | `marketing` | **Next.js (App Router, RSC-first) marketing site** — the public high-conversion landing/pricing/about/blog site. Separate framework from `apps/web`; shares only `packages/shared` (tokens/`APP_NAME`). Static-generated. Governed by `docs/Landing page/file-m00-marketing-context.md`. |
+
+## apps/marketing (`src/`) — Next.js marketing site (M01+)
+- **Token wiring:** `tailwind.config.ts` maps semantic names (bg-canvas/text-ink/bg-accent…) to CSS vars in `app/globals.css` — the SAME token palette as `apps/web/src/styles.css`, so the two apps read as one product. Overrides Tailwind's stock palette/fonts + adds a fluid clamp-based type scale (anti-slop, M00 §5). Fonts via `src/lib/fonts.ts` (`next/font`): **Space Grotesk** headings + **IBM Plex Sans** body (injected as `--font-heading`/`--font-body`).
+- `app/layout.tsx` — root layout: canvas/ink base, font CSS vars, header+footer shell, default metadata (full SEO in M04). `app/page.tsx` = landing (M01 intro + labeled M02/M03 slots). Routes: `pricing/`, `how-it-works/`, `about/`, `blog/` (+ `blog/[slug]` SSG + `blog/posts.ts` placeholder data), `privacy/`, `terms/`, `not-found.tsx`.
+- `src/components/` — `site-header.tsx` (**client island**: scroll-condense + mobile menu), `reveal.tsx` (**client island**: the ONE reusable scroll-reveal primitive — GSAP + ScrollTrigger, staggerable, honors `prefers-reduced-motion`), plus SERVER components `site-footer`, `wordmark`, `cta-button`, `page-hero`, `section-placeholder`.
+- `src/lib/site.ts` — nav/footer config + `SIGNUP_URL` (**PLACEHOLDER** `NEXT_PUBLIC_APP_URL` → wire the real `apps/web` signup route at deploy). `APP_NAME` re-exported from shared.
+- Dev: `npm run dev -w marketing` → port **4321** (in `.claude/launch.json`). RSC-first: only header + reveal are `"use client"`.
 
 ## packages/shared (`src/`)
 - `index.ts` — barrel re-exporting everything below.
