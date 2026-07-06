@@ -1,12 +1,16 @@
-// Landing page (/) — M02 builds the persuasion core: hero (+ the one parallax
-// island), pain, how-it-works (4 steps), and the dark demo centerpiece. The
-// remaining conversion/trust sections (differentiators, founder's note, pricing,
-// FAQ, final CTA) land in M03 via the labeled slot below.
+// Landing page (/) — the full conversion page. M02 built the top (hero → pain →
+// how-it-works → demo); M03 adds the trust + close (differentiators → founder's
+// note → pricing → FAQ → final CTA). RSC-first: only the header, reveal, parallax,
+// demo player, and FAQ accordion are client islands.
 import { Hero } from '@/components/sections/hero';
 import { Pain } from '@/components/sections/pain';
 import { HowItWorks } from '@/components/sections/how-it-works';
 import { Demo } from '@/components/sections/demo';
-import { SectionPlaceholder } from '@/components/section-placeholder';
+import { Differentiators } from '@/components/sections/differentiators';
+import { FounderNote } from '@/components/sections/founder-note';
+import { Pricing } from '@/components/sections/pricing';
+import { Faq } from '@/components/sections/faq';
+import { FinalCta } from '@/components/sections/final-cta';
 
 export default function LandingPage() {
   return (
@@ -15,11 +19,11 @@ export default function LandingPage() {
       <Pain />
       <HowItWorks />
       <Demo />
-      <SectionPlaceholder
-        file="M03"
-        title="Differentiators, founder's note, pricing, FAQ, and the final CTA"
-        note="The zigzag differentiators, an honest founder's note, transparent pricing, an AEO-ready FAQ, and the closing call to action."
-      />
+      <Differentiators />
+      <FounderNote />
+      <Pricing />
+      <Faq />
+      <FinalCta />
     </>
   );
 }

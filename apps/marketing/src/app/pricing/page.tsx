@@ -1,20 +1,25 @@
 import type { Metadata } from 'next';
 import { PageHero } from '@/components/page-hero';
-import { SectionPlaceholder } from '@/components/section-placeholder';
+import { Pricing } from '@/components/sections/pricing';
+import { Faq } from '@/components/sections/faq';
+import { FinalCta } from '@/components/sections/final-cta';
 
-export const metadata: Metadata = { title: 'Pricing' };
+export const metadata: Metadata = {
+  title: 'Pricing',
+  description:
+    'Start free, then pay only for what you use. Simple credit pricing that covers finding, researching, writing, and sending — no seats, no subscription.',
+};
 
 export default function PricingPage() {
   return (
     <>
       <PageHero eyebrow="Pricing" title="Pay for what you use — no five-tool stack.">
-        Simple credit-based pricing. Full tiers, the FAQ, and the comparison land in M03.
+        Start free with credits included. Buy more only when you need them. Every number below
+        is the real price — nothing hidden.
       </PageHero>
-      <SectionPlaceholder
-        file="M03"
-        title="Pricing tiers, credit packs, and the pricing FAQ"
-        note="Transparent pack pricing (credits for search, enrichment, drafting, sending) with a deeper FAQ."
-      />
+      <Pricing withHeading={false} />
+      <Faq />
+      <FinalCta />
     </>
   );
 }

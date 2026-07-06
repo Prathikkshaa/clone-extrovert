@@ -110,6 +110,13 @@
   }
 }
 
+/* Subtle accent-glow drift for the final CTA (decorative). Only runs via the
+ * `motion-safe:` variant; the reduced-motion block below also neutralises it. */
+@keyframes cta-drift {
+  0%, 100% { transform: translate(-50%, 0) scale(1); opacity: 0.9; }
+  50% { transform: translate(-50%, 10px) scale(1.06); opacity: 1; }
+}
+
 /* Scroll-reveal initial state (see components/reveal.tsx). Elements start hidden
  * + nudged down; GSAP animates them in on enter. Under reduced motion, the media
  * query below neutralises the transform so content shows immediately (M00 §6). */
