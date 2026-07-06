@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="Product demo poster placeholder">
+  <!-- PLACEHOLDER poster (M00 §13). Swap for a real product-demo poster frame. -->
+  <rect width="1280" height="720" fill="#17201f"/>
+  <rect x="120" y="120" width="1040" height="480" rx="16" fill="#1f2c2a" stroke="#2c3b39"/>
+  <circle cx="160" cy="160" r="6" fill="#2c3b39"/>
+  <circle cx="184" cy="160" r="6" fill="#2c3b39"/>
+  <circle cx="208" cy="160" r="6" fill="#2c3b39"/>
+  <rect x="152" y="220" width="360" height="20" rx="6" fill="#2dd4bf" opacity="0.85"/>
+  <rect x="152" y="264" width="760" height="12" rx="6" fill="#2c3b39"/>
+  <rect x="152" y="292" width="620" height="12" rx="6" fill="#2c3b39"/>
+  <rect x="152" y="340" width="880" height="14" rx="6" fill="#2c3b39"/>
+  <rect x="152" y="372" width="820" height="14" rx="6" fill="#2c3b39"/>
+  <rect x="152" y="404" width="700" height="14" rx="6" fill="#2c3b39"/>
+  <circle cx="640" cy="480" r="44" fill="#2dd4bf" opacity="0.9"/>
+  <path d="M628 458 L668 480 L628 502 Z" fill="#17201f"/>
+  <text x="640" y="650" fill="#a7b3b0" font-family="sans-serif" font-size="24" text-anchor="middle">Product demo — placeholder poster</text>
+</svg>

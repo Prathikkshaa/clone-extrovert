@@ -61,6 +61,7 @@
   html {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    scroll-behavior: smooth; /* anchor CTAs glide; forced to `auto` under reduced-motion below */
   }
 
   body {
