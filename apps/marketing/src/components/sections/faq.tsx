@@ -1,5 +1,5 @@
 'use client';
-// CLIENT ISLAND — the FAQ accordion. Needs open/close state, so it's a client
+// CLIENT ISLAND - the FAQ accordion. Needs open/close state, so it's a client
 // component. Accessible: each question is a real <button> in an <h3> with
 // aria-expanded + aria-controls; the answer is a region labelled by its button
 // and hidden via `hidden` when collapsed (keyboard + screen-reader friendly).

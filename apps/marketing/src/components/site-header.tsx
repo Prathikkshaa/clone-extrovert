@@ -1,6 +1,6 @@
 'use client';
 // CLIENT ISLAND (M00 §4): the header condenses on scroll and owns the mobile menu
-// (open/close state + scroll listener) — genuine interactivity. Kept minimal; all
+// (open/close state + scroll listener) - genuine interactivity. Kept minimal; all
 // content/links come from server-side config (lib/site.ts).
 
 import { useState, useEffect } from 'react';

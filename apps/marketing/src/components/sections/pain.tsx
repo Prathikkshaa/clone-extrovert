@@ -1,4 +1,4 @@
-// SERVER component — the pain section. Deliberate DENSITY DROP after the hero
+// SERVER component - the pain section. Deliberate DENSITY DROP after the hero
 // (M00 §5): quieter, tighter, narrower measure. Its whole job is the "that's
 // exactly me" moment (M00 §2). Empathetic, plain, short. Reveal on scroll.
 import { Reveal } from '@/components/reveal';
@@ -15,7 +15,7 @@ export function Pain() {
           </p>
           <p className="mt-5 text-body-lg text-muted">
             So you either pay for five different tools and stitch them together, or you put it
-            off — and the calendar stays empty. Neither one gets you clients.
+            off - and the calendar stays empty. Neither one gets you clients.
           </p>
         </Reveal>
       </div>

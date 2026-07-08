@@ -1,7 +1,7 @@
 'use client';
 // CLIENT ISLAND (M00 §4/§6): reveal needs GSAP + ScrollTrigger + the DOM, so it
 // must run on the client. It is the ONE reusable scroll-reveal primitive every
-// later section (M02/M03) composes — keep the client surface here, not in sections.
+// later section (M02/M03) composes - keep the client surface here, not in sections.
 
 import { useRef, useEffect, type ElementType, type ReactNode } from 'react';
 import { gsap } from 'gsap';
@@ -21,7 +21,7 @@ type RevealProps = {
 };
 
 /**
- * Fades + translates its children in as they enter the viewport — fast, subtle,
+ * Fades + translates its children in as they enter the viewport - fast, subtle,
  * staggerable (M00 §6: reveals, not scroll-jacking; 150–400ms). Honors
  * `prefers-reduced-motion` (content shows immediately, no transform). The initial
  * hidden state is set in CSS (`.reveal-init`) so there is no flash before hydration

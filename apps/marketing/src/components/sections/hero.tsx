@@ -1,8 +1,8 @@
-// SERVER component — the hero. Asymmetric, left-aligned (M00 §5): copy + CTAs on
+// SERVER component - the hero. Asymmetric, left-aligned (M00 §5): copy + CTAs on
 // the left, the product visual (with the one parallax island) on the right;
 // stacks on mobile (headline → visual → CTAs handled by source order + grid).
 //
-// Copy is DIRECTION per M02 — specific, transformation-led, no hype words. The
+// Copy is DIRECTION per M02 - specific, transformation-led, no hype words. The
 // user refines final words.
 import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
@@ -24,7 +24,7 @@ export function Hero() {
         </Reveal>
         <Reveal delay={0.1}>
           <p className="mt-6 max-w-prose text-body-lg text-muted">
-            For founders and agencies who need clients — not another tool to learn. Find local
+            For founders and agencies who need clients - not another tool to learn. Find local
             businesses worth reaching, send emails that sound like your best salesperson wrote
             each one, and stay out of spam. One tool, pay for what you use.
           </p>

@@ -1,4 +1,4 @@
-// SERVER component — footer. Real link groups, an honest compliance/trust line,
+// SERVER component - footer. Real link groups, an honest compliance/trust line,
 // and an honest "built by [founder]" placeholder. No fake badges, no invented
 // counts (M00 §7).
 import Link from 'next/link';
@@ -14,7 +14,7 @@ export function SiteFooter() {
           <Wordmark />
           <p className="mt-4 text-body-sm text-muted">
             Find the right local businesses, reach out like your best salesperson wrote each
-            email, and stay out of spam — one tool, pay for what you use.
+            email, and stay out of spam - one tool, pay for what you use.
           </p>
         </div>
 
@@ -50,13 +50,9 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t border-line">
-        <div className="shell flex flex-col gap-2 py-6 text-body-sm text-muted md:flex-row md:items-center md:justify-between">
+        <div className="shell flex py-6 text-body-sm text-muted">
           <p>
             © {year} {APP_NAME}. Built by {FOUNDER_NAME}.
-          </p>
-          <p className="text-muted/90">
-            Compliant by default — every email carries one-click unsubscribe and a real
-            mailing address.
           </p>
         </div>
       </div>

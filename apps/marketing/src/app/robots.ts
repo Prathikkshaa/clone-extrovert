@@ -1,5 +1,5 @@
 // robots.txt (Next generates /robots.txt at build). Allows normal crawlers AND
-// explicitly welcomes AI crawlers (GPTBot, ClaudeBot, PerplexityBot, …) — this
+// explicitly welcomes AI crawlers (GPTBot, ClaudeBot, PerplexityBot, …) - this
 // serves AEO: being crawlable is a precondition for being cited by AI assistants
 // (M00 §9). References the sitemap. (M04 §1)
 import type { MetadataRoute } from 'next';

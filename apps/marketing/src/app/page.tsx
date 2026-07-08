@@ -1,4 +1,4 @@
-// Landing page (/) — the full conversion page. M02 built the top (hero → pain →
+// Landing page (/) - the full conversion page. M02 built the top (hero → pain →
 // how-it-works → demo); M03 adds the trust + close (differentiators → founder's
 // note → pricing → FAQ → final CTA). RSC-first: only the header, reveal, parallax,
 // demo player, and FAQ accordion are client islands.

@@ -18,9 +18,7 @@
 
 | # | Item | Location | Replace with | Blocks launch? |
 |---|------|----------|--------------|----------------|
-| 6 | **Product demo video** | `public/demo/product-demo.mp4` (not shipped) | The real autoplay-silent walkthrough (~15–25s, muted). Until present, `DemoPlayer` shows the static fallback + captions. | No (fallback active) |
-| 7 | **Demo poster** | `public/demo/poster.svg` | A real first-frame poster (`.jpg`/`.webp`); update `poster` prop in `src/components/sections/demo.tsx`. | No |
-| 8 | **Founder photo** | `src/components/sections/founder-note.tsx` (dashed circle placeholder) | A real founder headshot. | No |
+| 6 | **Product demo (optional real video)** | `src/components/sections/demo.tsx` → `DemoLoop` (`demo-loop.tsx`) | The demo is now an on-brand animated UI that loops the four stages (search → leads → draft → booked). Optionally replace `DemoLoop` with a real screen-capture video later; not required. | No |
 | 9 | **Founder's-note copy** | `src/components/sections/founder-note.tsx` + `src/app/about/page.tsx` | Final words in the founder's own voice (current text is honest direction). | No |
 | 10 | **Founder name** | `src/lib/site.ts` → `FOUNDER_NAME` ("the founder") | The real name (also flows into `Organization` JSON-LD + footer). | No |
 | 11 | **Product screenshots** | DOM mocks: `src/components/product-panel.tsx`, the how-it-works snippets, the differentiator visuals | Real product screenshots/frames if desired. The DOM mocks are on-brand and sharp, so this is optional polish. | No |
@@ -28,11 +26,12 @@
 | 13 | **OG / social image** | generated at build by `src/app/opengraph-image.tsx` (real on-brand PNG) | A richer designed image only if wanted — the generated one is production-usable. | No |
 | 14 | **Favicon / logo** | none yet (wordmark is text + accent dot) | A favicon (`src/app/icon.png`) + logo mark if desired. | No |
 | 15 | **Real proof slot** | `src/components/sections/founder-note.tsx` (empty, labeled `SWAP-SLOT`) | Real testimonials / results / logos **once they exist** — never fabricated (M00 §7). | No |
-| 16 | **Blog posts** | `src/app/blog/posts.ts` (one typed placeholder post) | Real posts. Approach: swap the typed array for MDX or a CMS; the index + `[slug]` route + sitemap already read from this source. | No |
+| 16 | **More blog posts** | `src/app/blog/posts.ts` (one real SEO post shipped) | Add more posts (each is one typed `BlogPost` entry; the index, `[slug]` route, sitemap, and `BlogPosting` JSON-LD all read from here). Swap the typed array for MDX/a CMS when volume grows. | No |
+| 17 | **Reconcile credit value vs pack prices** | `src/components/sections/pricing.tsx` (`CREDIT_LIST_USD = '$0.20'`) | The site states "1 credit ≈ $0.20" (marketing list value), but the real packs from `@extrovertai/shared` price credits BELOW that (Starter $10/100 = $0.10, Scale ≈ $0.074). Decide before launch: keep $0.20 as a "list value / packs are a discount" framing, or raise the real pack prices in shared (File 14) so the numbers align. | **Recommended** |
 
 ## Status: NOT placeholder (already final)
 
-- **Pricing numbers** — `src/components/sections/pricing.tsx` reads the **finalized File 14 values** from `@extrovertai/shared` (`CREDIT_PACKS`, `CREDIT_COSTS`, `CREDIT_USD_CENTS`). If product File 14 prices change, they update here automatically.
+- **Pricing pack prices** — `src/components/sections/pricing.tsx` reads the **real File 14 values** from `@extrovertai/shared` (`CREDIT_PACKS`, `CREDIT_COSTS`). NOTE: the displayed per-credit anchor is a **marketing list value** (`CREDIT_LIST_USD = $0.20`) set locally, intentionally NOT the product's internal billing anchor (`CREDIT_USD_CENTS = 10¢` in shared, untouched). See swap-list #17 to reconcile.
 - **Design tokens** — shared with `apps/web` via CSS variables (no swap needed).
 - **SEO/AEO** — metadata, sitemap, robots (AI crawlers), and JSON-LD (`SoftwareApplication` / `Organization` / `FAQPage`) are wired and valid; they only need the real `SITE_URL` (#2).
 

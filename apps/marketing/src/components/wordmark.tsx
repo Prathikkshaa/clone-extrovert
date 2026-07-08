@@ -1,6 +1,6 @@
-// SERVER component — the wordmark. Name comes from APP_NAME (shared), never
+// SERVER component - the wordmark. Name comes from APP_NAME (shared), never
 // hardcoded (M00 §4). A restrained mark: the name in the heading face with a
-// single accent dot doing quiet brand work — no logo image needed yet.
+// single accent dot doing quiet brand work - no logo image needed yet.
 import Link from 'next/link';
 import { APP_NAME } from '@/lib/site';
 

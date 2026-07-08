@@ -1,8 +1,8 @@
-// SERVER component — a built, on-brand REPRESENTATION of the product UI (the lead
+// SERVER component - a built, on-brand REPRESENTATION of the product UI (the lead
 // list showing the "No website" buying-signal badge). This stands in for a real
 // product screenshot (M00 §13 placeholder) but renders as crisp DOM (no image
 // asset, no layout shift, sharp on every display) and reads as genuine product
-// imagery. Swap for a real screenshot/video frame when available — it's isolated
+// imagery. Swap for a real screenshot/video frame when available - it's isolated
 // here and used by both the hero and the demo fallback.
 //
 // Labeled as representative via the `aria-label`; the copy/data are realistic

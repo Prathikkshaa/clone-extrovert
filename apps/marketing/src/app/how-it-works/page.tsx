@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default function HowItWorksPage() {
   return (
     <>
-      <PageHero eyebrow="How it works" title="Find, personalize, send, and book — one loop.">
+      <PageHero eyebrow="How it works" title="Find, personalize, send, and book - one loop.">
         No new skill to learn. Here&rsquo;s exactly what happens between &ldquo;pick a market&rdquo; and
         &ldquo;a meeting on your calendar.&rdquo;
       </PageHero>

@@ -1,5 +1,5 @@
 'use client';
-// CLIENT ISLAND — the ONE constrained depth/parallax touch (M00 §6). It wraps the
+// CLIENT ISLAND - the ONE constrained depth/parallax touch (M00 §6). It wraps the
 // server-rendered product panel (passed as children, so the visual paints without
 // waiting on JS) and adds a subtle pointer-driven tilt + layered-depth parallax on
 // desktop pointer devices ONLY.
@@ -61,7 +61,7 @@ export function HeroVisual({ children }: { children: ReactNode }) {
 
   return (
     <div ref={wrapRef} className="relative">
-      {/* Layered accent glow behind the panel — quiet depth, not a floating blob. */}
+      {/* Layered accent glow behind the panel - quiet depth, not a floating blob. */}
       <div
         data-parallax-glow
         aria-hidden

@@ -1,5 +1,5 @@
-// SERVER component — a lightweight, left-aligned page header used by the secondary
-// route placeholders (pricing/about/etc). Asymmetric by default (M00 §5 — not
+// SERVER component - a lightweight, left-aligned page header used by the secondary
+// route placeholders (pricing/about/etc). Asymmetric by default (M00 §5 - not
 // everything centered). Real section designs replace these in M02/M03.
 import { Reveal } from './reveal';
 import type { ReactNode } from 'react';

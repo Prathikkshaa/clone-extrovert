@@ -1,7 +1,7 @@
-// SERVER components — Schema.org JSON-LD for AEO (M00 §9 / M04 §2). Being
+// SERVER components - Schema.org JSON-LD for AEO (M00 §9 / M04 §2). Being
 // citable by AI assistants + eligible for rich results. Everything here is
 // FACTUAL and derived from single sources (APP_NAME, SITE_*, FAQ_ITEMS, the real
-// File 14 pack prices) — no fabricated ratings, review counts, or user numbers.
+// File 14 pack prices) - no fabricated ratings, review counts, or user numbers.
 import { APP_NAME, SITE_URL, SITE_DESCRIPTION, FOUNDER_NAME } from '@/lib/site';
 import { FAQ_ITEMS } from '@/lib/faq';
 import { CREDIT_PACKS } from '@extrovertai/shared';
@@ -51,7 +51,7 @@ export function SoftwareApplicationJsonLd() {
             name: 'Free to start',
             price: '0',
             priceCurrency: 'USD',
-            description: 'Create an account and get free credits — no card needed.',
+            description: 'Create an account and get free credits - no card needed.',
           },
           ...CREDIT_PACKS.map((pack) => ({
             '@type': 'Offer',
@@ -66,7 +66,7 @@ export function SoftwareApplicationJsonLd() {
   );
 }
 
-/** FAQ — built from the SAME array the page renders, so they can never drift. */
+/** FAQ - built from the SAME array the page renders, so they can never drift. */
 export function FaqJsonLd() {
   return (
     <JsonLd

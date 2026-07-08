@@ -7,7 +7,7 @@ import { APP_NAME } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'About',
-  description: `Why ${APP_NAME} exists — built by someone who had the empty-pipeline problem, being built in the open, early and honest about it.`,
+  description: `Why ${APP_NAME} exists - built by someone who had the empty-pipeline problem, being built in the open, early and honest about it.`,
 };
 
 // About = founder story expanded + honest "we're new" tone (M00 §7). NO fabricated
@@ -16,7 +16,7 @@ export default function AboutPage() {
   return (
     <>
       <PageHero eyebrow="About" title="Built by someone who had this exact problem.">
-        No big team, no VC playbook — just a tool made to solve a real, boring, expensive
+        No big team, no VC playbook - just a tool made to solve a real, boring, expensive
         problem: getting clients without a full-time sales motion.
       </PageHero>
 
@@ -36,7 +36,7 @@ export default function AboutPage() {
           </p>
           <p>
             We&rsquo;re early, and we&rsquo;d rather say that plainly than fake a wall of logos. What
-            you see is what&rsquo;s built. The roadmap is shaped by what real users ask for — so if
+            you see is what&rsquo;s built. The roadmap is shaped by what real users ask for - so if
             you try it, your feedback genuinely moves it.
           </p>
         </Reveal>

@@ -1,4 +1,4 @@
-// SERVER component — differentiators as an editorial ZIGZAG (M00 §3/§5), NOT a
+// SERVER component - differentiators as an editorial ZIGZAG (M00 §3/§5), NOT a
 // symmetric card trio. Alternating left/right rows: a representative visual on one
 // side, objection-killing copy on the other, direction flipping down the page.
 // Each row reveals on scroll. Every claim answers a specific fear from the message
@@ -15,14 +15,14 @@ type Row = {
 };
 
 // Small, distinct representative visuals (labeled placeholders standing in for
-// real screenshots — M00 §13).
+// real screenshots - M00 §13).
 function EmailDraftVisual() {
   return (
     <div className="rounded-xl border border-line bg-surface p-5 shadow-[0_20px_50px_-30px_rgba(26,26,24,0.3)]">
       <p className="text-body-sm text-muted">To: owner@lonestarroofing.com</p>
       <p className="mt-1 text-body font-medium text-ink">Quick idea for Lone Star Roofing</p>
       <div className="mt-4 space-y-2 text-body-sm text-ink/80">
-        <p>Saw your 4.8★ from 126 jobs around Austin — clearly the crews do great work.</p>
+        <p>Saw your 4.8★ from 126 jobs around Austin - clearly the crews do great work.</p>
         <p>
           Noticed you&rsquo;re running without a site, so homeowners comparing roofers can&rsquo;t
           find you after the referral. I help contractors fix exactly that…
@@ -54,7 +54,7 @@ function ComplianceVisual() {
         <div className="h-full w-[45%] rounded-full bg-accent" />
       </div>
       <div className="mt-4 border-t border-line pt-3 text-[0.78rem] text-muted">
-        Unsubscribe · 123 Main St, Austin, TX — added to every email automatically
+        Unsubscribe · 123 Main St, Austin, TX - added to every email automatically
       </div>
     </div>
   );
@@ -87,12 +87,12 @@ const ROWS: Row[] = [
   {
     eyebrow: 'Personalized, not spam',
     title: 'Every email is written from the lead’s own site and reviews.',
-    copy: 'No mail-merge tokens, no “Hi {{first_name}}” tells. Each message references what that business actually does — in your voice — so it reads like you sat down and wrote it. Because, essentially, you did.',
+    copy: 'No mail-merge tokens, no “Hi {{first_name}}” tells. Each message references what that business actually does - in your voice - so it reads like you sat down and wrote it. Because, essentially, you did.',
     visual: <EmailDraftVisual />,
   },
   {
     eyebrow: 'Buying-signal targeting',
-    title: 'Find the businesses that actually need you — like the ones with no website.',
+    title: 'Find the businesses that actually need you - like the ones with no website.',
     copy: 'Search any industry and city, then filter for signals that mean “ready to buy”: no website, thin online presence, low review counts. You reach people with an obvious gap, not a random list.',
     visual: <ProductPanel />,
   },
@@ -104,7 +104,7 @@ const ROWS: Row[] = [
   },
   {
     eyebrow: 'One tool, not five',
-    title: 'Search, write, send, follow up, and book — in one place.',
+    title: 'Search, write, send, follow up, and book - in one place.',
     copy: 'Stop stitching together a lead-list tool, an email finder, a copywriter, a sending platform, and a scheduler. It’s one workflow, and you only pay for what you use.',
     visual: <OneToolVisual />,
   },

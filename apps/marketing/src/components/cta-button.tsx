@@ -1,4 +1,4 @@
-// SERVER component — a plain styled link, no interactivity. The single primary
+// SERVER component - a plain styled link, no interactivity. The single primary
 // action ("Start free") + a quiet secondary variant (M00 §11). Token-driven; the
 // accent does real work here and (almost) nowhere else.
 import Link from 'next/link';

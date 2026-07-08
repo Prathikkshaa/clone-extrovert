@@ -1,12 +1,12 @@
 /**
- * Fonts — self-hosted via next/font (no layout shift, no external requests at
+ * Fonts - self-hosted via next/font (no layout shift, no external requests at
  * runtime; Next fetches + subsets at build time).
  *
- * CHOICE (M00 §5 — "one confident, distinctive type choice, not default Inter"):
- *  - Headings: **Space Grotesk** — a characterful geometric grotesk with a slight
+ * CHOICE (M00 §5 - "one confident, distinctive type choice, not default Inter"):
+ *  - Headings: **Space Grotesk** - a characterful geometric grotesk with a slight
  *    technical edge. Distinctive without being loud; reads as intentional/human,
  *    not the default-Inter "AI template" look. Weight 500 for headings.
- *  - Body: **IBM Plex Sans** — a clean, warm humanist sans that pairs well with a
+ *  - Body: **IBM Plex Sans** - a clean, warm humanist sans that pairs well with a
  *    geometric heading and stays highly readable at long measures. Weights 400/500.
  *
  * Two weights only (400/500), matching the product design system. Both expose a

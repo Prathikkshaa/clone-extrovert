@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { PageHero } from '@/components/page-hero';
 import { Reveal } from '@/components/reveal';
-import { PLACEHOLDER_POSTS } from './posts';
+import { BLOG_POSTS } from './posts';
 
 export const metadata: Metadata = {
   title: 'Blog',
@@ -10,19 +10,20 @@ export const metadata: Metadata = {
     'Practical playbooks on finding local business leads, writing cold email that lands, and booking meetings without a full-time sales motion.',
 };
 
-// Blog is the SEO/AEO content engine (M00 §9). M01 scaffolds only: the hub +
-// one placeholder post structure. Real posts + full SEO land in M04.
+const dateFmt = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+// Blog is the SEO/AEO content engine (M00 §9). Posts come from ./posts.
 export default function BlogIndexPage() {
   return (
     <>
       <PageHero eyebrow="Blog" title="Field notes on outreach that actually books meetings.">
-        Practical guides for finding clients without becoming a full-time salesperson. The
-        content engine gets built out in M04.
+        Practical guides for finding clients without becoming a full-time salesperson.
       </PageHero>
 
       <section className="shell py-12">
         <ul className="grid gap-6 md:grid-cols-2">
-          {PLACEHOLDER_POSTS.map((post, i) => (
+          {BLOG_POSTS.map((post, i) => (
             <Reveal as="li" key={post.slug} delay={i * 0.05}>
               <Link
                 href={`/blog/${post.slug}`}
@@ -33,6 +34,9 @@ export default function BlogIndexPage() {
                   {post.title}
                 </h2>
                 <p className="mt-2 text-body-sm text-muted">{post.excerpt}</p>
+                <p className="mt-4 text-body-sm text-muted/80">
+                  {dateFmt(post.datePublished)} · {post.readMinutes} min read
+                </p>
               </Link>
             </Reveal>
           ))}

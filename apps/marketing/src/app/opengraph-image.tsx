@@ -1,14 +1,14 @@
-// OG / social image — generated at build via next/og (a real 1200×630 PNG, not a
+// OG / social image - generated at build via next/og (a real 1200×630 PNG, not a
 // placeholder file). Applies to every route (root convention) and Twitter falls
 // back to it via the summary_large_image card. On-brand: warm canvas, ink, the
 // single teal accent + wordmark dot. (M04 §1)
 //
 // NOTE: this is the on-brand system-generated OG. Swap for a richer designed image
-// only if desired (swap-list) — it is NOT a launch blocker.
+// only if desired (swap-list) - it is NOT a launch blocker.
 import { ImageResponse } from 'next/og';
 import { APP_NAME, SITE_DESCRIPTION } from '@/lib/site';
 
-export const alt = `${APP_NAME} — book more meetings without learning to sell`;
+export const alt = `${APP_NAME} - book more meetings without learning to sell`;
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 

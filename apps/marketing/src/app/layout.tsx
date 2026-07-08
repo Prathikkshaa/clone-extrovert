@@ -1,4 +1,4 @@
-// Root layout — canvas/ink base, the distinctive fonts as CSS variables, the
+// Root layout - canvas/ink base, the distinctive fonts as CSS variables, the
 // sticky-header + footer shell, site-wide SEO/AEO metadata defaults, and the
 // Organization + SoftwareApplication JSON-LD. RSC by default; header is a client
 // island. Per-page titles/descriptions override via each route's `metadata`.
@@ -10,7 +10,7 @@ import { OrganizationJsonLd, SoftwareApplicationJsonLd } from '@/components/stru
 import { APP_NAME, SITE_URL, SITE_DESCRIPTION } from '@/lib/site';
 import './globals.css';
 
-const TITLE_DEFAULT = `${APP_NAME} — book more meetings without learning to sell`;
+const TITLE_DEFAULT = `${APP_NAME} - book more meetings without learning to sell`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

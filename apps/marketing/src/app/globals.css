@@ -1,5 +1,5 @@
 /*
- * Global styles + design tokens — ExtrovertAI marketing site.
+ * Global styles + design tokens - ExtrovertAI marketing site.
  *
  * WHY: tokens are CSS custom properties (mirroring apps/web/src/styles.css so the
  * two apps stay visually one product). Tailwind maps semantic utility names to
@@ -10,14 +10,14 @@
 @tailwind utilities;
 
 :root {
-  /* Core palette (warm ink on warm canvas — never stark white) */
+  /* Core palette (warm ink on warm canvas - never stark white) */
   --color-ink: #1a1a18;
   --color-canvas: #fafaf8;
   --color-surface: #ffffff;
   --color-muted: #6b6b66;
   --color-line: #e7e7e2;
 
-  /* Single accent — the one teal doing real work (M00 §5). CTAs + positive only. */
+  /* Single accent - the one teal doing real work (M00 §5). CTAs + positive only. */
   --color-accent: #0f766e;
   --color-accent-strong: #0b5d56;
   --color-accent-soft: #e3f1ef;
@@ -30,7 +30,7 @@
   --color-warning-soft: #f7ecd9;
   --color-danger-soft: #f9e6e6;
 
-  /* Radii — a touch larger for marketing surfaces than the app's dense UI. */
+  /* Radii - a touch larger for marketing surfaces than the app's dense UI. */
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-xl: 24px;
@@ -87,7 +87,7 @@
 @layer components {
   /* A dark section island for deliberate rhythm (e.g. the M02 demo). Applying
    * .on-dark swaps this subtree's tokens to the dark palette without touching the
-   * global theme — "dark sections used intentionally", not dark-everything. */
+   * global theme - "dark sections used intentionally", not dark-everything. */
   .on-dark {
     --color-ink: #f4f4f0;
     --color-canvas: #17201f;

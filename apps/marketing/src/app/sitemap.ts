@@ -1,9 +1,9 @@
-// Sitemap (Next generates /sitemap.xml at build) — all public marketing routes.
+// Sitemap (Next generates /sitemap.xml at build) - all public marketing routes.
 // Blog posts are pulled from the same content source so new posts appear
 // automatically. (M04 §1)
 import type { MetadataRoute } from 'next';
 import { SITE_URL } from '@/lib/site';
-import { PLACEHOLDER_POSTS } from './blog/posts';
+import { BLOG_POSTS } from './blog/posts';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -16,11 +16,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === '' ? 1 : 0.7,
   }));
 
-  const posts: MetadataRoute.Sitemap = PLACEHOLDER_POSTS.map((p) => ({
+  const posts: MetadataRoute.Sitemap = BLOG_POSTS.map((p) => ({
     url: `${SITE_URL}/blog/${p.slug}`,
-    lastModified: now,
+    lastModified: new Date(p.datePublished),
     changeFrequency: 'monthly',
-    priority: 0.5,
+    priority: 0.6,
   }));
 
   return [...pages, ...posts];
