@@ -40,6 +40,14 @@ const LOADING_STEPS: LoadingStep[] = [
 ];
 const STEP_INTERVAL_MS = 1100;
 
+// Quick-pick tone chips — friendlier than a blank box (users rarely know what to type).
+const TONE_SUGGESTIONS = [
+  'Friendly and professional',
+  'Warm and approachable',
+  'Confident and direct',
+  'Expert and reassuring',
+];
+
 @Component({
   selector: 'app-onboarding',
   imports: [FormsModule, Button, Card, Field, Icon, PageHeader],
@@ -56,19 +64,45 @@ export class Onboarding implements OnDestroy {
   protected readonly notice = signal<string | null>(null);
   protected readonly saving = signal(false);
   protected readonly isManual = signal(false);
+  /** True when we opened straight into review with an already-saved profile
+   *  ("Update profile from website" from Settings) — changes the copy + actions. */
+  protected readonly editingExisting = signal(false);
 
   protected readonly loadingSteps = LOADING_STEPS;
   protected readonly activeStep = signal(0);
   private loadingTimer: ReturnType<typeof setInterval> | null = null;
+
+  protected readonly toneSuggestions = TONE_SUGGESTIONS;
+  /** Which field's "improve with AI" is currently running (null = none). */
+  protected readonly assisting = signal<'services' | 'about' | 'value_prop' | null>(null);
+
+  constructor() {
+    // If a profile already exists, open in review with it prefilled so the user
+    // SEES their current details (fixes "Update profile from website" showing blank).
+    this.api.get().subscribe({
+      next: (p) => {
+        if (p && this.hasContent(p)) {
+          this.prefill(p);
+          this.editingExisting.set(true);
+          this.step.set('review');
+        }
+      },
+      error: () => {
+        /* no existing profile / not critical — start at the URL step */
+      },
+    });
+  }
 
   protected readonly title = computed(() => {
     switch (this.step()) {
       case 'loading':
         return 'Reading your site…';
       case 'review':
-        return this.isManual()
-          ? 'Tell us about your business'
-          : 'Here’s what we found — does this look right?';
+        return this.editingExisting()
+          ? 'Your profile'
+          : this.isManual()
+            ? 'Tell us about your business'
+            : 'Here’s what we found — does this look right?';
       default:
         return 'Set up your profile';
     }
@@ -92,6 +126,62 @@ export class Onboarding implements OnDestroy {
 
   selectLogo(url: string): void {
     this.logoUrl = url;
+  }
+
+  setTone(tone: string): void {
+    this.tone = tone;
+  }
+
+  /** Enable the "improve with AI" button only once there's something to work with. */
+  canAssist(text: string): boolean {
+    return text.trim().length >= 3 && this.assisting() === null;
+  }
+
+  /** Expand a field's rough notes into clear copy with AI (e.g. "digital marketing
+   *  services" → a concrete description). Fills the field with the result. */
+  assist(field: 'services' | 'about' | 'value_prop'): void {
+    const current = field === 'services' ? this.services : field === 'about' ? this.about : this.valueProp;
+    if (!this.canAssist(current)) {
+      this.toast.warn('Type a few words first, then let AI expand them.');
+      return;
+    }
+    this.assisting.set(field);
+    this.api.assist(field, current).subscribe({
+      next: ({ text }) => {
+        if (field === 'services') this.services = text;
+        else if (field === 'about') this.about = text;
+        else this.valueProp = text;
+        this.assisting.set(null);
+        this.toast.success('Polished with AI — edit anything you like.');
+      },
+      error: (err) => {
+        this.assisting.set(null);
+        this.toast.error(err?.error?.message ?? 'Couldn’t generate that — please try again.');
+      },
+    });
+  }
+
+  /** Empty every field on the review form (keeps you on the page). */
+  clearAll(): void {
+    this.services = '';
+    this.about = '';
+    this.valueProp = '';
+    this.tone = '';
+    this.proofText = '';
+    this.logoUrl = null;
+    this.logoCandidates.set([]);
+    this.notice.set(null);
+    this.toast.info('Cleared. Fill it in or read a website again.');
+  }
+
+  /** Start over from the URL step to read a different website. */
+  tryAnotherWebsite(): void {
+    this.clearAll();
+    this.website = null;
+    this.url = '';
+    this.isManual.set(false);
+    this.editingExisting.set(false);
+    this.step.set('url');
   }
 
   readSite(): void {
@@ -180,9 +270,22 @@ export class Onboarding implements OnDestroy {
       });
   }
 
-  private fillFromCrawl(res: CrawlResult): void {
-    const p: CompanyProfile = res.profile;
+  /** Any user-facing content worth showing on the review step? */
+  private hasContent(p: CompanyProfile): boolean {
+    return !!(
+      p.services ||
+      p.about ||
+      p.value_prop ||
+      p.tone ||
+      (p.proof_points && p.proof_points.length) ||
+      p.website
+    );
+  }
+
+  /** Copy a profile into the editable review fields. */
+  private prefill(p: CompanyProfile): void {
     this.website = p.website;
+    this.url = p.website ?? '';
     this.services = p.services ?? '';
     this.about = p.about ?? '';
     this.valueProp = p.value_prop ?? '';
@@ -190,6 +293,16 @@ export class Onboarding implements OnDestroy {
     this.proofText = (p.proof_points ?? []).join('\n');
     this.brandColor = p.brand_color;
     this.useBranding = p.theme_source === 'fetched' && !!p.brand_color;
+    if (p.logo_url) {
+      this.logoUrl = p.logo_url;
+      this.logoCandidates.set([p.logo_url]);
+    }
+  }
+
+  private fillFromCrawl(res: CrawlResult): void {
+    const p: CompanyProfile = res.profile;
+    this.prefill(p);
+    this.editingExisting.set(false);
     // Logo candidates: include the saved best guess + all crawl candidates.
     const candidates = [
       ...(res.meta.logoCandidates ?? []),

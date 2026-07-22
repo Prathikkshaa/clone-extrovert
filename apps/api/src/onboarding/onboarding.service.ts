@@ -12,6 +12,8 @@ import type { SaveProfileDto } from './onboarding.dto';
 
 type CompanyProfile = Tables<'company_profiles'>;
 
+export type AssistField = 'services' | 'about' | 'value_prop';
+
 interface ExtractedProfile {
   services: string | null;
   about: string | null;
@@ -107,6 +109,34 @@ export class OnboardingService {
         logoCandidates: branding.logos,
       },
     };
+  }
+
+  /**
+   * AI writing help for a profile field: turn the user's rough notes (e.g. "digital
+   * marketing services") into a clear, concrete description they can edit. Grounded —
+   * never invents specific facts (clients, numbers, awards). Used by the "improve
+   * with AI" buttons on the setup form. Not metered (part of free onboarding).
+   */
+  async assist(field: AssistField, text: string): Promise<{ text: string }> {
+    const clean = (text ?? '').trim();
+    if (clean.length < 3) {
+      throw new BadRequestException('Type a few words first, then let AI expand them.');
+    }
+    const guidance: Record<AssistField, string> = {
+      services: 'what this business offers (its products/services), in 1–2 concrete sentences',
+      about: 'who this business is, in 1–2 concrete sentences',
+      value_prop: 'the single main promise/benefit to customers, in one concise sentence',
+    };
+    const system =
+      'You help a small-business owner write a clear, plain-language company profile used ' +
+      'for cold outreach. Expand their rough notes into a concise, concrete description. ' +
+      'Do NOT invent specific facts — no fake clients, numbers, awards, or guarantees. Plain ' +
+      'words, no hype or buzzwords. Return ONLY the improved text — no preamble, no quotes.';
+    const prompt = `Write ${guidance[field]}.\n\nThe owner's rough notes: "${clean}"\n\nImproved version:`;
+    const out = await this.llm.complete({ system, prompt, maxTokens: 220, temperature: 0.5 });
+    const improved = out.trim().replace(/^["']+|["']+$/g, '').trim();
+    if (!improved) throw new BadRequestException('Couldn’t generate that — please try again.');
+    return { text: improved };
   }
 
   async getProfile(userId: string): Promise<CompanyProfile | null> {

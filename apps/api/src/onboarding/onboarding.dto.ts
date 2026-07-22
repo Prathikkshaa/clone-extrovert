@@ -13,6 +13,15 @@ export class CrawlDto {
   url!: string;
 }
 
+export class AssistDto {
+  @IsIn(['services', 'about', 'value_prop'])
+  field!: 'services' | 'about' | 'value_prop';
+
+  @IsString()
+  @MaxLength(2000)
+  text!: string;
+}
+
 export class SaveProfileDto {
   @IsOptional()
   @IsString()

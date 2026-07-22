@@ -15,7 +15,7 @@ import { SupabaseAuthGuard } from '../auth/supabase-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import type { AuthUser } from '../auth/auth-user.interface';
 import { OnboardingService, type CrawlOutcome } from './onboarding.service';
-import { CrawlDto, SaveProfileDto } from './onboarding.dto';
+import { AssistDto, CrawlDto, SaveProfileDto } from './onboarding.dto';
 
 @Controller()
 @UseGuards(SupabaseAuthGuard)
@@ -34,6 +34,12 @@ export class OnboardingController {
       throw new BadRequestException(result.error ?? 'We couldn’t read that site.');
     }
     return result;
+  }
+
+  /** AI writing help for a single profile field (services/about/value_prop). */
+  @Post('onboarding/assist')
+  assist(@CurrentUser() _user: AuthUser, @Body() dto: AssistDto): Promise<{ text: string }> {
+    return this.onboarding.assist(dto.field, dto.text);
   }
 
   @Get('company-profile')

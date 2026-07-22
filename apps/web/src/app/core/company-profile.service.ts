@@ -50,6 +50,14 @@ export class CompanyProfileApiService {
     return this.http.post<CrawlResult>(`${this.base}/onboarding/crawl`, { url });
   }
 
+  /** AI writing help: expand rough notes for a profile field into clear copy. */
+  assist(
+    field: 'services' | 'about' | 'value_prop',
+    text: string,
+  ): Observable<{ text: string }> {
+    return this.http.post<{ text: string }>(`${this.base}/onboarding/assist`, { field, text });
+  }
+
   get(): Observable<CompanyProfile | null> {
     return this.http.get<CompanyProfile | null>(`${this.base}/company-profile`);
   }

@@ -100,34 +100,91 @@
 
     <ui-card class="mt-6">
       <div class="space-y-5">
-        <ui-field label="What you offer" for="services">
+        <ui-field
+          label="What you offer"
+          for="services"
+          hint="Your products or services. Rough notes are fine — tap “Improve with AI” to expand them."
+        >
           <textarea
             id="services"
             name="services"
             rows="3"
             class="ui-textarea"
+            placeholder="e.g. digital marketing services"
             [(ngModel)]="services"
           ></textarea>
+          <div class="mt-2 flex justify-end">
+            <button
+              ui-button
+              variant="secondary"
+              size="sm"
+              iconLeft="sparkles"
+              [disabled]="!canAssist(services)"
+              [loading]="assisting() === 'services'"
+              (click)="assist('services')"
+            >
+              Improve with AI
+            </button>
+          </div>
         </ui-field>
-        <ui-field label="About you" for="about">
+
+        <ui-field
+          label="About you"
+          for="about"
+          hint="Who you are in a line or two. Jot the basics and let AI polish it."
+        >
           <textarea
             id="about"
             name="about"
             rows="3"
             class="ui-textarea"
+            placeholder="e.g. a small team helping local shops get found online"
             [(ngModel)]="about"
           ></textarea>
+          <div class="mt-2 flex justify-end">
+            <button
+              ui-button
+              variant="secondary"
+              size="sm"
+              iconLeft="sparkles"
+              [disabled]="!canAssist(about)"
+              [loading]="assisting() === 'about'"
+              (click)="assist('about')"
+            >
+              Improve with AI
+            </button>
+          </div>
         </ui-field>
-        <ui-field label="Your main promise" for="valueProp">
+
+        <ui-field
+          label="Your main promise"
+          for="valueProp"
+          hint="The one benefit customers get. Keep it to a sentence."
+        >
           <textarea
             id="valueProp"
             name="valueProp"
-            rows="3"
+            rows="2"
             class="ui-textarea"
+            placeholder="e.g. more customers from Google, without the guesswork"
             [(ngModel)]="valueProp"
           ></textarea>
+          <div class="mt-2 flex justify-end">
+            <button
+              ui-button
+              variant="secondary"
+              size="sm"
+              iconLeft="sparkles"
+              [disabled]="!canAssist(valueProp)"
+              [loading]="assisting() === 'value_prop'"
+              (click)="assist('value_prop')"
+            >
+              Improve with AI
+            </button>
+          </div>
         </ui-field>
-        <ui-field label="Tone of voice" for="tone">
+
+        <ui-field label="Tone of voice" for="tone" hint="Pick one, or type your own.">
           <input
             id="tone"
             name="tone"
@@ -135,13 +192,36 @@
             placeholder="e.g. friendly and professional"
             [(ngModel)]="tone"
           />
+          <div class="mt-2 flex flex-wrap gap-2">
+            @for (t of toneSuggestions; track t) {
+              <button
+                type="button"
+                (click)="setTone(t)"
+                class="rounded-full border px-3 py-1 text-sm transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                [class.border-accent]="tone === t"
+                [class.bg-accent-soft]="tone === t"
+                [class.text-accent]="tone === t"
+                [class.border-line]="tone !== t"
+                [class.text-muted]="tone !== t"
+                [class.hover:text-ink]="tone !== t"
+              >
+                {{ t }}
+              </button>
+            }
+          </div>
         </ui-field>
-        <ui-field label="Proof points (one per line)" for="proof">
+
+        <ui-field
+          label="Proof points (one per line)"
+          for="proof"
+          hint="Optional — real numbers, named clients, awards or guarantees that build trust."
+        >
           <textarea
             id="proof"
             name="proof"
             rows="3"
             class="ui-textarea"
+            placeholder="e.g. 4.9★ from 120 reviews&#10;Trusted by 30+ local businesses"
             [(ngModel)]="proofText"
           ></textarea>
         </ui-field>
@@ -182,7 +262,7 @@
         }
       </div>
 
-      <div class="mt-6">
+      <div class="mt-6 flex flex-wrap items-center gap-3">
         <button
           ui-button
           variant="primary"
@@ -190,7 +270,13 @@
           [loading]="saving()"
           (click)="save()"
         >
-          Save and continue
+          {{ editingExisting() ? 'Save changes' : 'Save and continue' }}
+        </button>
+        <button ui-button variant="secondary" iconLeft="search" (click)="tryAnotherWebsite()">
+          Try another website
+        </button>
+        <button ui-button variant="ghost" iconLeft="trash-2" (click)="clearAll()">
+          Clear all
         </button>
       </div>
     </ui-card>
