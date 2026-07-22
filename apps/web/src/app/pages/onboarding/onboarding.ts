@@ -12,8 +12,10 @@ import {
   type CompanyProfile,
   type CrawlResult,
 } from '../../core/company-profile.service';
+import { firstValueFrom } from 'rxjs';
 import { ThemeService } from '../../core/theme.service';
 import { BrandService } from '../../core/brand.service';
+import { AuthService } from '../../core/auth.service';
 import { Button } from '../../ui/button/button';
 import { Card } from '../../ui/card/card';
 import { Field } from '../../ui/field/field';
@@ -39,6 +41,8 @@ const LOADING_STEPS: LoadingStep[] = [
   { label: 'Writing your profile', icon: 'pen-line' },
 ];
 const STEP_INTERVAL_MS = 1100;
+// AI "improve" buttons unlock once there's enough to work with.
+const MIN_ASSIST_CHARS = 10;
 
 // Quick-pick tone chips — friendlier than a blank box (users rarely know what to type).
 const TONE_SUGGESTIONS = [
@@ -46,6 +50,15 @@ const TONE_SUGGESTIONS = [
   'Warm and approachable',
   'Confident and direct',
   'Expert and reassuring',
+];
+
+// Starter templates for proof points — click to insert, then fill in the specifics.
+// We never auto-invent numbers; these are scaffolds the user completes themselves.
+const PROOF_EXAMPLES = [
+  '4.9★ from [N] reviews',
+  'Trusted by [N]+ local businesses',
+  '[N] years in business',
+  'Helped clients [achieve a specific result]',
 ];
 
 @Component({
@@ -57,6 +70,7 @@ export class Onboarding implements OnDestroy {
   private readonly api = inject(CompanyProfileApiService);
   private readonly theme = inject(ThemeService);
   private readonly brand = inject(BrandService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
 
@@ -73,8 +87,11 @@ export class Onboarding implements OnDestroy {
   private loadingTimer: ReturnType<typeof setInterval> | null = null;
 
   protected readonly toneSuggestions = TONE_SUGGESTIONS;
+  protected readonly proofExamples = PROOF_EXAMPLES;
   /** Which field's "improve with AI" is currently running (null = none). */
   protected readonly assisting = signal<'services' | 'about' | 'value_prop' | null>(null);
+  /** True while "Improve all with AI" is polishing every field in turn. */
+  protected readonly improvingAll = signal(false);
 
   constructor() {
     // If a profile already exists, open in review with it prefilled so the user
@@ -132,9 +149,94 @@ export class Onboarding implements OnDestroy {
     this.tone = tone;
   }
 
-  /** Enable the "improve with AI" button only once there's something to work with. */
+  /** Enable the "improve with AI" button only once there's enough to work with. */
   canAssist(text: string): boolean {
-    return text.trim().length >= 3 && this.assisting() === null;
+    return text.trim().length >= MIN_ASSIST_CHARS && this.assisting() === null && !this.improvingAll();
+  }
+
+  /** How many of the 5 profile fields are filled — drives the completeness meter. */
+  completedCount(): number {
+    return [this.services, this.about, this.valueProp, this.tone, this.proofText].filter(
+      (v) => v.trim().length > 0,
+    ).length;
+  }
+  totalFields = 5;
+  completionPct(): number {
+    return Math.round((this.completedCount() / this.totalFields) * 100);
+  }
+
+  /** Polish every text field (that has enough content) with AI, in sequence. */
+  async improveAll(): Promise<void> {
+    if (this.improvingAll() || this.assisting()) return;
+    const fields: ('services' | 'about' | 'value_prop')[] = ['services', 'about', 'value_prop'];
+    const todo = fields.filter((f) => this.fieldValue(f).trim().length >= MIN_ASSIST_CHARS);
+    if (todo.length === 0) {
+      this.toast.warn('Add a few words to a field first, then improve all.');
+      return;
+    }
+    this.improvingAll.set(true);
+    let done = 0;
+    for (const f of todo) {
+      try {
+        const { text } = await firstValueFrom(this.api.assist(f, this.fieldValue(f)));
+        this.setFieldValue(f, text);
+        done++;
+      } catch {
+        /* skip a field that fails; keep going */
+      }
+    }
+    this.improvingAll.set(false);
+    if (done > 0) this.toast.success(`Polished ${done} field${done === 1 ? '' : 's'} with AI.`);
+    else this.toast.error('Couldn’t improve those right now — please try again.');
+  }
+
+  /** Append a proof-point starter template on its own line. */
+  addProofExample(example: string): void {
+    const lines = this.proofText.split('\n').map((l) => l.trim()).filter(Boolean);
+    if (lines.includes(example)) return;
+    this.proofText = [...lines, example].join('\n');
+  }
+
+  // --- live sample outreach email (built locally, updates as you type) ---
+  sampleSubject(): string {
+    const vp = this.valueProp.trim();
+    return vp ? this.clip(vp, 60) : 'A quick idea for your business';
+  }
+  sampleEmail(): string {
+    const offer = this.services.trim();
+    const promise = this.valueProp.trim();
+    const proof = this.proofText.split('\n').map((l) => l.trim()).filter(Boolean)[0];
+    const name = this.auth.firstName() ?? 'you';
+    const lines = [
+      'Hi [First name],',
+      '',
+      offer
+        ? `I run a business that ${this.lower(this.clip(offer, 160))}`
+        : 'I run a business that helps companies like yours — [what you offer].',
+      promise
+        ? `The reason I’m reaching out: ${this.lower(this.clip(promise, 140))}`
+        : '[Your main promise — the benefit they get.]',
+      proof ? `A quick proof point: ${proof}.` : '',
+      '',
+      'Worth a short chat next week?',
+      '',
+      `Best,\n${name}`,
+    ].filter((l) => l !== '');
+    return lines.join('\n');
+  }
+  private fieldValue(f: 'services' | 'about' | 'value_prop'): string {
+    return f === 'services' ? this.services : f === 'about' ? this.about : this.valueProp;
+  }
+  private setFieldValue(f: 'services' | 'about' | 'value_prop', v: string): void {
+    if (f === 'services') this.services = v;
+    else if (f === 'about') this.about = v;
+    else this.valueProp = v;
+  }
+  private clip(s: string, n: number): string {
+    return s.length > n ? s.slice(0, n).trimEnd() + '…' : s;
+  }
+  private lower(s: string): string {
+    return s.charAt(0).toLowerCase() + s.slice(1);
   }
 
   /** Expand a field's rough notes into clear copy with AI (e.g. "digital marketing

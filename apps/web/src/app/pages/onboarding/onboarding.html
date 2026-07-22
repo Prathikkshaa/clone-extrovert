@@ -1,4 +1,8 @@
-<div class="mx-auto max-w-2xl px-4 py-8 sm:px-6">
+<div
+  class="mx-auto px-4 py-8 sm:px-6"
+  [class.max-w-2xl]="step() !== 'review'"
+  [class.max-w-5xl]="step() === 'review'"
+>
   <ui-page-header
     [title]="title()"
     [subtitle]="
@@ -98,187 +102,260 @@
       </div>
     }
 
+    <!-- Completeness meter + one-click "improve all" -->
     <ui-card class="mt-6">
-      <div class="space-y-5">
-        <ui-field
-          label="What you offer"
-          for="services"
-          hint="Your products or services. Rough notes are fine — tap “Improve with AI” to expand them."
-        >
-          <textarea
-            id="services"
-            name="services"
-            rows="3"
-            class="ui-textarea"
-            placeholder="e.g. digital marketing services"
-            [(ngModel)]="services"
-          ></textarea>
-          <div class="mt-2 flex justify-end">
-            <button
-              ui-button
-              variant="secondary"
-              size="sm"
-              iconLeft="sparkles"
-              [disabled]="!canAssist(services)"
-              [loading]="assisting() === 'services'"
-              (click)="assist('services')"
-            >
-              Improve with AI
-            </button>
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center justify-between gap-3">
+            <p class="text-sm font-medium text-ink">Profile completeness</p>
+            <p class="text-sm text-muted">{{ completedCount() }} of {{ totalFields }} filled</p>
           </div>
-        </ui-field>
-
-        <ui-field
-          label="About you"
-          for="about"
-          hint="Who you are in a line or two. Jot the basics and let AI polish it."
-        >
-          <textarea
-            id="about"
-            name="about"
-            rows="3"
-            class="ui-textarea"
-            placeholder="e.g. a small team helping local shops get found online"
-            [(ngModel)]="about"
-          ></textarea>
-          <div class="mt-2 flex justify-end">
-            <button
-              ui-button
-              variant="secondary"
-              size="sm"
-              iconLeft="sparkles"
-              [disabled]="!canAssist(about)"
-              [loading]="assisting() === 'about'"
-              (click)="assist('about')"
-            >
-              Improve with AI
-            </button>
+          <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-canvas">
+            <span
+              class="block h-full rounded-full bg-accent transition-all duration-500"
+              [style.width.%]="completionPct()"
+            ></span>
           </div>
-        </ui-field>
-
-        <ui-field
-          label="Your main promise"
-          for="valueProp"
-          hint="The one benefit customers get. Keep it to a sentence."
-        >
-          <textarea
-            id="valueProp"
-            name="valueProp"
-            rows="2"
-            class="ui-textarea"
-            placeholder="e.g. more customers from Google, without the guesswork"
-            [(ngModel)]="valueProp"
-          ></textarea>
-          <div class="mt-2 flex justify-end">
-            <button
-              ui-button
-              variant="secondary"
-              size="sm"
-              iconLeft="sparkles"
-              [disabled]="!canAssist(valueProp)"
-              [loading]="assisting() === 'value_prop'"
-              (click)="assist('value_prop')"
-            >
-              Improve with AI
-            </button>
-          </div>
-        </ui-field>
-
-        <ui-field label="Tone of voice" for="tone" hint="Pick one, or type your own.">
-          <input
-            id="tone"
-            name="tone"
-            class="ui-input"
-            placeholder="e.g. friendly and professional"
-            [(ngModel)]="tone"
-          />
-          <div class="mt-2 flex flex-wrap gap-2">
-            @for (t of toneSuggestions; track t) {
-              <button
-                type="button"
-                (click)="setTone(t)"
-                class="rounded-full border px-3 py-1 text-sm transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                [class.border-accent]="tone === t"
-                [class.bg-accent-soft]="tone === t"
-                [class.text-accent]="tone === t"
-                [class.border-line]="tone !== t"
-                [class.text-muted]="tone !== t"
-                [class.hover:text-ink]="tone !== t"
-              >
-                {{ t }}
-              </button>
-            }
-          </div>
-        </ui-field>
-
-        <ui-field
-          label="Proof points (one per line)"
-          for="proof"
-          hint="Optional — real numbers, named clients, awards or guarantees that build trust."
-        >
-          <textarea
-            id="proof"
-            name="proof"
-            rows="3"
-            class="ui-textarea"
-            placeholder="e.g. 4.9★ from 120 reviews&#10;Trusted by 30+ local businesses"
-            [(ngModel)]="proofText"
-          ></textarea>
-        </ui-field>
-
-        <!-- Logo picker — we found a few images; pick your logo (single-select). -->
-        @if (logoCandidates().length > 0) {
-          <div class="rounded-lg border border-line bg-canvas p-4">
-            <p class="text-heading-sm text-ink">Your logo</p>
-            <p class="mt-0.5 text-sm text-muted">We found a few images — pick your logo.</p>
-            <div
-              class="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4"
-              role="radiogroup"
-              aria-label="Choose your logo"
-            >
-              @for (candidate of logoCandidates(); track candidate) {
-                <button
-                  type="button"
-                  role="radio"
-                  [attr.aria-checked]="logoUrl === candidate"
-                  (click)="selectLogo(candidate)"
-                  class="relative flex aspect-square items-center justify-center overflow-hidden rounded-md border-2 bg-surface p-2 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                  [class.border-accent]="logoUrl === candidate"
-                  [class.border-line]="logoUrl !== candidate"
-                  [class.hover:border-muted]="logoUrl !== candidate"
-                >
-                  <img [src]="candidate" alt="" class="max-h-full max-w-full object-contain" />
-                  @if (logoUrl === candidate) {
-                    <span
-                      class="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-white"
-                    >
-                      <ui-icon name="check" [size]="11" />
-                    </span>
-                  }
-                </button>
-              }
-            </div>
-          </div>
-        }
-      </div>
-
-      <div class="mt-6 flex flex-wrap items-center gap-3">
+        </div>
         <button
           ui-button
-          variant="primary"
-          iconRight="arrow-right"
-          [loading]="saving()"
-          (click)="save()"
+          variant="secondary"
+          size="sm"
+          iconLeft="sparkles"
+          class="shrink-0"
+          [loading]="improvingAll()"
+          (click)="improveAll()"
         >
-          {{ editingExisting() ? 'Save changes' : 'Save and continue' }}
-        </button>
-        <button ui-button variant="secondary" iconLeft="search" (click)="tryAnotherWebsite()">
-          Try another website
-        </button>
-        <button ui-button variant="ghost" iconLeft="trash-2" (click)="clearAll()">
-          Clear all
+          Improve all with AI
         </button>
       </div>
     </ui-card>
+
+    <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-5">
+      <!-- Left: the editable form -->
+      <div class="lg:col-span-3">
+        <ui-card>
+          <div class="space-y-5">
+            <ui-field
+              label="What you offer"
+              for="services"
+              hint="Your products or services. Rough notes are fine — “Improve with AI” expands them."
+            >
+              <textarea
+                id="services"
+                name="services"
+                rows="3"
+                class="ui-textarea"
+                placeholder="e.g. digital marketing services"
+                [(ngModel)]="services"
+              ></textarea>
+              <div class="mt-2 flex justify-end">
+                <button
+                  ui-button
+                  variant="secondary"
+                  size="sm"
+                  iconLeft="sparkles"
+                  [disabled]="!canAssist(services)"
+                  [loading]="assisting() === 'services'"
+                  (click)="assist('services')"
+                >
+                  Improve with AI
+                </button>
+              </div>
+            </ui-field>
+
+            <ui-field
+              label="About you"
+              for="about"
+              hint="Who you are in a line or two. Jot the basics and let AI polish it."
+            >
+              <textarea
+                id="about"
+                name="about"
+                rows="3"
+                class="ui-textarea"
+                placeholder="e.g. a small team helping local shops get found online"
+                [(ngModel)]="about"
+              ></textarea>
+              <div class="mt-2 flex justify-end">
+                <button
+                  ui-button
+                  variant="secondary"
+                  size="sm"
+                  iconLeft="sparkles"
+                  [disabled]="!canAssist(about)"
+                  [loading]="assisting() === 'about'"
+                  (click)="assist('about')"
+                >
+                  Improve with AI
+                </button>
+              </div>
+            </ui-field>
+
+            <ui-field
+              label="Your main promise"
+              for="valueProp"
+              hint="The one benefit customers get. Keep it to a sentence."
+            >
+              <textarea
+                id="valueProp"
+                name="valueProp"
+                rows="2"
+                class="ui-textarea"
+                placeholder="e.g. more customers from Google, without the guesswork"
+                [(ngModel)]="valueProp"
+              ></textarea>
+              <div class="mt-2 flex justify-end">
+                <button
+                  ui-button
+                  variant="secondary"
+                  size="sm"
+                  iconLeft="sparkles"
+                  [disabled]="!canAssist(valueProp)"
+                  [loading]="assisting() === 'value_prop'"
+                  (click)="assist('value_prop')"
+                >
+                  Improve with AI
+                </button>
+              </div>
+            </ui-field>
+
+            <ui-field label="Tone of voice" for="tone" hint="Pick one, or type your own.">
+              <input
+                id="tone"
+                name="tone"
+                class="ui-input"
+                placeholder="e.g. friendly and professional"
+                [(ngModel)]="tone"
+              />
+              <div class="mt-2 flex flex-wrap gap-2">
+                @for (t of toneSuggestions; track t) {
+                  <button
+                    type="button"
+                    (click)="setTone(t)"
+                    class="rounded-full border px-3 py-1 text-sm transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    [class.border-accent]="tone === t"
+                    [class.bg-accent-soft]="tone === t"
+                    [class.text-accent]="tone === t"
+                    [class.border-line]="tone !== t"
+                    [class.text-muted]="tone !== t"
+                    [class.hover:text-ink]="tone !== t"
+                  >
+                    {{ t }}
+                  </button>
+                }
+              </div>
+            </ui-field>
+
+            <ui-field
+              label="Proof points (one per line)"
+              for="proof"
+              hint="Optional — real numbers, named clients, awards or guarantees that build trust."
+            >
+              <textarea
+                id="proof"
+                name="proof"
+                rows="3"
+                class="ui-textarea"
+                placeholder="e.g. 4.9★ from 120 reviews&#10;Trusted by 30+ local businesses"
+                [(ngModel)]="proofText"
+              ></textarea>
+              <div class="mt-2 flex flex-wrap items-center gap-2">
+                <span class="text-xs text-muted">Add a starter:</span>
+                @for (ex of proofExamples; track ex) {
+                  <button
+                    type="button"
+                    (click)="addProofExample(ex)"
+                    class="inline-flex items-center gap-1 rounded-full border border-line px-2.5 py-1 text-xs text-muted transition-colors duration-200 hover:border-accent hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  >
+                    <ui-icon name="plus" [size]="12" />
+                    {{ ex }}
+                  </button>
+                }
+              </div>
+            </ui-field>
+
+            <!-- Logo picker — we found a few images; pick your logo (single-select). -->
+            @if (logoCandidates().length > 0) {
+              <div class="rounded-lg border border-line bg-canvas p-4">
+                <p class="text-heading-sm text-ink">Your logo</p>
+                <p class="mt-0.5 text-sm text-muted">We found a few images — pick your logo.</p>
+                <div
+                  class="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4"
+                  role="radiogroup"
+                  aria-label="Choose your logo"
+                >
+                  @for (candidate of logoCandidates(); track candidate) {
+                    <button
+                      type="button"
+                      role="radio"
+                      [attr.aria-checked]="logoUrl === candidate"
+                      (click)="selectLogo(candidate)"
+                      class="relative flex aspect-square items-center justify-center overflow-hidden rounded-md border-2 bg-surface p-2 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      [class.border-accent]="logoUrl === candidate"
+                      [class.border-line]="logoUrl !== candidate"
+                      [class.hover:border-muted]="logoUrl !== candidate"
+                    >
+                      <img [src]="candidate" alt="" class="max-h-full max-w-full object-contain" />
+                      @if (logoUrl === candidate) {
+                        <span
+                          class="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-white"
+                        >
+                          <ui-icon name="check" [size]="11" />
+                        </span>
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </ui-card>
+      </div>
+
+      <!-- Right: live sample-email preview (shows WHY each field matters) -->
+      <div class="lg:col-span-2">
+        <div class="lg:sticky lg:top-20">
+          <ui-card>
+            <div class="flex items-center gap-2 border-b border-line pb-3">
+              <span
+                class="flex h-7 w-7 items-center justify-center rounded-lg bg-accent-soft text-accent"
+              >
+                <ui-icon name="mail" [size]="15" />
+              </span>
+              <p class="text-sm font-medium text-ink">Sample outreach email</p>
+            </div>
+            <div class="mt-3">
+              <p class="text-xs uppercase tracking-wide text-muted">Subject</p>
+              <p class="mt-0.5 text-sm font-medium text-ink">{{ sampleSubject() }}</p>
+            </div>
+            <p class="mt-3 whitespace-pre-line text-sm leading-relaxed text-ink">
+              {{ sampleEmail() }}
+            </p>
+            <p class="mt-4 border-t border-line pt-3 text-xs text-muted">
+              Live preview — this is roughly how your profile shapes each email. Edit a field to
+              watch it update.
+            </p>
+          </ui-card>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      <button
+        ui-button
+        variant="primary"
+        iconRight="arrow-right"
+        [loading]="saving()"
+        (click)="save()"
+      >
+        {{ editingExisting() ? 'Save changes' : 'Save and continue' }}
+      </button>
+      <button ui-button variant="secondary" iconLeft="search" (click)="tryAnotherWebsite()">
+        Try another website
+      </button>
+      <button ui-button variant="ghost" iconLeft="trash-2" (click)="clearAll()">Clear all</button>
+    </div>
   }
 </div>
