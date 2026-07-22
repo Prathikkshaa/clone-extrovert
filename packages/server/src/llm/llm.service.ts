@@ -16,6 +16,10 @@ export interface CompleteOptions {
 
 const ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
 const TIMEOUT_MS = 90000;
+// Transient upstream failures (esp. 429 rate-limits on free models) are retried
+// with backoff before we give up on a model and fall through to the next one.
+const MAX_ATTEMPTS_PER_MODEL = 3;
+const RETRY_BASE_MS = 700;
 
 @Injectable()
 export class LlmService {
@@ -23,11 +27,17 @@ export class LlmService {
 
   constructor(private readonly config: ConfigService) {}
 
-  /** Raw completion → assistant message text. */
+  /**
+   * Raw completion → assistant message text. Resilient by design: for each model
+   * it retries transient failures (429 rate-limit / 5xx) with backoff, and if a
+   * model stays unavailable it falls through to the next model in the chain
+   * (LLM_MODEL, then the comma-separated LLM_MODEL_FALLBACKS). This is what stops a
+   * single rate-limited free model from silently producing empty profiles/hooks.
+   */
   async complete(options: CompleteOptions): Promise<string> {
     const apiKey = this.config.get<string>('OPENROUTER_API_KEY');
-    const model = this.config.get<string>('LLM_MODEL');
-    if (!apiKey || !model) {
+    const models = this.modelChain();
+    if (!apiKey || models.length === 0) {
       throw new Error('OPENROUTER_API_KEY and LLM_MODEL must be set to use the LLM.');
     }
 
@@ -36,6 +46,45 @@ export class LlmService {
       { role: 'user', content: options.prompt },
     ];
 
+    let lastError = 'LLM request failed.';
+    for (const model of models) {
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS_PER_MODEL; attempt++) {
+        try {
+          const { content, status, error } = await this.callOnce(apiKey, model, messages, options);
+          if (content !== null && !error) {
+            if (model !== models[0]) {
+              this.logger.log(`LLM served by fallback model "${model}".`);
+            }
+            return content;
+          }
+          lastError = error ?? `LLM request failed (${status}).`;
+          // Retry only transient conditions (rate-limit / server errors); on a
+          // hard error (e.g. 404 model not found, 401) move straight to the next model.
+          if (!this.isTransient(status) || attempt === MAX_ATTEMPTS_PER_MODEL) break;
+          this.logger.warn(
+            `Model "${model}" ${status} (attempt ${attempt}/${MAX_ATTEMPTS_PER_MODEL}) — retrying: ${lastError}`,
+          );
+          await this.delay(RETRY_BASE_MS * attempt);
+        } catch (err) {
+          // Network/timeout — treat as transient and retry, else next model.
+          lastError = (err as Error).message;
+          if (attempt === MAX_ATTEMPTS_PER_MODEL) break;
+          await this.delay(RETRY_BASE_MS * attempt);
+        }
+      }
+      if (models.length > 1) this.logger.warn(`Model "${model}" unavailable — trying next.`);
+    }
+    throw new Error(lastError);
+  }
+
+  /** A single OpenRouter call. Returns the text (or null) plus status/error so the
+   *  caller can decide whether to retry or fall through. Never throws on HTTP. */
+  private async callOnce(
+    apiKey: string,
+    model: string,
+    messages: { role: string; content: string }[],
+    options: CompleteOptions,
+  ): Promise<{ content: string | null; status: number; error?: string }> {
     const res = await fetch(ENDPOINT, {
       method: 'POST',
       headers: {
@@ -58,9 +107,32 @@ export class LlmService {
       error?: { message?: string };
     };
     if (!res.ok || json.error) {
-      throw new Error(json.error?.message ?? `LLM request failed (${res.status}).`);
+      return { content: null, status: res.status, error: json.error?.message };
     }
-    return json.choices?.[0]?.message?.content ?? '';
+    const content = json.choices?.[0]?.message?.content ?? '';
+    // A 200 with empty content (some models stream reasoning elsewhere) is a soft
+    // failure worth falling through on.
+    return { content: content.trim() ? content : null, status: res.status };
+  }
+
+  /** Primary model + optional comma-separated fallbacks (LLM_MODEL_FALLBACKS). */
+  private modelChain(): string[] {
+    const primary = (this.config.get<string>('LLM_MODEL') ?? '').trim();
+    const fallbacks = (this.config.get<string>('LLM_MODEL_FALLBACKS') ?? '')
+      .split(',')
+      .map((m) => m.trim())
+      .filter(Boolean);
+    return [...(primary ? [primary] : []), ...fallbacks].filter(
+      (m, i, arr) => arr.indexOf(m) === i,
+    );
+  }
+
+  private isTransient(status: number): boolean {
+    return status === 429 || status === 408 || status >= 500;
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /** Completion constrained to JSON, parsed into T. Retries once on parse failure. */
