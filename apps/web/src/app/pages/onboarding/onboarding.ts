@@ -202,27 +202,29 @@ export class Onboarding implements OnDestroy {
     const vp = this.valueProp.trim();
     return vp ? this.clip(vp, 60) : 'A quick idea for your business';
   }
-  sampleEmail(): string {
+  /** The sender's full name for the sign-off + "from" line. */
+  senderName(): string {
+    return this.auth.displayName() ?? 'Your name';
+  }
+  sampleGreeting(): string {
+    return 'Hi [First name],';
+  }
+  /** Body paragraphs, each rendered with its own spacing in the preview. */
+  sampleBody(): string[] {
     const offer = this.services.trim();
     const promise = this.valueProp.trim();
     const proof = this.proofText.split('\n').map((l) => l.trim()).filter(Boolean)[0];
-    const name = this.auth.firstName() ?? 'you';
-    const lines = [
-      'Hi [First name],',
-      '',
+    const paras = [
       offer
         ? `I run a business that ${this.lower(this.clip(offer, 160))}`
         : 'I run a business that helps companies like yours — [what you offer].',
       promise
         ? `The reason I’m reaching out: ${this.lower(this.clip(promise, 140))}`
         : '[Your main promise — the benefit they get.]',
-      proof ? `A quick proof point: ${proof}.` : '',
-      '',
-      'Worth a short chat next week?',
-      '',
-      `Best,\n${name}`,
-    ].filter((l) => l !== '');
-    return lines.join('\n');
+    ];
+    if (proof) paras.push(`A quick proof point: ${proof}.`);
+    paras.push('Worth a short chat next week?');
+    return paras;
   }
   private fieldValue(f: 'services' | 'about' | 'value_prop'): string {
     return f === 'services' ? this.services : f === 'about' ? this.about : this.valueProp;
