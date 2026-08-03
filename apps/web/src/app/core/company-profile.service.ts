@@ -58,6 +58,20 @@ export class CompanyProfileApiService {
     return this.http.post<{ text: string }>(`${this.base}/onboarding/assist`, { field, text });
   }
 
+  /** Generate a full AI sample outreach email from the profile details. */
+  sampleEmail(input: {
+    services: string;
+    about: string;
+    value_prop: string;
+    tone: string;
+    proof_points?: string[];
+  }): Observable<{ subject: string; body: string }> {
+    return this.http.post<{ subject: string; body: string }>(
+      `${this.base}/onboarding/sample-email`,
+      input,
+    );
+  }
+
   get(): Observable<CompanyProfile | null> {
     return this.http.get<CompanyProfile | null>(`${this.base}/company-profile`);
   }

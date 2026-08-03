@@ -92,6 +92,10 @@ export class Onboarding implements OnDestroy {
   protected readonly assisting = signal<'services' | 'about' | 'value_prop' | null>(null);
   /** True while "Improve all with AI" is polishing every field in turn. */
   protected readonly improvingAll = signal(false);
+  /** True while generating the AI sample email. */
+  protected readonly generatingSample = signal(false);
+  /** The AI-generated sample email (overrides the live template when present). */
+  protected readonly aiSample = signal<{ subject: string; body: string } | null>(null);
 
   constructor() {
     // If a profile already exists, open in review with it prefilled so the user
@@ -210,6 +214,61 @@ export class Onboarding implements OnDestroy {
     this.improvingAll.set(false);
     if (done > 0) this.toast.success(`Polished ${done} field${done === 1 ? '' : 's'} with AI.`);
     else this.toast.error('Couldn’t improve those right now — please try again.');
+  }
+
+  /** All the details needed to generate a real AI sample email are present. */
+  canGenerateSample(): boolean {
+    return (
+      this.services.trim().length >= 10 &&
+      this.about.trim().length >= 10 &&
+      this.valueProp.trim().length >= 5 &&
+      this.tone.trim().length >= 2 &&
+      !this.generatingSample()
+    );
+  }
+
+  /** Ask AI to draft a realistic sample outreach email from the profile. */
+  generateSample(): void {
+    if (!this.canGenerateSample()) {
+      this.toast.warn('Fill in what you offer, about you, your main promise, and tone first.');
+      return;
+    }
+    this.generatingSample.set(true);
+    this.api
+      .sampleEmail({
+        services: this.services,
+        about: this.about,
+        value_prop: this.valueProp,
+        tone: this.tone,
+        proof_points: this.proofText.split('\n').map((l) => l.trim()).filter(Boolean),
+      })
+      .subscribe({
+        next: (res) => {
+          this.aiSample.set(res);
+          this.generatingSample.set(false);
+          this.toast.success('Sample email generated.');
+        },
+        error: (err) => {
+          this.generatingSample.set(false);
+          this.toast.error(err?.error?.message ?? 'Couldn’t generate a sample — please try again.');
+        },
+      });
+  }
+
+  /** Drop back to the live template preview. */
+  clearSample(): void {
+    this.aiSample.set(null);
+  }
+
+  /** Whether the crawl found any logo candidates to pick from. */
+  hasLogos(): boolean {
+    return this.logoCandidates().length > 0;
+  }
+  /** Note shown when no logo is available to pick. */
+  logoEmptyNote(): string {
+    return this.website
+      ? 'We couldn’t find a logo on your site. Read a website that has one, or continue without a logo.'
+      : 'Add your website above to auto-detect a logo, or continue without one for now.';
   }
 
   /** Append a proof-point starter template on its own line. */

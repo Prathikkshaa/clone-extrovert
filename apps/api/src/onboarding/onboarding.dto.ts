@@ -7,6 +7,29 @@ import {
   MaxLength,
 } from 'class-validator';
 
+export class SampleEmailDto {
+  @IsString()
+  @MaxLength(1000)
+  services!: string;
+
+  @IsString()
+  @MaxLength(1000)
+  about!: string;
+
+  @IsString()
+  @MaxLength(1000)
+  value_prop!: string;
+
+  @IsString()
+  @MaxLength(200)
+  tone!: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  proof_points?: string[];
+}
+
 export class CrawlDto {
   @IsString()
   @MaxLength(2000)

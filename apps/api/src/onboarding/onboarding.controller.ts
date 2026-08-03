@@ -15,7 +15,7 @@ import { SupabaseAuthGuard } from '../auth/supabase-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import type { AuthUser } from '../auth/auth-user.interface';
 import { OnboardingService, type CrawlOutcome } from './onboarding.service';
-import { AssistDto, CrawlDto, SaveProfileDto } from './onboarding.dto';
+import { AssistDto, CrawlDto, SampleEmailDto, SaveProfileDto } from './onboarding.dto';
 
 @Controller()
 @UseGuards(SupabaseAuthGuard)
@@ -40,6 +40,21 @@ export class OnboardingController {
   @Post('onboarding/assist')
   assist(@CurrentUser() _user: AuthUser, @Body() dto: AssistDto): Promise<{ text: string }> {
     return this.onboarding.assist(dto.field, dto.text);
+  }
+
+  /** Generate a realistic AI sample outreach email from the profile details. */
+  @Post('onboarding/sample-email')
+  sampleEmail(
+    @CurrentUser() user: AuthUser,
+    @Body() dto: SampleEmailDto,
+  ): Promise<{ subject: string; body: string }> {
+    return this.onboarding.sampleEmail(user.id, {
+      services: dto.services,
+      about: dto.about,
+      value_prop: dto.value_prop,
+      tone: dto.tone,
+      proof_points: dto.proof_points,
+    });
   }
 
   @Get('company-profile')

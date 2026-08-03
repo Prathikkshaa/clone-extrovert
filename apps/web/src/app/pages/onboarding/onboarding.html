@@ -350,20 +350,22 @@
           </p>
         </section>
 
-        <!-- 6 · Logo -->
-        @if (logoCandidates().length > 0) {
-          <section class="rounded-xl border border-line bg-surface p-4 sm:p-5">
-            <div class="flex items-center gap-2.5">
-              <span
-                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent"
-              >
-                <ui-icon name="palette" [size]="16" />
-              </span>
-              <div>
-                <p class="text-sm font-medium text-ink">Your logo</p>
-                <p class="text-xs text-muted">We found a few images — pick the right one.</p>
-              </div>
+        <!-- 6 · Logo (always shown; disabled with a note when none available) -->
+        <section class="rounded-xl border border-line bg-surface p-4 sm:p-5">
+          <div class="flex items-center gap-2.5">
+            <span
+              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent"
+            >
+              <ui-icon name="palette" [size]="16" />
+            </span>
+            <div>
+              <p class="text-sm font-medium text-ink">Your logo</p>
+              <p class="text-xs text-muted">
+                {{ hasLogos() ? 'We found a few images — pick the right one.' : 'Shown on your emails and brand.' }}
+              </p>
             </div>
+          </div>
+          @if (hasLogos()) {
             <div
               class="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4"
               role="radiogroup"
@@ -391,8 +393,20 @@
                 </button>
               }
             </div>
-          </section>
-        }
+          } @else {
+            <!-- No logo found / no website — disabled placeholder + note. -->
+            <div
+              class="mt-3 flex items-center gap-3 rounded-md border border-dashed border-line bg-canvas p-4 opacity-80"
+            >
+              <span
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-surface text-muted"
+              >
+                <ui-icon name="palette" [size]="18" />
+              </span>
+              <p class="text-xs text-muted">{{ logoEmptyNote() }}</p>
+            </div>
+          }
+        </section>
       </div>
 
       <!-- Right: live sample-email preview, styled like an email client -->
@@ -403,11 +417,19 @@
             <div class="flex items-center gap-2 border-b border-line bg-canvas px-4 py-2.5">
               <ui-icon name="mail" [size]="15" class="text-accent" />
               <p class="text-sm font-medium text-ink">Sample outreach email</p>
-              <span
-                class="ml-auto inline-flex items-center gap-1 rounded-full bg-positive-soft px-2 py-0.5 text-[11px] font-medium text-positive"
-              >
-                <span class="h-1.5 w-1.5 rounded-full bg-positive"></span> Live
-              </span>
+              @if (aiSample()) {
+                <span
+                  class="ml-auto inline-flex items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-medium text-accent"
+                >
+                  <ui-icon name="sparkles" [size]="11" /> AI
+                </span>
+              } @else {
+                <span
+                  class="ml-auto inline-flex items-center gap-1 rounded-full bg-positive-soft px-2 py-0.5 text-[11px] font-medium text-positive"
+                >
+                  <span class="h-1.5 w-1.5 rounded-full bg-positive"></span> Live
+                </span>
+              }
             </div>
 
             <div class="p-5">
@@ -423,28 +445,53 @@
                 </div>
               </div>
 
-              <!-- subject -->
-              <div class="mt-4">
-                <p class="text-[11px] font-medium uppercase tracking-wide text-muted">Subject</p>
-                <p class="mt-1 text-sm font-semibold text-ink">{{ sampleSubject() }}</p>
-              </div>
-
-              <!-- body -->
-              <div class="mt-4 space-y-3 text-sm leading-relaxed text-ink">
-                <p>{{ sampleGreeting() }}</p>
-                @for (para of sampleBody(); track $index) {
-                  <p>{{ para }}</p>
-                }
-                <div class="pt-1">
-                  <p>Best,</p>
-                  <p class="font-medium">{{ senderName() }}</p>
+              @if (aiSample(); as s) {
+                <!-- AI-generated sample -->
+                <div class="mt-4">
+                  <p class="text-[11px] font-medium uppercase tracking-wide text-muted">Subject</p>
+                  <p class="mt-1 text-sm font-semibold text-ink">{{ s.subject }}</p>
                 </div>
-              </div>
+                <p class="mt-4 whitespace-pre-line text-sm leading-relaxed text-ink">{{ s.body }}</p>
+              } @else {
+                <!-- Live template preview -->
+                <div class="mt-4">
+                  <p class="text-[11px] font-medium uppercase tracking-wide text-muted">Subject</p>
+                  <p class="mt-1 text-sm font-semibold text-ink">{{ sampleSubject() }}</p>
+                </div>
+                <div class="mt-4 space-y-3 text-sm leading-relaxed text-ink">
+                  <p>{{ sampleGreeting() }}</p>
+                  @for (para of sampleBody(); track $index) {
+                    <p>{{ para }}</p>
+                  }
+                  <div class="pt-1">
+                    <p>Best,</p>
+                    <p class="font-medium">{{ senderName() }}</p>
+                  </div>
+                </div>
+              }
             </div>
 
-            <p class="border-t border-line bg-canvas px-4 py-2.5 text-xs text-muted">
-              Updates live as you edit — this is roughly how your profile shapes each email.
-            </p>
+            <!-- Generate / regenerate a real AI sample -->
+            <div class="flex flex-wrap items-center gap-2 border-t border-line bg-canvas px-4 py-3">
+              <button
+                ui-button
+                variant="primary"
+                size="sm"
+                iconLeft="sparkles"
+                [disabled]="!canGenerateSample()"
+                [loading]="generatingSample()"
+                (click)="generateSample()"
+              >
+                {{ aiSample() ? 'Regenerate sample' : 'Generate sample email' }}
+              </button>
+              @if (aiSample()) {
+                <button ui-button variant="ghost" size="sm" (click)="clearSample()">
+                  Back to live preview
+                </button>
+              } @else {
+                <span class="text-xs text-muted">Fill all fields to generate a full AI sample.</span>
+              }
+            </div>
           </div>
         </div>
       </div>
