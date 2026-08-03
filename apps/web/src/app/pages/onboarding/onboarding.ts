@@ -156,13 +156,35 @@ export class Onboarding implements OnDestroy {
 
   /** How many of the 5 profile fields are filled — drives the completeness meter. */
   completedCount(): number {
-    return [this.services, this.about, this.valueProp, this.tone, this.proofText].filter(
-      (v) => v.trim().length > 0,
-    ).length;
+    return this.fieldStatuses().filter((f) => f.done).length;
   }
   totalFields = 5;
   completionPct(): number {
     return Math.round((this.completedCount() / this.totalFields) * 100);
+  }
+  allDone(): boolean {
+    return this.completedCount() === this.totalFields;
+  }
+  isFilled(text: string): boolean {
+    return text.trim().length > 0;
+  }
+  /** Per-field done state — powers the meter's status pills + panel checks. */
+  fieldStatuses(): { label: string; done: boolean }[] {
+    return [
+      { label: 'Offer', done: this.isFilled(this.services) },
+      { label: 'About', done: this.isFilled(this.about) },
+      { label: 'Promise', done: this.isFilled(this.valueProp) },
+      { label: 'Tone', done: this.isFilled(this.tone) },
+      { label: 'Proof', done: this.isFilled(this.proofText) },
+    ];
+  }
+  /** Encouraging status line for the completeness card. */
+  completionMessage(): string {
+    const n = this.completedCount();
+    if (n === 0) return 'Let’s fill this in — or read your website to auto-fill.';
+    if (n >= this.totalFields) return 'Looking great — your profile is complete.';
+    if (n >= 3) return 'Almost there — just a couple left.';
+    return 'Good start — keep going.';
   }
 
   /** Polish every text field (that has enough content) with AI, in sequence. */
