@@ -12,10 +12,10 @@
         ui-button
         variant="primary"
         iconLeft="mail"
-        [disabled]="!providers().google || connecting()"
+        [disabled]="!providers().google || connecting() || gmailConnected()"
         (click)="connect('google')"
       >
-        Connect Gmail
+        {{ gmailConnected() ? 'Gmail connected' : 'Connect Gmail' }}
       </button>
       <div class="relative">
         <button
@@ -36,6 +36,11 @@
     </div>
     @if (!providers().google) {
       <p class="mt-3 text-xs text-muted">Gmail isn’t set up on this server yet.</p>
+    } @else if (gmailConnected()) {
+      <p class="mt-3 text-xs text-muted">
+        You can connect one Gmail at a time. To use a different inbox, disconnect the current one
+        below first.
+      </p>
     }
   </ui-card>
 

@@ -5,7 +5,7 @@
 // "not set up yet" rather than a broken button. Status goes through toasts;
 // disconnect uses the accessible confirm dialog.
 import { Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   MailboxApiService,
   type MailboxItem,
@@ -27,6 +27,7 @@ import { ToastService } from '../../ui/toast/toast.service';
 export class Mailboxes {
   private readonly api = inject(MailboxApiService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
   private readonly confirm = inject(ConfirmService);
 
@@ -40,6 +41,10 @@ export class Mailboxes {
   );
   protected readonly history = computed(() =>
     this.mailboxes().filter((m) => m.status === 'disconnected'),
+  );
+  // One Gmail at a time: block a second connect until the existing one is removed.
+  protected readonly gmailConnected = computed(() =>
+    this.active().some((m) => m.provider === 'gmail'),
   );
 
   constructor() {
@@ -71,9 +76,30 @@ export class Mailboxes {
     if (status) {
       history.replaceState(history.state, '', window.location.pathname);
     }
+    // After a completed OAuth round-trip, trap the Back button so it can't return
+    // to the provider's consent screen — send the user Home instead.
+    if (status === 'connected' || status === 'failed' || status === 'cancelled') {
+      this.trapBackFromOAuth();
+    }
+  }
+
+  /** Guard a single Back press after OAuth so it lands in-app, not on Google. */
+  private trapBackFromOAuth(): void {
+    const here = window.location.pathname;
+    history.pushState(null, '', here);
+    const handler = (): void => {
+      window.removeEventListener('popstate', handler);
+      void this.router.navigateByUrl('/home');
+    };
+    window.addEventListener('popstate', handler);
   }
 
   connect(provider: 'google' | 'microsoft'): void {
+    // One Gmail at a time — remove the existing one before connecting another.
+    if (provider === 'google' && this.gmailConnected()) {
+      this.toast.warn('Disconnect your current Gmail first, then connect a different one.');
+      return;
+    }
     this.connecting.set(true);
     this.api.connectUrl(provider).subscribe({
       next: ({ url }) => {
