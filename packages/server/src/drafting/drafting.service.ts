@@ -74,11 +74,9 @@ export class DraftingService {
     if (existing > 0) return { status: 'skipped', leadId, reason: 'already_drafted' };
 
     const profile = await this.loadProfile(userId);
-    const senderName = await this.senderName(userId);
-
     try {
       const messages = await this.billing.withCreditGate(userId, 'draft', leadId, () =>
-        this.generate(lead, profile, senderName),
+        this.generate(lead, profile),
       );
       await this.persist(leadId, messages);
       return { status: 'drafted', leadId, count: messages.length };
@@ -182,21 +180,21 @@ export class DraftingService {
 
   // --- generation ---
 
-  private async generate(
-    lead: LeadRow,
-    profile: ProfileRow,
-    senderName: string | null,
-  ): Promise<GeneratedMessage[]> {
-    const signOffRule = senderName
-      ? `Sign off every message with the sender's real name: "Best,\\n${senderName}" (you may vary "Best," but always use the name).`
-      : 'Do NOT invent a sender name — end with a simple sign-off like "Best," that the user can personalize.';
+  private async generate(lead: LeadRow, profile: ProfileRow): Promise<GeneratedMessage[]> {
+    // The sender's signature is appended automatically at send time (Settings →
+    // email signature, or a "Regards, <name>" default), so the body must NOT add its
+    // own closing — otherwise every email would have two sign-offs.
+    const signOffRule =
+      'Do NOT add a sign-off, closing line, or signature (no "Best,", "Regards,", or a ' +
+      'name) — end the message right after the call to action. A signature is added ' +
+      'automatically afterwards.';
     const parsed = await this.llm.extractJson<{ messages?: unknown }>({
       system:
         'You write short, human, specific B2B cold outreach. You ONLY use facts you are given. ' +
         'Never invent facts about the recipient, and never invent results, clients, or proof ' +
         'points the sender did not provide. No filler ("I hope this finds you well"), no hype, ' +
         `no buzzwords. Plain words a 12-year-old understands. ${signOffRule}`,
-      prompt: this.buildPrompt(lead, profile, senderName),
+      prompt: this.buildPrompt(lead, profile),
       maxTokens: 1100,
       temperature: 0.5,
     });
@@ -225,7 +223,7 @@ export class DraftingService {
     return messages;
   }
 
-  private buildPrompt(lead: LeadRow, profile: ProfileRow, senderName: string | null): string {
+  private buildPrompt(lead: LeadRow, profile: ProfileRow): string {
     const reviews = this.parseReviews(lead.reviews);
     const profileBlock = profile
       ? [
@@ -242,7 +240,6 @@ export class DraftingService {
 
     return [
       "SENDER (the person writing the email) — pitch THIS person's offer in their voice:",
-      senderName ? `Sender name (use in the sign-off): ${senderName}` : '',
       profileBlock,
       '',
       'RECIPIENT (the lead being contacted):',

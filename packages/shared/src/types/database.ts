@@ -32,6 +32,7 @@ export type Database = {
           daily_send_cap: number;
           physical_address: string | null;
           booking_url: string | null;
+          email_signature: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -43,6 +44,7 @@ export type Database = {
           daily_send_cap?: number;
           physical_address?: string | null;
           booking_url?: string | null;
+          email_signature?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -54,6 +56,7 @@ export type Database = {
           daily_send_cap?: number;
           physical_address?: string | null;
           booking_url?: string | null;
+          email_signature?: string | null;
           created_at?: string;
           updated_at?: string;
         };

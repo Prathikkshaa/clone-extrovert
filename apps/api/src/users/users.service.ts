@@ -83,7 +83,12 @@ export class UsersService {
   async updateProfile(
     userId: string,
     email: string | null,
-    patch: { physical_address?: string; mode?: 'draft' | 'autonomous'; booking_url?: string },
+    patch: {
+      physical_address?: string;
+      mode?: 'draft' | 'autonomous';
+      booking_url?: string;
+      email_signature?: string;
+    },
   ): Promise<UserProfile> {
     await this.getOrCreateProfile(userId, email); // ensure the row exists
     const update: Partial<UserProfile> = {};
@@ -93,6 +98,9 @@ export class UsersService {
     if (patch.mode !== undefined) update.mode = patch.mode;
     if (patch.booking_url !== undefined) {
       update.booking_url = this.normalizeBookingUrl(patch.booking_url);
+    }
+    if (patch.email_signature !== undefined) {
+      update.email_signature = patch.email_signature.trim() || null;
     }
 
     const { data, error } = await this.supabase

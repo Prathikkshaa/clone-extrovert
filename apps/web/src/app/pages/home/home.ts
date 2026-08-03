@@ -31,6 +31,8 @@ interface ChecklistItem {
   label: string;
   hint: string;
   link: string;
+  /** Optional in-page anchor so we land on the right Settings section. */
+  fragment?: string;
   icon: IconName;
   done: boolean;
 }
@@ -137,6 +139,7 @@ export class Home {
       label: 'Add your mailing address',
       hint: 'Required on every email to send legally.',
       link: '/settings',
+      fragment: 'address',
       icon: 'map-pin',
       done: this.addressSet() === true,
     },
@@ -145,6 +148,7 @@ export class Home {
       label: 'Connect your booking link',
       hint: 'Let leads book a meeting straight from your emails.',
       link: '/settings',
+      fragment: 'booking',
       icon: 'calendar',
       done: this.bookingSet() === true,
     },

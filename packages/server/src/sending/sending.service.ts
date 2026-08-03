@@ -105,11 +105,16 @@ export class SendingService {
     // click is a strong engagement signal). No-op when the user hasn't set a link. ---
     const withCta = await this.appendBookingCta(userId, msg.body ?? '');
 
+    // --- Signature: append the user's custom signature (or "Regards, <name>") after
+    // the email body, before compliance. Kept out of the generated body so a settings
+    // change applies to every send without re-drafting. ---
+    const withSignature = `${withCta}\n\n${await this.resolveSignature(userId)}`;
+
     // --- Click tracking: rewrite links to our redirect endpoint (trustworthy signal).
     // Done BEFORE compliance so the unsubscribe link in the footer is never wrapped. ---
     const tracked = this.clickTracking.wrapLinks(
       { userId, leadId: lead.id, messageId },
-      withCta,
+      withSignature,
     );
 
     // --- Compliance: append unsubscribe + physical address; block if no address ---
@@ -322,5 +327,31 @@ export class SendingService {
     if (!link) return body;
     if (body.includes(link)) return body;
     return `${body}\n\nPrefer to grab a time directly? ${link}`;
+  }
+
+  /**
+   * The sign-off appended to every send: the user's custom email signature when set,
+   * otherwise "Regards, <full name>" (name from auth metadata, falling back to a
+   * plain "Regards,"). Editing the signature in Settings applies to all future sends.
+   */
+  private async resolveSignature(userId: string): Promise<string> {
+    const admin = this.supabase.getAdminClient();
+    const { data } = await admin
+      .from('users')
+      .select('email_signature')
+      .eq('id', userId)
+      .maybeSingle();
+    const custom = data?.email_signature?.trim();
+    if (custom) return custom;
+
+    let name = '';
+    try {
+      const { data: userData } = await admin.auth.admin.getUserById(userId);
+      const meta = userData.user?.user_metadata as { full_name?: string } | undefined;
+      name = meta?.full_name?.trim() ?? '';
+    } catch {
+      /* fall back to a nameless sign-off */
+    }
+    return name ? `Regards,\n${name}` : 'Regards,';
   }
 }

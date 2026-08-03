@@ -12,6 +12,7 @@ export interface MeProfile {
   daily_send_cap: number;
   physical_address: string | null;
   booking_url: string | null;
+  email_signature: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -26,6 +27,7 @@ export class MeApiService {
     physical_address?: string;
     mode?: 'draft' | 'autonomous';
     booking_url?: string;
+    email_signature?: string;
   }): Observable<MeProfile> {
     return this.http.put<MeProfile>(`${this.base}/me`, patch);
   }

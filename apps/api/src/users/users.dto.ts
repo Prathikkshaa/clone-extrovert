@@ -17,4 +17,10 @@ export class UpdateMeDto {
   @IsString()
   @MaxLength(500)
   booking_url?: string;
+
+  // Optional custom email signature appended after the generated email body.
+  @IsOptional()
+  @IsString()
+  @MaxLength(600)
+  email_signature?: string;
 }

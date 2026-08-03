@@ -6,7 +6,7 @@
 // link (File 13). All saves confirm via toasts.
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   CompanyProfileApiService,
   type CompanyProfile,
@@ -48,6 +48,7 @@ export class Settings {
   private readonly theme = inject(ThemeService);
   private readonly brand = inject(BrandService);
   protected readonly themeMode = inject(ThemeModeService);
+  private readonly route = inject(ActivatedRoute);
   private readonly toast = inject(ToastService);
 
   protected readonly appName = environment.appName;
@@ -78,6 +79,10 @@ export class Settings {
   protected readonly bookingConnected = signal(false);
   protected readonly savingBooking = signal(false);
 
+  // Optional custom email signature appended after the generated email body.
+  protected emailSignature = '';
+  protected readonly savingSignature = signal(false);
+
   constructor() {
     this.api.get().subscribe({
       next: (p) => {
@@ -85,6 +90,9 @@ export class Settings {
         this.theme.apply(p);
         this.brand.set(p);
         this.loading.set(false);
+        // Deep-link support: when arriving as /settings#booking (e.g. from Home's
+        // getting-started list), scroll that section into view once it's rendered.
+        this.scrollToFragment();
       },
       error: () => {
         this.toast.error('Could not load your settings.');
@@ -102,6 +110,7 @@ export class Settings {
         this.address = m.physical_address ?? '';
         this.bookingUrl = m.booking_url ?? '';
         this.bookingConnected.set(Boolean(m.booking_url));
+        this.emailSignature = m.email_signature ?? '';
       },
       error: () => {
         /* address + booking link are loaded best-effort */
@@ -111,6 +120,17 @@ export class Settings {
 
   setAppearance(mode: ThemeMode): void {
     this.themeMode.set(mode);
+  }
+
+  /** Scroll to the section named by the URL fragment (#booking, #address, …). */
+  private scrollToFragment(): void {
+    const id = this.route.snapshot.fragment;
+    if (!id) return;
+    // Defer so the just-rendered sections exist in the DOM.
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   }
 
   protected providerLabel(provider: string): string {
@@ -169,6 +189,31 @@ export class Settings {
       error: () => {
         this.savingBooking.set(false);
         this.toast.error('Could not save. Check the link and try again.');
+      },
+    });
+  }
+
+  /** Placeholder showing the default sign-off when no custom signature is set. */
+  protected defaultSignature(): string {
+    const name = this.auth.displayName();
+    return name ? `Regards, ${name}` : 'Regards, [your name]';
+  }
+
+  saveSignature(): void {
+    this.savingSignature.set(true);
+    this.me.update({ email_signature: this.emailSignature.trim() }).subscribe({
+      next: (m) => {
+        this.emailSignature = m.email_signature ?? '';
+        this.savingSignature.set(false);
+        this.toast.success(
+          m.email_signature
+            ? 'Signature saved — it’ll be added to your outreach emails.'
+            : 'Signature cleared — we’ll sign off with your name.',
+        );
+      },
+      error: () => {
+        this.savingSignature.set(false);
+        this.toast.error('Could not save your signature. Please try again.');
       },
     });
   }
