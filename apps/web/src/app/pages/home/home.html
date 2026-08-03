@@ -9,6 +9,41 @@
     </a>
   </ui-page-header>
 
+  <!-- Welcome: celebrate the free starter credits so it's a happy first moment. -->
+  @if (showWelcome()) {
+    <div
+      class="mt-6 flex items-start gap-3 rounded-lg border border-accent/30 bg-accent-soft p-4"
+    >
+      <span
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-white"
+      >
+        <ui-icon name="sparkles" [size]="20" />
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="text-heading-sm text-ink">
+          🎉 You’ve got {{ freeCredits }} free credits{{ firstName() ? ', ' + firstName() : '' }}!
+        </p>
+        <p class="mt-0.5 text-sm text-muted">
+          They’re on us to get you started — enough to find leads, enrich them, and write your
+          first emails. Give it a try.
+        </p>
+        <a routerLink="/search" class="mt-3 inline-block">
+          <button ui-button variant="primary" size="sm" iconRight="arrow-right">
+            Find my first leads
+          </button>
+        </a>
+      </div>
+      <button
+        type="button"
+        class="shrink-0 rounded p-1 text-muted transition-colors duration-200 hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        (click)="dismissWelcome()"
+        aria-label="Dismiss"
+      >
+        <ui-icon name="x" [size]="16" />
+      </button>
+    </div>
+  }
+
   <!-- Mailbox needs reconnection: blocks sending, so surface it prominently. -->
   @if (mailboxNeedsReconnect()) {
     <div

@@ -4,6 +4,7 @@
 export const environment = {
   production: false,
   appName: 'ExtrovertAI',
+  signupCredits: 100,
   supabaseUrl: '',
   supabaseAnonKey: '',
   apiUrl: 'http://localhost:3000',

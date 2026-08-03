@@ -22,6 +22,9 @@ import { PageHeader } from '../../ui/page-header/page-header';
 import { PipelineStepper } from '../../ui/pipeline-stepper/pipeline-stepper';
 import { Skeleton } from '../../ui/skeleton/skeleton';
 import type { IconName } from '../../ui/icon/icon-paths';
+import { environment } from '../../../environments/environment';
+
+const WELCOME_KEY = 'extrovertai.welcome-dismissed';
 
 interface ChecklistItem {
   key: string;
@@ -47,6 +50,33 @@ export class Home {
 
   protected readonly email = this.auth.currentEmail();
   protected readonly firstName = this.auth.firstName;
+
+  // Welcome / free-credits banner (env-driven amount, dismissible + auto-hides
+  // once the user has spent below their starter grant).
+  protected readonly freeCredits = environment.signupCredits;
+  private readonly welcomeDismissed = signal(this.readWelcomeDismissed());
+  protected readonly showWelcome = computed(
+    () =>
+      this.freeCredits > 0 &&
+      !this.welcomeDismissed() &&
+      this.hasLeads() === false &&
+      (this.summary()?.creditBalance ?? 0) > 0,
+  );
+  dismissWelcome(): void {
+    this.welcomeDismissed.set(true);
+    try {
+      localStorage.setItem(WELCOME_KEY, '1');
+    } catch {
+      /* storage may be unavailable */
+    }
+  }
+  private readWelcomeDismissed(): boolean {
+    try {
+      return localStorage.getItem(WELCOME_KEY) === '1';
+    } catch {
+      return false;
+    }
+  }
 
   /** Time-of-day greeting, e.g. "Good morning, Sarah". Computed from the local
    *  clock at load so it reads naturally for the user's actual time of day. */
