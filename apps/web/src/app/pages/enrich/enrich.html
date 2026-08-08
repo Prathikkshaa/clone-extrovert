@@ -36,20 +36,34 @@
       </select>
     </ui-field>
 
-    @if (selectedListId && leads().length > 0) {
-      <div class="mt-4 flex flex-wrap items-center gap-3 border-t border-line pt-4">
-        <span class="text-sm font-medium text-ink">{{ selectedCount() }} selected</span>
+    @if (selectedListId && selectableLeads().length > 0) {
+      <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4">
+        <button
+          type="button"
+          class="rounded-md border border-line px-2.5 py-1 text-xs font-medium text-muted transition-colors duration-200 hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          (click)="toggleSelectAll()"
+        >
+          {{ allSelectableSelected() ? 'Clear all' : 'Select all' }}
+        </button>
+        <span class="text-sm text-muted">{{ selectedCount() }} selected</span>
+        <span class="flex-1"></span>
+        <span class="text-xs text-muted">{{ costPer }} credits each</span>
         <button
           ui-button
-          variant="secondary"
+          variant="primary"
           size="sm"
+          iconLeft="sparkles"
+          [loading]="working()"
           [disabled]="working() || selectedCount() === 0"
           (click)="enrichSelected()"
         >
-          Enrich selected
+          Enrich selected ({{ selectedCount() }})
         </button>
-        <span class="text-sm text-muted">Each lead uses {{ costPer }} credits.</span>
       </div>
+    } @else if (selectedListId && leads().length > 0 && enrichedCount() === leads().length) {
+      <p class="mt-4 flex items-center gap-2 border-t border-line pt-4 text-sm text-positive">
+        <ui-icon name="circle-check" [size]="16" /> All {{ leads().length }} leads enriched.
+      </p>
     }
   </ui-card>
 
@@ -95,50 +109,183 @@
     <ul class="mt-6 space-y-3">
       @for (lead of leads(); track lead.id) {
         <li>
-          <label
-            class="flex items-start gap-3 rounded-lg border bg-surface p-4 transition-colors duration-200"
-            [class.cursor-pointer]="lead.enrichment_status !== 'complete'"
-            [class.border-accent]="isSelected(lead.id)"
-            [class.bg-accent-soft]="isSelected(lead.id)"
-            [class.border-line]="!isSelected(lead.id)"
-            [class.hover:border-muted]="!isSelected(lead.id) && lead.enrichment_status !== 'complete'"
-          >
-            <input
-              type="checkbox"
-              [checked]="isSelected(lead.id)"
-              (change)="toggle(lead.id)"
-              [disabled]="lead.enrichment_status === 'complete'"
-              class="mt-0.5 h-5 w-5 shrink-0 accent-accent disabled:opacity-40"
-              [attr.aria-label]="'Select ' + lead.name"
-            />
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <p class="truncate text-body font-medium text-ink">{{ lead.name }}</p>
-                @if (lead.rating !== null) {
-                  <span class="shrink-0 text-sm text-muted"
-                    >★ {{ lead.rating }} ({{ lead.review_count ?? 0 }})</span
-                  >
-                }
+          @if (lead.enrichment_status === 'complete') {
+            <!-- ENRICHED CARD — no checkbox; a polished, scannable summary. -->
+            <div class="rounded-xl border border-line bg-surface p-4 sm:p-5">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <p class="truncate text-body font-medium text-ink">{{ lead.name }}</p>
+                    @if (lead.rating !== null) {
+                      <span class="text-xs text-muted"
+                        >★ {{ lead.rating }} · {{ lead.review_count ?? 0 }} reviews</span
+                      >
+                    }
+                  </div>
+                  @if (lead.website) {
+                    <a
+                      [href]="lead.website"
+                      target="_blank"
+                      rel="noopener"
+                      class="mt-0.5 inline-flex items-center gap-1 text-xs text-accent hover:text-accent-strong"
+                      >Visit website <ui-icon name="external-link" [size]="11" /></a
+                    >
+                  } @else {
+                    <span class="mt-0.5 inline-block text-xs text-warning">No website</span>
+                  }
+                </div>
+                <span
+                  class="inline-flex shrink-0 items-center gap-1 rounded-full bg-positive-soft px-2.5 py-1 text-xs font-medium text-positive"
+                >
+                  <ui-icon name="circle-check" [size]="13" /> Enriched
+                </span>
               </div>
-              <div class="mt-1 text-sm">
-                @if (lead.website) {
-                  <a
-                    [href]="lead.website"
-                    target="_blank"
-                    rel="noopener"
-                    (click)="$event.stopPropagation()"
-                    class="text-accent hover:text-accent-strong"
-                    >Website</a
+
+              <!-- Contact chips -->
+              <div class="mt-3 flex flex-wrap gap-2">
+                @if (lead.email) {
+                  <span
+                    class="inline-flex items-center gap-1.5 rounded-md bg-canvas px-2.5 py-1 text-sm text-ink"
                   >
+                    <ui-icon name="mail" [size]="14" class="text-accent" />{{ lead.email }}
+                  </span>
                 } @else {
-                  <span class="text-warning">No website</span>
+                  <span
+                    class="inline-flex items-center gap-1.5 rounded-md bg-canvas px-2.5 py-1 text-sm text-muted"
+                  >
+                    <ui-icon name="mail" [size]="14" /> No email found
+                  </span>
+                }
+                @if (lead.phone) {
+                  <span
+                    class="inline-flex items-center gap-1.5 rounded-md bg-canvas px-2.5 py-1 text-sm text-ink"
+                  >
+                    <ui-icon name="phone" [size]="14" class="text-accent" />{{ lead.phone }}
+                  </span>
                 }
               </div>
 
-              <!-- Per-lead progress / results -->
-              @switch (lead.enrichment_status) {
-                @case ('pending') {
-                  @if (isQueued(lead.id)) {
+              <!-- Reviews summary as chips -->
+              @if (hasReviewSummary(lead)) {
+                <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  @if (positives(lead).length > 0) {
+                    <div>
+                      <p class="text-xs font-medium uppercase tracking-wide text-positive">
+                        Customers like
+                      </p>
+                      <div class="mt-1.5 flex flex-wrap gap-1.5">
+                        @for (p of positives(lead); track p) {
+                          <span
+                            class="rounded-full bg-positive-soft px-2 py-0.5 text-xs text-positive"
+                            >{{ p }}</span
+                          >
+                        }
+                      </div>
+                    </div>
+                  }
+                  @if (negatives(lead).length > 0) {
+                    <div>
+                      <p class="text-xs font-medium uppercase tracking-wide text-warning">
+                        Common complaints
+                      </p>
+                      <div class="mt-1.5 flex flex-wrap gap-1.5">
+                        @for (n of negatives(lead); track n) {
+                          <span
+                            class="rounded-full bg-warning-soft px-2 py-0.5 text-xs text-warning"
+                            >{{ n }}</span
+                          >
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- The hook — highlighted callout that draws the eye -->
+              @if (lead.hook) {
+                <div class="mt-3 flex gap-2.5 rounded-lg bg-accent-soft px-3 py-2.5">
+                  <ui-icon name="sparkles" [size]="16" class="mt-0.5 shrink-0 text-accent" />
+                  <div>
+                    <p class="text-xs font-medium uppercase tracking-wide text-accent">
+                      Why reach out
+                    </p>
+                    <p class="mt-0.5 text-sm text-ink">{{ lead.hook }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <!-- SELECTABLE CARD — checkbox + live status until enriched. -->
+            <label
+              class="flex cursor-pointer items-start gap-3 rounded-xl border bg-surface p-4 transition-colors duration-200"
+              [class.border-accent]="isSelected(lead.id)"
+              [class.bg-accent-soft]="isSelected(lead.id)"
+              [class.border-line]="!isSelected(lead.id)"
+              [class.hover:border-muted]="!isSelected(lead.id)"
+            >
+              <input
+                type="checkbox"
+                [checked]="isSelected(lead.id)"
+                (change)="toggle(lead.id)"
+                class="mt-0.5 h-5 w-5 shrink-0 accent-accent"
+                [attr.aria-label]="'Select ' + lead.name"
+              />
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center justify-between gap-2">
+                  <p class="truncate text-body font-medium text-ink">{{ lead.name }}</p>
+                  @if (lead.rating !== null) {
+                    <span class="shrink-0 text-sm text-muted"
+                      >★ {{ lead.rating }} ({{ lead.review_count ?? 0 }})</span
+                    >
+                  }
+                </div>
+                <div class="mt-1 text-sm">
+                  @if (lead.website) {
+                    <a
+                      [href]="lead.website"
+                      target="_blank"
+                      rel="noopener"
+                      (click)="$event.stopPropagation()"
+                      class="text-accent hover:text-accent-strong"
+                      >Website</a
+                    >
+                  } @else {
+                    <span class="text-warning">No website</span>
+                  }
+                </div>
+
+                @switch (lead.enrichment_status) {
+                  @case ('pending') {
+                    @if (isQueued(lead.id)) {
+                      <div class="mt-3">
+                        <div
+                          class="flex items-center gap-3 rounded-md bg-accent-soft px-3 py-2.5"
+                          aria-label="Enriching"
+                        >
+                          <span
+                            class="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface text-accent"
+                          >
+                            <span
+                              class="absolute inset-0 animate-ping rounded-full bg-accent-soft opacity-60"
+                            ></span>
+                            <ui-icon name="sparkles" [size]="16" class="relative" />
+                          </span>
+                          <div class="min-w-0">
+                            <p class="text-sm font-medium text-ink">{{ enrichingLabel() }}…</p>
+                            <p class="truncate text-xs text-muted">
+                              Contact, reviews & your reason to reach out.
+                            </p>
+                          </div>
+                        </div>
+                        <div class="mt-2 h-1 w-full overflow-hidden rounded-full bg-accent-soft">
+                          <span class="enrich-bar block h-full rounded-full bg-accent"></span>
+                        </div>
+                      </div>
+                    } @else {
+                      <p class="mt-3 text-sm text-muted">Not enriched yet — select and enrich.</p>
+                    }
+                  }
+                  @case ('in_progress') {
                     <div class="mt-3">
                       <div
                         class="flex items-center gap-3 rounded-md bg-accent-soft px-3 py-2.5"
@@ -163,121 +310,41 @@
                         <span class="enrich-bar block h-full rounded-full bg-accent"></span>
                       </div>
                     </div>
-                  } @else {
-                    <p class="mt-3 text-sm text-muted">Not enriched yet.</p>
+                  }
+                  @case ('failed') {
+                    <p class="mt-3 text-sm text-danger">
+                      Couldn’t finish enriching this lead. Nothing was charged — try again.
+                    </p>
                   }
                 }
-                @case ('in_progress') {
-                  <div class="mt-3">
-                    <div
-                      class="flex items-center gap-3 rounded-md bg-accent-soft px-3 py-2.5"
-                      aria-label="Enriching"
-                    >
-                      <span
-                        class="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface text-accent"
-                      >
-                        <span
-                          class="absolute inset-0 animate-ping rounded-full bg-accent-soft opacity-60"
-                        ></span>
-                        <ui-icon name="sparkles" [size]="16" class="relative" />
-                      </span>
-                      <div class="min-w-0">
-                        <p class="text-sm font-medium text-ink">{{ enrichingLabel() }}…</p>
-                        <p class="truncate text-xs text-muted">
-                          Contact, reviews & your reason to reach out.
-                        </p>
-                      </div>
-                    </div>
-                    <div class="mt-2 h-1 w-full overflow-hidden rounded-full bg-accent-soft">
-                      <span class="enrich-bar block h-full rounded-full bg-accent"></span>
-                    </div>
-                  </div>
-                }
-                @case ('failed') {
-                  <p class="mt-3 text-sm text-danger">
-                    Couldn’t finish enriching this lead. Nothing was charged — try again.
-                  </p>
-                }
-                @case ('complete') {
-                  <!-- Contact -->
-                  <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-                    @if (lead.email) {
-                      <span class="text-ink"
-                        ><span class="text-muted">Email:</span> {{ lead.email }}</span
-                      >
-                    } @else {
-                      <span class="text-muted">No email found — add one by hand or skip.</span>
-                    }
-                    @if (lead.phone) {
-                      <span class="text-ink"
-                        ><span class="text-muted">Phone:</span> {{ lead.phone }}</span
-                      >
-                    }
-                  </div>
-
-                  <!-- Reviews summary -->
-                  @if (hasReviewSummary(lead)) {
-                    <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      @if (positives(lead).length > 0) {
-                        <div>
-                          <p class="text-xs font-medium uppercase tracking-wide text-positive">
-                            Customers like
-                          </p>
-                          <ul class="mt-1 space-y-0.5 text-sm text-ink">
-                            @for (p of positives(lead); track p) {
-                              <li>+ {{ p }}</li>
-                            }
-                          </ul>
-                        </div>
-                      }
-                      @if (negatives(lead).length > 0) {
-                        <div>
-                          <p class="text-xs font-medium uppercase tracking-wide text-warning">
-                            Common complaints
-                          </p>
-                          <ul class="mt-1 space-y-0.5 text-sm text-ink">
-                            @for (n of negatives(lead); track n) {
-                              <li>− {{ n }}</li>
-                            }
-                          </ul>
-                        </div>
-                      }
-                    </div>
-                  }
-
-                  <!-- The hook — highlighted callout that draws the eye -->
-                  @if (lead.hook) {
-                    <div class="mt-3 rounded-md border-l-4 border-accent bg-accent-soft px-3 py-2">
-                      <p class="text-xs font-medium uppercase tracking-wide text-accent">
-                        Why reach out
-                      </p>
-                      <p class="mt-0.5 text-sm text-ink">{{ lead.hook }}</p>
-                    </div>
-                  }
-                }
-              }
-            </div>
-          </label>
+              </div>
+            </label>
+          }
         </li>
       }
     </ul>
 
-    <!-- What's next -->
-    <div
-      class="mt-6 flex flex-col gap-3 rounded-lg bg-accent-soft p-4 sm:flex-row sm:items-center sm:justify-between"
-    >
-      <div class="flex items-start gap-3">
-        <ui-icon name="pen-line" [size]="18" class="mt-0.5 shrink-0 text-accent" />
-        <div>
-          <p class="text-sm font-medium text-ink">Next: write your emails</p>
-          <p class="text-sm text-muted">
-            Generate personalised emails grounded in each lead’s hook.
-          </p>
+    <!-- What's next: only surfaces once at least one lead is enriched. -->
+    @if (enrichedCount() > 0) {
+      <div
+        class="mt-6 flex flex-col gap-3 rounded-lg bg-accent-soft p-4 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="flex items-start gap-3">
+          <ui-icon name="pen-line" [size]="18" class="mt-0.5 shrink-0 text-accent" />
+          <div>
+            <p class="text-sm font-medium text-ink">
+              {{ enrichedCount() }} lead{{ enrichedCount() === 1 ? '' : 's' }} enriched — write your
+              emails
+            </p>
+            <p class="text-sm text-muted">
+              Generate personalised emails grounded in each lead’s hook.
+            </p>
+          </div>
         </div>
+        <a routerLink="/draft" [queryParams]="{ list: selectedListId }" class="shrink-0">
+          <button ui-button variant="primary" iconRight="arrow-right">Write emails</button>
+        </a>
       </div>
-      <a routerLink="/draft" class="shrink-0">
-        <button ui-button variant="primary" iconRight="arrow-right">Write emails</button>
-      </a>
-    </div>
+    }
   }
 </div>

@@ -82,11 +82,23 @@ export class Enrich implements OnDestroy {
   private inFlight = new Set<string>();
   private pollDeadline = 0;
 
-  // Leads still needing enrichment (for "enrich all" + cost preview).
+  // Leads still needing enrichment (for "enrich all" + cost preview + selection).
   protected readonly pendingLeads = computed(() =>
     this.leads().filter((l) => l.enrichment_status !== 'complete'),
   );
+  /** Leads that can still be selected/enriched (not already complete). */
+  protected readonly selectableLeads = this.pendingLeads;
+  protected readonly enrichedLeads = computed(() =>
+    this.leads().filter((l) => l.enrichment_status === 'complete'),
+  );
+  protected readonly enrichedCount = computed(() => this.enrichedLeads().length);
   protected readonly selectedCount = computed(() => this.selected().size);
+  /** True when every still-enrichable lead is selected (drives Select-all toggle). */
+  protected readonly allSelectableSelected = computed(() => {
+    const sel = this.selected();
+    const selectable = this.selectableLeads();
+    return selectable.length > 0 && selectable.every((l) => sel.has(l.id));
+  });
   // True only while a batch we started is still running (disables the buttons).
   protected readonly working = signal(false);
 
@@ -140,6 +152,16 @@ export class Enrich implements OnDestroy {
 
   isSelected(id: string): boolean {
     return this.selected().has(id);
+  }
+
+  /** Select every lead that still needs enriching (or clear when all are selected). */
+  toggleSelectAll(): void {
+    if (this.allSelectableSelected()) this.clearSelection();
+    else this.selected.set(new Set(this.selectableLeads().map((l) => l.id)));
+  }
+
+  clearSelection(): void {
+    this.selected.set(new Set());
   }
 
   /** True only for leads in the batch we're currently running (vs idle 'pending'). */
