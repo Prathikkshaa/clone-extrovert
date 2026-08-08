@@ -190,13 +190,19 @@ export class DraftingService {
       'automatically afterwards.';
     const parsed = await this.llm.extractJson<{ messages?: unknown }>({
       system:
-        'You write short, human, specific B2B cold outreach. You ONLY use facts you are given. ' +
-        'Never invent facts about the recipient, and never invent results, clients, or proof ' +
-        'points the sender did not provide. No filler ("I hope this finds you well"), no hype, ' +
-        `no buzzwords. Plain words a 12-year-old understands. ${signOffRule}`,
+        'You write short, human, high-converting B2B cold outreach emails. Use ONLY facts you ' +
+        'are given — never invent facts about the recipient, results, clients, or proof points ' +
+        'the sender did not provide. No filler ("I hope this finds you well"), no hype, no ' +
+        'buzzwords; plain words a 12-year-old understands.\n' +
+        'SUBJECT LINES: specific and curiosity-piquing but honest — reference the recipient or ' +
+        'the angle, 3–7 words, sentence case, no clickbait, no "Re:", no emojis.\n' +
+        'FORMAT every email body as a real email: start with a short greeting line ("Hi there,"), ' +
+        'then a blank line, then 2–3 SHORT paragraphs (one idea each) separated by blank lines, ' +
+        'ending with a single clear call-to-action phrased as an easy question. Separate ' +
+        `paragraphs with a blank line (\\n\\n). ${signOffRule}`,
       prompt: this.buildPrompt(lead, profile),
       maxTokens: 1100,
-      temperature: 0.5,
+      temperature: 0.6,
     });
 
     const raw = Array.isArray(parsed.messages) ? parsed.messages : [];
@@ -250,15 +256,18 @@ export class DraftingService {
       reviews.positive.length ? `Customers praise: ${reviews.positive.join('; ')}` : '',
       reviews.negative.length ? `Customers complain about: ${reviews.negative.join('; ')}` : '',
       '',
-      'Write a 3-message cold-email sequence to this recipient:',
+      'Write a 3-message cold-email sequence to this recipient. Each body must be a properly',
+      'formatted email: greeting line ("Hi there,"), blank line, short paragraphs separated by',
+      'blank lines, then a one-line question as the call to action.',
       '  step 1 = first email: open with something specific to THEM (use the angle above), then',
-      '           briefly say how the sender can help, then a soft ask. Keep it under ~110 words.',
+      '           briefly say how the sender can help, then a soft ask. ~90–120 words.',
       '  step 2 = a short follow-up a few days later: light, friendly nudge, new small angle. <70 words.',
       '  step 3 = a final brief check-in: very short, easy to say no to. <50 words.',
-      'Each needs its own subject line (short, lowercase-ish, not clickbait, no "Re:").',
+      'Each needs its own catchy-but-honest subject line (3–7 words, sentence case, no clickbait, no "Re:").',
       '',
       'Return JSON exactly: {"messages":[{"step":1,"subject":"...","body":"..."},{"step":2,...},{"step":3,...}]}',
-      'Ground every sentence in the facts above. If a fact is missing, leave it out — do not invent it.',
+      'In each "body", use real line breaks (\\n\\n between paragraphs). Ground every sentence in',
+      'the facts above. If a fact is missing, leave it out — do not invent it.',
     ]
       .filter(Boolean)
       .join('\n');
