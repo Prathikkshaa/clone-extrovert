@@ -58,9 +58,33 @@ export const CREDIT_DEBIT_ACTIONS: readonly CreditAction[] = [
  * needed to go live — paste the keys and it works.
  */
 export const CREDIT_PACKS = [
-  { id: 'starter', label: 'Starter', credits: 100, priceUsdCents: 1000 },
-  { id: 'growth', label: 'Growth', credits: 550, priceUsdCents: 4500 },
-  { id: 'scale', label: 'Scale', credits: 1200, priceUsdCents: 8900 },
+  {
+    id: 'starter',
+    label: 'Starter',
+    credits: 100,
+    priceUsdCents: 1000,
+    audience: 'Trying it out',
+    tagline: 'Test the waters with your first campaign.',
+    popular: false,
+  },
+  {
+    id: 'growth',
+    label: 'Growth',
+    credits: 550,
+    priceUsdCents: 4500,
+    audience: 'Growing your outreach',
+    tagline: 'Run real campaigns every week — the best value.',
+    popular: true,
+  },
+  {
+    id: 'scale',
+    label: 'Scale',
+    credits: 1200,
+    priceUsdCents: 8900,
+    audience: 'High-volume senders',
+    tagline: 'Always-on outreach at the lowest price per credit.',
+    popular: false,
+  },
 ] as const;
 
 export type CreditPack = (typeof CREDIT_PACKS)[number];

@@ -27,6 +27,17 @@ export interface CreditPack {
   label: string;
   credits: number;
   priceUsdCents: number;
+  audience?: string;
+  tagline?: string;
+  popular?: boolean;
+}
+
+export interface BillingReport {
+  generatedAt: string;
+  days: number;
+  balance: number;
+  usage: UsageSummary;
+  entries: LedgerEntry[];
 }
 
 export interface BillingSummary {
@@ -48,6 +59,12 @@ export class BillingApiService {
 
   summary(): Observable<BillingSummary> {
     return this.http.get<BillingSummary>(`${this.base}/billing/summary`);
+  }
+
+  report(days: number): Observable<BillingReport> {
+    return this.http.get<BillingReport>(`${this.base}/billing/report`, {
+      params: { days: String(days) },
+    });
   }
 
   checkout(packId: string): Observable<CheckoutResponse> {

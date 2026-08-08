@@ -42,7 +42,16 @@
   @if (summary(); as s) {
     <!-- Balance + low/zero state -->
     <ui-card class="mt-8">
-      <p class="text-sm text-muted">Current balance</p>
+      <div class="flex items-center gap-1.5">
+        <p class="text-sm text-muted">Current balance</p>
+        <span
+          class="inline-flex cursor-help text-muted"
+          title="Your balance is the running total of every credit — bought, spent, and refunded."
+          aria-label="What is my balance?"
+        >
+          <ui-icon name="info" [size]="14" />
+        </span>
+      </div>
       <p
         class="mt-1 text-4xl font-medium"
         [class.text-ink]="!isZero()"
@@ -66,101 +75,192 @@
             You have {{ s.balance }} credits left. Top up so your campaigns don’t stop mid-flight.
           </p>
         </div>
+      } @else if (freeCredits > 0) {
+        <p class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-positive-soft px-3 py-1 text-xs font-medium text-positive">
+          <ui-icon name="sparkles" [size]="13" /> New accounts start with {{ freeCredits }} free
+          credits — no card needed.
+        </p>
       }
     </ui-card>
 
     <!-- Credit packs -->
-    <section class="mt-6">
-      <h2 class="text-heading-sm text-ink">Buy credits</h2>
-      @if (!s.billingConfigured) {
-        <p class="mt-1 text-sm text-muted">
-          Billing isn’t switched on yet. Once Stripe keys are added, you can buy credits here —
+    <section class="mt-8">
+      <h2 class="text-heading-sm text-ink">Choose your plan</h2>
+      <p class="mt-1 text-sm text-muted">
+        @if (!s.billingConfigured) {
+          Billing isn’t switched on yet. Once Stripe keys are added you can buy credits here —
           securely on Stripe (we never see your card).
-        </p>
-      } @else {
-        <p class="mt-1 text-sm text-muted">
-          Secure checkout on Stripe. We never see your card details.
-        </p>
-      }
-      <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        } @else {
+          Pick the pack that fits how you’re growing. Secure checkout on Stripe — we never see your
+          card.
+        }
+      </p>
+      <div class="mt-5 grid grid-cols-1 items-start gap-4 sm:grid-cols-3">
         @for (pack of s.packs; track pack.id) {
-          <ui-card>
-            <p class="text-sm font-medium text-ink">{{ pack.label }}</p>
-            <p class="mt-2 text-3xl font-medium text-ink">{{ pack.credits }}</p>
-            <p class="text-xs text-muted">credits</p>
-            <p class="mt-3 text-sm text-ink">{{ price(pack) }}</p>
+          <ui-card
+            class="relative transition-shadow duration-200"
+            [class.ring-2]="pack.popular"
+            [class.ring-accent]="pack.popular"
+            [class.border-accent]="pack.popular"
+            [class.shadow-md]="pack.popular"
+            [class.sm:-mt-2]="pack.popular"
+          >
+            @if (pack.popular) {
+              <span
+                class="absolute -top-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-accent px-3 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white shadow-sm"
+              >
+                <ui-icon name="sparkles" [size]="11" /> Most popular
+              </span>
+            }
+            @if (pack.audience) {
+              <p
+                class="text-xs font-medium uppercase tracking-wide"
+                [class.text-accent]="pack.popular"
+                [class.text-muted]="!pack.popular"
+              >
+                {{ pack.audience }}
+              </p>
+            }
+            <p class="mt-1 text-heading-sm text-ink">{{ pack.label }}</p>
+
+            <div class="mt-3 flex items-baseline gap-1">
+              <span class="text-3xl font-semibold text-ink">{{ price(pack) }}</span>
+            </div>
+            <p class="mt-0.5 text-sm text-ink">{{ pack.credits }} credits</p>
             <p class="text-xs text-muted">{{ perCredit(pack) }}</p>
+
+            <div class="mt-3 flex items-center gap-1.5 rounded-md bg-canvas px-2.5 py-1.5">
+              <ui-icon name="users" [size]="14" class="text-accent" />
+              <span class="text-xs text-ink"
+                >≈ {{ approxLeads(pack) }} leads, start to finish</span
+              >
+            </div>
+
+            @if (pack.tagline) {
+              <p class="mt-3 text-xs text-muted">{{ pack.tagline }}</p>
+            }
+
             <button
               ui-button
-              variant="primary"
+              [variant]="pack.popular ? 'primary' : 'secondary'"
               class="mt-4 w-full"
               [loading]="buyingPackId() === pack.id"
               [disabled]="!s.billingConfigured || buyingPackId() !== null"
               (click)="buy(pack)"
             >
-              Buy
+              {{ pack.popular ? 'Choose Growth' : 'Choose ' + pack.label }}
             </button>
           </ui-card>
         }
       </div>
     </section>
 
-    <!-- Segregated usage breakdown -->
+    <!-- Segregated usage breakdown + donut chart -->
     <ui-card class="mt-8" title="Where your credits went">
       <div header>
         <span class="text-xs text-muted">Last {{ s.usage.windowDays }} days</span>
       </div>
-      <dl class="space-y-2 text-sm">
-        @for (action of actions; track action) {
-          <div class="flex items-center justify-between">
-            <dt class="text-muted">
-              {{ reasonLabel(action) }}
-              <span class="text-xs">({{ s.creditCosts[action] }}/use)</span>
-            </dt>
-            <dd class="text-ink">{{ spend(action) }} credits</dd>
-          </div>
-        }
-        <div class="flex items-center justify-between border-t border-line pt-2">
-          <dt class="font-medium text-ink">Total spent</dt>
-          <dd class="font-medium text-ink">{{ s.usage.totalSpent }} credits</dd>
+
+      @if (hasSpend()) {
+        <div class="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:gap-8">
+          <!-- Donut -->
+          <svg viewBox="0 0 120 120" class="h-36 w-36 shrink-0 -rotate-90">
+            <circle cx="60" cy="60" [attr.r]="donutRadius" fill="none" stroke="var(--color-line)" stroke-width="14" />
+            @for (seg of donutSegments(); track seg.action) {
+              <circle
+                cx="60"
+                cy="60"
+                [attr.r]="donutRadius"
+                fill="none"
+                [attr.stroke]="seg.color"
+                stroke-width="14"
+                stroke-linecap="butt"
+                [attr.stroke-dasharray]="seg.dash"
+                [attr.stroke-dashoffset]="seg.offset"
+              />
+            }
+          </svg>
+          <!-- Legend -->
+          <dl class="w-full flex-1 space-y-2 text-sm">
+            @for (seg of donutSegments(); track seg.action) {
+              <div class="flex items-center justify-between gap-3">
+                <dt class="flex items-center gap-2 text-muted">
+                  <span class="h-2.5 w-2.5 shrink-0 rounded-full" [style.background]="seg.color"></span>
+                  {{ reasonLabel(seg.action) }}
+                  <span class="text-xs">({{ s.creditCosts[seg.action] }}/use)</span>
+                </dt>
+                <dd class="tabular-nums text-ink">{{ seg.value }} · {{ seg.pct }}%</dd>
+              </div>
+            }
+            <div class="flex items-center justify-between border-t border-line pt-2">
+              <dt class="font-medium text-ink">Total spent</dt>
+              <dd class="font-medium tabular-nums text-ink">{{ s.usage.totalSpent }} credits</dd>
+            </div>
+            @if (s.usage.refunded > 0) {
+              <div class="flex items-center justify-between">
+                <dt class="text-muted">Refunded (failed actions)</dt>
+                <dd class="tabular-nums text-positive">+{{ s.usage.refunded }}</dd>
+              </div>
+            }
+            @if (s.usage.purchased > 0) {
+              <div class="flex items-center justify-between">
+                <dt class="text-muted">Bought</dt>
+                <dd class="tabular-nums text-positive">+{{ s.usage.purchased }}</dd>
+              </div>
+            }
+          </dl>
         </div>
-        @if (s.usage.refunded > 0) {
-          <div class="flex items-center justify-between">
-            <dt class="text-muted">Refunded (failed actions)</dt>
-            <dd class="text-positive">+{{ s.usage.refunded }} credits</dd>
-          </div>
-        }
-        @if (s.usage.purchased > 0) {
-          <div class="flex items-center justify-between">
-            <dt class="text-muted">Bought</dt>
-            <dd class="text-positive">+{{ s.usage.purchased }} credits</dd>
-          </div>
-        }
-      </dl>
-      @if (s.usage.totalSpent === 0 && s.usage.purchased === 0) {
-        <p class="mt-3 text-sm text-muted">No credit activity in this window yet.</p>
+      } @else {
+        <p class="text-sm text-muted">No credit activity in this window yet.</p>
       }
+
+      <!-- Export report (#15) -->
+      <div class="mt-5 flex flex-wrap items-center gap-2 border-t border-line pt-4">
+        <span class="text-sm text-muted">Export a detailed report</span>
+        <select name="reportDays" [(ngModel)]="reportDays" class="ui-select w-auto">
+          @for (r of reportRanges; track r.value) {
+            <option [ngValue]="r.value">{{ r.label }}</option>
+          }
+        </select>
+        <button
+          ui-button
+          variant="secondary"
+          size="sm"
+          iconLeft="download"
+          [loading]="exportingReport()"
+          (click)="exportReport()"
+        >
+          Export PDF
+        </button>
+      </div>
     </ui-card>
 
-    <!-- Recent ledger -->
+    <!-- Recent ledger (most recent 15) -->
     <ui-card class="mt-6" title="Recent activity">
+      <div header>
+        <span class="text-xs text-muted">Latest {{ s.recent.length }}</span>
+      </div>
       @if (s.recent.length === 0) {
         <p class="text-sm text-muted">Nothing yet.</p>
       } @else {
         <ul class="divide-y divide-line text-sm">
           @for (entry of s.recent; track entry.created_at) {
             <li class="flex items-center justify-between py-2">
-              <span class="text-muted">{{ reasonLabel(entry.reason) }}</span>
-              <span [class.text-positive]="entry.delta > 0" [class.text-ink]="entry.delta <= 0">
+              <span class="text-muted">
+                {{ reasonLabel(entry.reason) }}
+                <span class="ml-1 text-xs">{{ entry.created_at | date: 'MMM d, h:mm a' }}</span>
+              </span>
+              <span
+                class="tabular-nums"
+                [class.text-positive]="entry.delta > 0"
+                [class.text-ink]="entry.delta <= 0"
+              >
                 {{ entry.delta > 0 ? '+' : '' }}{{ entry.delta }}
               </span>
             </li>
           }
         </ul>
       }
-      <p class="mt-4 text-xs text-muted">
-        Balance always equals the sum of every entry — purchases, debits, and refunds.
-      </p>
     </ui-card>
   }
 </div>

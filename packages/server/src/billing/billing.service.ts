@@ -137,6 +137,22 @@ export class BillingService {
    * my credits go?" — spend split by action type, plus purchases/refunds and the net
    * change (= purchased − spent + refunded). Scoped + capped by created_at.
    */
+  /** Full ledger over a day window (newest first), for the exportable report. */
+  async ledgerSince(userId: string, days = 30, cap = 2000): Promise<LedgerEntry[]> {
+    const windowDays = Number.isFinite(days) && days > 0 ? Math.min(365, Math.floor(days)) : 30;
+    const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000).toISOString();
+    const { data, error } = await this.supabase
+      .getAdminClient()
+      .from('credit_ledger')
+      .select('delta, reason, ref_id, created_at')
+      .eq('user_id', userId)
+      .gte('created_at', since)
+      .order('created_at', { ascending: false })
+      .limit(cap);
+    if (error) throw new Error(`Could not read ledger: ${error.message}`);
+    return data ?? [];
+  }
+
   async usageSummary(userId: string, days = 30): Promise<UsageSummary> {
     const windowDays = Number.isFinite(days) && days > 0 ? Math.min(365, Math.floor(days)) : 30;
     const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000).toISOString();

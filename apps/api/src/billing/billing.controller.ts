@@ -4,7 +4,7 @@
 // went), recent ledger entries, and the buyable packs — and start a Stripe-hosted
 // Checkout. Card data never touches us: checkout returns a Stripe URL the browser
 // redirects to. Credits are granted by the webhook, not here.
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   BillingService,
@@ -48,7 +48,7 @@ export class BillingController {
     const [balance, usage, recent] = await Promise.all([
       this.billing.getBalance(user.id),
       this.billing.usageSummary(user.id, 30),
-      this.billing.recentLedger(user.id, 12),
+      this.billing.recentLedger(user.id, 15),
     ]);
     return {
       balance,
@@ -65,6 +65,28 @@ export class BillingController {
   @Get('packs')
   packs(): { packs: readonly CreditPack[]; configured: boolean } {
     return { packs: CREDIT_PACKS, configured: this.stripe.isConfigured() };
+  }
+
+  /** Detailed activity report over the chosen window — the client renders + prints
+   *  it as a PDF. `days` is clamped server-side (1–365) by the underlying methods. */
+  @Get('report')
+  async report(
+    @CurrentUser() user: AuthUser,
+    @Query('days') days?: string,
+  ): Promise<{
+    generatedAt: string;
+    days: number;
+    balance: number;
+    usage: UsageSummary;
+    entries: LedgerEntry[];
+  }> {
+    const n = Number(days) || 30;
+    const [balance, usage, entries] = await Promise.all([
+      this.billing.getBalance(user.id),
+      this.billing.usageSummary(user.id, n),
+      this.billing.ledgerSince(user.id, n),
+    ]);
+    return { generatedAt: new Date().toISOString(), days: usage.windowDays, balance, usage, entries };
   }
 
   /**
