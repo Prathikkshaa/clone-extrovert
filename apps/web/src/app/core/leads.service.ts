@@ -17,8 +17,10 @@ export interface LeadCard {
 }
 
 export interface SearchFilters {
-  noWebsite?: boolean;
+  website?: 'any' | 'has' | 'none';
+  minRating?: number;
   maxRating?: number;
+  minReviews?: number;
   maxReviews?: number;
 }
 

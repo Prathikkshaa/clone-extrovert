@@ -12,8 +12,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 export interface PlacesFilters {
-  noWebsite?: boolean;
+  noWebsite?: boolean; // legacy alias for website === 'none'
+  website?: 'any' | 'has' | 'none';
+  minRating?: number; // keep businesses at/above this rating
   maxRating?: number; // keep businesses at/below this rating (improvement opportunity)
+  minReviews?: number; // keep businesses at/above this review count
   maxReviews?: number; // keep businesses at/below this review count
 }
 
@@ -244,16 +247,25 @@ export class PlacesService {
 
   private applyFilters(results: PlaceResult[], filters?: PlacesFilters): PlaceResult[] {
     if (!filters) return results;
+    const website = filters.website ?? (filters.noWebsite ? 'none' : 'any');
     return results.filter((r) => {
-      if (filters.noWebsite && r.website) return false;
-      if (typeof filters.maxRating === 'number' && r.rating !== null && r.rating > filters.maxRating)
-        return false;
-      if (
-        typeof filters.maxReviews === 'number' &&
-        r.reviewCount !== null &&
-        r.reviewCount > filters.maxReviews
-      )
-        return false;
+      // Website availability.
+      if (website === 'none' && r.website) return false;
+      if (website === 'has' && !r.website) return false;
+      // Rating range (skip businesses with no rating only when a bound is set).
+      if (typeof filters.minRating === 'number') {
+        if (r.rating === null || r.rating < filters.minRating) return false;
+      }
+      if (typeof filters.maxRating === 'number') {
+        if (r.rating !== null && r.rating > filters.maxRating) return false;
+      }
+      // Review-count range.
+      if (typeof filters.minReviews === 'number') {
+        if ((r.reviewCount ?? 0) < filters.minReviews) return false;
+      }
+      if (typeof filters.maxReviews === 'number') {
+        if (r.reviewCount !== null && r.reviewCount > filters.maxReviews) return false;
+      }
       return true;
     });
   }

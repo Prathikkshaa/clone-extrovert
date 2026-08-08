@@ -3,10 +3,12 @@ import {
   ArrayNotEmpty,
   IsArray,
   IsBoolean,
+  IsIn,
   IsInt,
   IsNumber,
   IsOptional,
   IsString,
+  Max,
   MaxLength,
   Min,
   ValidateNested,
@@ -19,8 +21,25 @@ export class FiltersDto {
   noWebsite?: boolean;
 
   @IsOptional()
+  @IsIn(['any', 'has', 'none'])
+  website?: 'any' | 'has' | 'none';
+
+  @IsOptional()
   @IsNumber()
+  @Min(0)
+  @Max(5)
+  minRating?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(5)
   maxRating?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  minReviews?: number;
 
   @IsOptional()
   @IsInt()

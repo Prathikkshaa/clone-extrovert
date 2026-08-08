@@ -11,6 +11,7 @@ import {
   LeadsApiService,
   type LeadCard,
   type LeadList,
+  type SearchFilters,
 } from '../../core/leads.service';
 import { Button } from '../../ui/button/button';
 import { Card } from '../../ui/card/card';
@@ -49,8 +50,58 @@ export class Search {
   // form
   protected industry = '';
   protected location = '';
-  protected noWebsite = false;
-  protected lowRating = false;
+
+  // Filters (segmented controls → SearchFilters). Defaults keep every business.
+  protected websiteFilter: 'any' | 'has' | 'none' = 'any';
+  protected ratingFilter: 'any' | 'top' | 'good' | 'low' = 'any';
+  protected reviewsFilter: 'any' | 'few' | 'mid' | 'many' = 'any';
+
+  protected readonly websiteOptions = [
+    { value: 'any', label: 'Any' },
+    { value: 'has', label: 'Has website' },
+    { value: 'none', label: 'No website' },
+  ] as const;
+  protected readonly ratingOptions = [
+    { value: 'any', label: 'Any' },
+    { value: 'top', label: '4.5★ +' },
+    { value: 'good', label: '4★ +' },
+    { value: 'low', label: 'Under 4★' },
+  ] as const;
+  protected readonly reviewsOptions = [
+    { value: 'any', label: 'Any' },
+    { value: 'few', label: 'Under 25' },
+    { value: 'mid', label: '25–100' },
+    { value: 'many', label: '100 +' },
+  ] as const;
+
+  /** True when any filter is narrowing the results (drives the "clear" affordance). */
+  protected hasActiveFilters(): boolean {
+    return (
+      this.websiteFilter !== 'any' ||
+      this.ratingFilter !== 'any' ||
+      this.reviewsFilter !== 'any'
+    );
+  }
+
+  private buildFilters(): SearchFilters {
+    const f: SearchFilters = {};
+    if (this.websiteFilter !== 'any') f.website = this.websiteFilter;
+    if (this.ratingFilter === 'top') f.minRating = 4.5;
+    else if (this.ratingFilter === 'good') f.minRating = 4;
+    else if (this.ratingFilter === 'low') f.maxRating = 3.9;
+    if (this.reviewsFilter === 'few') f.maxReviews = 24;
+    else if (this.reviewsFilter === 'mid') {
+      f.minReviews = 25;
+      f.maxReviews = 100;
+    } else if (this.reviewsFilter === 'many') f.minReviews = 100;
+    return f;
+  }
+
+  clearFilters(): void {
+    this.websiteFilter = 'any';
+    this.ratingFilter = 'any';
+    this.reviewsFilter = 'any';
+  }
 
   // state
   protected readonly loading = signal(false);
@@ -161,10 +212,7 @@ export class Search {
       .search({
         industry: this.industry,
         location: this.location,
-        filters: {
-          noWebsite: this.noWebsite || undefined,
-          maxRating: this.lowRating ? 4.0 : undefined,
-        },
+        filters: this.buildFilters(),
         pageToken: pageToken ?? undefined,
       })
       .subscribe({
