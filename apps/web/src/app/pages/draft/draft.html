@@ -4,20 +4,13 @@
     subtitle="Personalised for each lead — in your voice, using their hook. Review fast, edit, approve."
     [breadcrumb]="[{ label: 'Home', link: '/home' }, { label: 'Write' }]"
   >
-    @if (current()) {
+    @if (allApproved()) {
+      <button ui-button actions variant="primary" iconRight="arrow-right" (click)="startSending()">
+        Start sending
+      </button>
+    } @else if (current()) {
       <button ui-button actions variant="primary" iconRight="arrow-right" (click)="approveCurrent()">
         Approve &amp; next
-      </button>
-    } @else if (todo().length > 0) {
-      <button
-        ui-button
-        actions
-        variant="primary"
-        iconLeft="pen-line"
-        [loading]="busyGenerating()"
-        (click)="generateAll()"
-      >
-        Write drafts ({{ todo().length }})
       </button>
     }
   </ui-page-header>
@@ -41,12 +34,67 @@
       </select>
     </ui-field>
 
-    @if (selectedListId && todo().length > 0 && !busyGenerating()) {
-      <div class="mt-4 flex flex-wrap items-center gap-3 border-t border-line pt-4">
-        <span class="text-sm text-muted">Each lead uses {{ costPer }} credit.</span>
-      </div>
-    }
   </ui-card>
+
+  <!-- Choose which enriched leads to write for (#6) -->
+  @if (!loading() && !busyGenerating() && selectedListId && todo().length > 0) {
+    <ui-card class="mt-6" title="Choose leads to write for">
+      <div header>
+        <span class="text-xs text-muted">{{ costPer }} credit each</span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 border-b border-line pb-3">
+        <button
+          type="button"
+          class="rounded-md border border-line px-2.5 py-1 text-xs font-medium text-muted transition-colors duration-200 hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          (click)="toggleSelectAllTodo()"
+        >
+          {{ allTodoSelected() ? 'Clear all' : 'Select all' }}
+        </button>
+        <span class="text-sm text-muted">{{ selectedTodoCount() }} selected</span>
+        <span class="flex-1"></span>
+        <button
+          ui-button
+          variant="primary"
+          size="sm"
+          iconLeft="pen-line"
+          [disabled]="selectedTodoCount() === 0"
+          (click)="generateSelected()"
+        >
+          Write emails ({{ selectedTodoCount() }})
+        </button>
+      </div>
+
+      <ul class="mt-2 divide-y divide-line">
+        @for (lead of todo(); track lead.leadId) {
+          <li>
+            <label class="flex cursor-pointer items-start gap-3 py-3 transition-colors duration-200">
+              <input
+                type="checkbox"
+                [checked]="isTodoSelected(lead.leadId)"
+                (change)="toggleTodo(lead.leadId)"
+                class="mt-0.5 h-5 w-5 shrink-0 accent-accent"
+                [attr.aria-label]="'Select ' + lead.name"
+              />
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-medium text-ink">{{ lead.name }}</p>
+                @if (lead.email) {
+                  <p class="mt-0.5 flex items-center gap-1 truncate text-xs text-muted">
+                    <ui-icon name="mail" [size]="12" /> {{ lead.email }}
+                  </p>
+                }
+                @if (lead.hook) {
+                  <p class="mt-1 line-clamp-2 text-xs text-ink">
+                    <span class="font-medium text-accent">Why: </span>{{ lead.hook }}
+                  </p>
+                }
+              </div>
+            </label>
+          </li>
+        }
+      </ul>
+    </ui-card>
+  }
 
   <!-- Live progress while drafts are written (innovative, not a bare skeleton) -->
   @if (busyGenerating()) {
@@ -146,7 +194,34 @@
   }
 
   <!-- Review queue -->
-  @if (current(); as lead) {
+  @if (allApproved()) {
+    <!-- Everything approved → the only next step is sending (#8). -->
+    <ui-card class="mt-6">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <span
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-positive-soft text-positive"
+        >
+          <ui-icon name="circle-check" [size]="22" />
+        </span>
+        <div class="flex-1">
+          <p class="text-heading-sm text-ink">All drafts approved 🎉</p>
+          <p class="text-sm text-muted">
+            {{ review().length }} email set{{ review().length === 1 ? '' : 's' }} ready — send them
+            on a safe, throttled schedule.
+          </p>
+        </div>
+        <button
+          ui-button
+          variant="primary"
+          iconRight="arrow-right"
+          class="shrink-0"
+          (click)="startSending()"
+        >
+          Start sending
+        </button>
+      </div>
+    </ui-card>
+  } @else if (current(); as lead) {
     <ui-card class="mt-6">
       <div class="flex items-center justify-between text-sm text-muted">
         <span>Lead {{ index() + 1 }} of {{ review().length }}</span>
@@ -230,39 +305,6 @@
         <span class="text-ink">↓</span> skip · <span class="text-ink">↑</span> back ·
         <span class="text-ink">R</span> regenerate · <span class="text-ink">1/2/3</span> switch step
       </p>
-    </ui-card>
-
-    <!-- What's next -->
-    <div
-      class="mt-6 flex flex-col gap-3 rounded-lg bg-accent-soft p-4 sm:flex-row sm:items-center sm:justify-between"
-    >
-      <div class="flex items-start gap-3">
-        <ui-icon name="send" [size]="18" class="mt-0.5 shrink-0 text-accent" />
-        <div>
-          <p class="text-sm font-medium text-ink">Next: start sending</p>
-          <p class="text-sm text-muted">Send your approved emails on a safe, throttled schedule.</p>
-        </div>
-      </div>
-      <a routerLink="/send" class="shrink-0">
-        <button ui-button variant="primary" iconRight="arrow-right">Start sending</button>
-      </a>
-    </div>
-  } @else if (!loading() && review().length > 0) {
-    <ui-card class="mt-6">
-      <div class="flex items-center gap-3">
-        <span
-          class="flex h-9 w-9 items-center justify-center rounded-lg bg-positive-soft text-positive"
-        >
-          <ui-icon name="circle-check" [size]="20" />
-        </span>
-        <div>
-          <p class="text-heading-sm text-ink">All drafts reviewed</p>
-          <p class="text-sm text-muted">Approved drafts are ready to send.</p>
-        </div>
-        <a routerLink="/send" class="ml-auto">
-          <button ui-button variant="primary" iconRight="arrow-right">Start sending</button>
-        </a>
-      </div>
     </ui-card>
   }
 

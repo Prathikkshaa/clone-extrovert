@@ -7,7 +7,7 @@
 // busyGenerating signal pattern (see PROGRESS) are unchanged.
 import { Component, HostListener, OnDestroy, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CREDIT_COSTS } from '@extrovertai/shared';
 import { LeadsApiService, type LeadList } from '../../core/leads.service';
 import { EnrichmentApiService } from '../../core/enrichment.service';
@@ -40,6 +40,7 @@ interface TodoLead {
   leadId: string;
   name: string | null;
   hook: string | null;
+  email?: string | null;
 }
 
 const POLL_MS = 3000;
@@ -84,6 +85,8 @@ export class Draft implements OnDestroy {
   private readonly leadsApi = inject(LeadsApiService);
   private readonly enrichApi = inject(EnrichmentApiService);
   private readonly api = inject(DraftingApiService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
 
   protected readonly costPer = CREDIT_COSTS.draft;
@@ -93,9 +96,18 @@ export class Draft implements OnDestroy {
   protected selectedListId = '';
   protected readonly loading = signal(false);
 
-  protected readonly todo = signal<TodoLead[]>([]); // leads with no drafts yet
+  protected readonly todo = signal<TodoLead[]>([]); // enriched leads with no drafts yet
   protected readonly review = signal<ReviewLead[]>([]); // leads with drafts (the queue)
   protected readonly failed = signal<TodoLead[]>([]); // generation timed out / failed
+
+  // Which to-write leads the user picked (choose who to draft for).
+  protected readonly selectedTodo = signal<Set<string>>(new Set());
+  protected readonly selectedTodoCount = computed(() => this.selectedTodo().size);
+  protected readonly allTodoSelected = computed(() => {
+    const sel = this.selectedTodo();
+    const t = this.todo();
+    return t.length > 0 && t.every((l) => sel.has(l.leadId));
+  });
 
   protected readonly index = signal(0);
   protected readonly step = signal(1);
@@ -122,12 +134,46 @@ export class Draft implements OnDestroy {
   // dependency on Map.size and would stay stuck at its first value.
   protected readonly busyGenerating = signal(false);
   protected readonly remaining = computed(() => this.review().filter((l) => !l.approved).length);
+  /** Everything in the review queue is approved → prompt to start sending (#8). */
+  protected readonly allApproved = computed(
+    () => this.review().length > 0 && this.remaining() === 0,
+  );
 
   constructor() {
     this.leadsApi.getLists().subscribe({
       next: (l) => this.lists.set(l),
       error: () => this.toast.error('Could not load your lists.'),
     });
+    // Carried over from Enrich's "Write emails" CTA: open that list.
+    const listId = this.route.snapshot.queryParamMap.get('list');
+    if (listId) {
+      this.selectedListId = listId;
+      this.loadList();
+    }
+  }
+
+  // --- to-write lead selection ---
+  toggleTodo(id: string): void {
+    const next = new Set(this.selectedTodo());
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    this.selectedTodo.set(next);
+  }
+  isTodoSelected(id: string): boolean {
+    return this.selectedTodo().has(id);
+  }
+  toggleSelectAllTodo(): void {
+    if (this.allTodoSelected()) this.selectedTodo.set(new Set());
+    else this.selectedTodo.set(new Set(this.todo().map((l) => l.leadId)));
+  }
+  /** Write drafts for just the selected leads. */
+  generateSelected(): void {
+    const ids = [...this.selectedTodo()].filter((id) => this.todo().some((l) => l.leadId === id));
+    if (ids.length === 0) {
+      this.toast.warn('Select at least one lead to write for.');
+      return;
+    }
+    this.enqueue(ids);
   }
 
   ngOnDestroy(): void {
@@ -138,14 +184,19 @@ export class Draft implements OnDestroy {
     this.todo.set([]);
     this.review.set([]);
     this.failed.set([]);
+    this.selectedTodo.set(new Set());
     this.index.set(0);
     this.step.set(1);
     if (!this.selectedListId) return;
     this.loading.set(true);
     this.enrichApi.listLeads(this.selectedListId).subscribe({
       next: (leads) => {
-        const ids = leads.map((l) => l.id);
-        const meta = new Map(leads.map((l) => [l.id, { name: l.name, hook: l.hook }]));
+        // Only enriched leads can be drafted well (they carry the hook/context).
+        const enriched = leads.filter((l) => l.enrichment_status === 'complete');
+        const ids = enriched.map((l) => l.id);
+        const meta = new Map(
+          enriched.map((l) => [l.id, { name: l.name, hook: l.hook, email: l.email }]),
+        );
         if (ids.length === 0) {
           this.loading.set(false);
           return;
@@ -175,6 +226,10 @@ export class Draft implements OnDestroy {
       return;
     }
     this.enqueue(ids);
+  }
+
+  startSending(): void {
+    void this.router.navigate(['/send'], { queryParams: { list: this.selectedListId } });
   }
 
   // --- review queue navigation ---
@@ -309,7 +364,14 @@ export class Draft implements OnDestroy {
         }
         const now = Date.now();
         ids.forEach((id) => this.generating.set(id, now));
-        this.todo.set([]);
+        // Remove only the leads we actually enqueued (others stay selectable).
+        const idSet = new Set(ids);
+        this.todo.update((t) => t.filter((l) => !idSet.has(l.leadId)));
+        this.selectedTodo.update((s) => {
+          const n = new Set(s);
+          ids.forEach((id) => n.delete(id));
+          return n;
+        });
         if (res.reason === 'partial_credits') {
           this.toast.warn(
             `Writing ${res.enqueued} draft set${res.enqueued === 1 ? '' : 's'}; ${res.skipped} skipped — out of credits. Top up to finish.`,
@@ -325,7 +387,10 @@ export class Draft implements OnDestroy {
     });
   }
 
-  private ingest(rows: LeadDrafts[], meta: Map<string, { name: string | null; hook: string | null }>): void {
+  private ingest(
+    rows: LeadDrafts[],
+    meta: Map<string, { name: string | null; hook: string | null; email: string | null }>,
+  ): void {
     const review: ReviewLead[] = [];
     const todo: TodoLead[] = [];
     for (const r of rows) {
@@ -340,7 +405,7 @@ export class Draft implements OnDestroy {
           approved: r.drafts.every((d) => d.approved),
         });
       } else if (!this.generating.has(r.leadId)) {
-        todo.push({ leadId: r.leadId, name, hook });
+        todo.push({ leadId: r.leadId, name, hook, email: meta.get(r.leadId)?.email ?? null });
       }
     }
     this.review.set(review);
