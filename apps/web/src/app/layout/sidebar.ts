@@ -43,8 +43,10 @@ interface NavItem {
           [class]="linkClass(rlaHome.isActive)"
           (click)="navigate.emit()"
         >
-          <ui-icon name="home" [size]="18" />
-          <span class="flex-1">Home</span>
+          <ui-icon name="home" [size]="18" class="shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 group-hover:-rotate-6 group-active:scale-90" />
+          <span class="flex-1 transition-transform duration-200 group-hover:translate-x-0.5"
+            >Home</span
+          >
         </a>
       </div>
 
@@ -60,8 +62,10 @@ interface NavItem {
             [class]="linkClass(rla.isActive)"
             (click)="navigate.emit()"
           >
-            <ui-icon [name]="item.icon" [size]="18" />
-            <span class="flex-1">{{ item.label }}</span>
+            <ui-icon [name]="item.icon" [size]="18" class="shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 group-hover:-rotate-6 group-active:scale-90" />
+            <span class="flex-1 transition-transform duration-200 group-hover:translate-x-0.5">{{
+              item.label
+            }}</span>
           </a>
         }
       </div>
@@ -78,8 +82,10 @@ interface NavItem {
             [class]="linkClass(rla.isActive)"
             (click)="navigate.emit()"
           >
-            <ui-icon [name]="item.icon" [size]="18" />
-            <span class="flex-1">{{ item.label }}</span>
+            <ui-icon [name]="item.icon" [size]="18" class="shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 group-hover:-rotate-6 group-active:scale-90" />
+            <span class="flex-1 transition-transform duration-200 group-hover:translate-x-0.5">{{
+              item.label
+            }}</span>
             @if (item.badge && inboxUnread() > 0) {
               <span
                 class="inline-flex min-w-5 items-center justify-center rounded-full bg-accent px-1.5 py-0.5 text-xs font-medium text-white"
@@ -91,23 +97,16 @@ interface NavItem {
       </div>
     </nav>
 
-    <!-- Brand: the user's fetched logo + name (fills the space above the
-         pinned section and personalises the app — master-context §7). -->
-    @if (brand.hasBrand()) {
+    <!-- Brand: the user's fetched logo ONLY. No logo → show nothing here (no
+         monogram, no text) so the sidebar stays clean. -->
+    @if (brand.logoUrl(); as logo) {
       <a
         routerLink="/settings"
         class="block px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         [title]="brand.name() ?? 'Your brand'"
         (click)="navigate.emit()"
       >
-        @if (brand.logoUrl(); as logo) {
-          <img [src]="logo" [alt]="brand.name() ?? ''" class="h-16 w-full object-contain" />
-        } @else {
-          <span
-            class="flex h-12 w-12 items-center justify-center rounded bg-accent-soft text-lg font-medium uppercase text-accent"
-            >{{ brandInitial() }}</span
-          >
-        }
+        <img [src]="logo" [alt]="brand.name() ?? ''" class="h-16 w-full object-contain" />
       </a>
     }
 
@@ -120,8 +119,10 @@ interface NavItem {
           [class]="linkClass(rla.isActive)"
           (click)="navigate.emit()"
         >
-          <ui-icon [name]="item.icon" [size]="18" />
-          <span class="flex-1">{{ item.label }}</span>
+          <ui-icon [name]="item.icon" [size]="18" class="shrink-0 transition-transform duration-200 ease-out group-hover:scale-110 group-hover:-rotate-6 group-active:scale-90" />
+          <span class="flex-1 transition-transform duration-200 group-hover:translate-x-0.5">{{
+            item.label
+          }}</span>
         </a>
       }
     </div>
@@ -137,11 +138,6 @@ export class Sidebar {
   private readonly badges = inject(NavBadgeService);
   protected readonly inboxUnread = this.badges.inboxUnread;
   protected readonly brand = inject(BrandService);
-
-  /** First letter for the monogram fallback when there's a name but no logo. */
-  protected brandInitial(): string {
-    return (this.brand.name() ?? '?').charAt(0);
-  }
 
   protected readonly workflow: NavItem[] = [
     { label: 'Find leads', link: '/search', icon: 'search' },
@@ -159,7 +155,7 @@ export class Sidebar {
   ];
 
   private static readonly LINK_BASE =
-    'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ' +
+    'group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ' +
     'transition-colors duration-200 focus:outline-none focus-visible:ring-2 ' +
     'focus-visible:ring-accent';
 
