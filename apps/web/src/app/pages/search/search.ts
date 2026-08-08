@@ -114,6 +114,52 @@ export class Search {
   private readonly nextPageToken = signal<string | null>(null);
   protected readonly canLoadMore = computed(() => !!this.nextPageToken());
 
+  // Client-side refine of the returned results (does not re-hit the API).
+  protected readonly resWebsite = signal<'any' | 'has' | 'none'>('any');
+  protected readonly resRating = signal<'any' | 'high' | 'low'>('any');
+  protected readonly resWebsiteOpts = [
+    { v: 'any', l: 'Any' },
+    { v: 'has', l: 'Site' },
+    { v: 'none', l: 'No site' },
+  ] as const;
+  protected readonly resRatingOpts = [
+    { v: 'any', l: 'Any ★' },
+    { v: 'high', l: '4★+' },
+    { v: 'low', l: '<4★' },
+  ] as const;
+  protected readonly resHasPhone = signal(false);
+  protected readonly resQuery = signal('');
+  protected readonly resultsFiltered = computed(() => {
+    const web = this.resWebsite();
+    const rating = this.resRating();
+    const phone = this.resHasPhone();
+    const q = this.resQuery().trim().toLowerCase();
+    return this.results().filter((l) => {
+      if (web === 'has' && !l.website) return false;
+      if (web === 'none' && l.website) return false;
+      if (rating === 'high' && (l.rating ?? 0) < 4) return false;
+      if (rating === 'low' && (l.rating === null || l.rating >= 4)) return false;
+      if (phone && !l.phone) return false;
+      if (q && !(l.name ?? '').toLowerCase().includes(q) && !(l.address ?? '').toLowerCase().includes(q))
+        return false;
+      return true;
+    });
+  });
+  protected hasResultFilters(): boolean {
+    return (
+      this.resWebsite() !== 'any' ||
+      this.resRating() !== 'any' ||
+      this.resHasPhone() ||
+      this.resQuery().trim().length > 0
+    );
+  }
+  clearResultFilters(): void {
+    this.resWebsite.set('any');
+    this.resRating.set('any');
+    this.resHasPhone.set(false);
+    this.resQuery.set('');
+  }
+
   // save-to-list
   protected readonly lists = signal<LeadList[]>([]);
   protected targetListId = ''; // '' = new list
@@ -260,7 +306,8 @@ export class Search {
   }
 
   selectAll(): void {
-    this.selected.set(new Set(this.results().map((l) => l.id)));
+    // Select the currently VISIBLE (filtered) results.
+    this.selected.set(new Set(this.resultsFiltered().map((l) => l.id)));
   }
 
   clearSelection(): void {

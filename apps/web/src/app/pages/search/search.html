@@ -160,23 +160,103 @@
         />
       </div>
     } @else {
+      <!-- Refine the returned list (client-side; no extra credit) -->
+      <div class="mt-6 rounded-lg border border-line bg-surface p-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="relative min-w-40 flex-1">
+            <ui-icon
+              name="search"
+              [size]="14"
+              class="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted"
+            />
+            <input
+              type="text"
+              [ngModel]="resQuery()"
+              (ngModelChange)="resQuery.set($event)"
+              name="resQuery"
+              placeholder="Filter by name or address…"
+              class="ui-input py-1.5 pl-8 text-sm"
+            />
+          </div>
+          <div class="flex items-center gap-1 rounded-md border border-line p-0.5">
+            @for (o of resWebsiteOpts; track o.v) {
+              <button
+                type="button"
+                (click)="resWebsite.set(o.v)"
+                class="rounded px-2 py-1 text-xs font-medium transition-colors duration-200"
+                [class.bg-accent-soft]="resWebsite() === o.v"
+                [class.text-accent]="resWebsite() === o.v"
+                [class.text-muted]="resWebsite() !== o.v"
+              >
+                {{ o.l }}
+              </button>
+            }
+          </div>
+          <div class="flex items-center gap-1 rounded-md border border-line p-0.5">
+            @for (o of resRatingOpts; track o.v) {
+              <button
+                type="button"
+                (click)="resRating.set(o.v)"
+                class="rounded px-2 py-1 text-xs font-medium transition-colors duration-200"
+                [class.bg-accent-soft]="resRating() === o.v"
+                [class.text-accent]="resRating() === o.v"
+                [class.text-muted]="resRating() !== o.v"
+              >
+                {{ o.l }}
+              </button>
+            }
+          </div>
+          <label class="flex cursor-pointer items-center gap-1.5 text-xs text-muted">
+            <input
+              type="checkbox"
+              [ngModel]="resHasPhone()"
+              (ngModelChange)="resHasPhone.set($event)"
+              name="resHasPhone"
+              class="h-4 w-4 accent-accent"
+            />
+            Has phone
+          </label>
+          @if (hasResultFilters()) {
+            <button
+              type="button"
+              class="text-xs font-medium text-muted transition-colors duration-200 hover:text-ink"
+              (click)="clearResultFilters()"
+            >
+              Clear
+            </button>
+          }
+        </div>
+      </div>
+
       <!-- Select-all row -->
-      <div class="mt-6 flex items-center justify-between">
-        <p class="text-sm text-muted">{{ results().length }} businesses</p>
+      <div class="mt-4 flex items-center justify-between">
+        <p class="text-sm text-muted">
+          {{ resultsFiltered().length }}
+          @if (resultsFiltered().length !== results().length) {
+            of {{ results().length }}
+          }
+          businesses
+        </p>
         <button
           type="button"
           class="text-sm font-medium text-accent transition-colors duration-200 hover:text-accent-strong"
-          (click)="selectedCount() === results().length ? clearSelection() : selectAll()"
+          (click)="selectedCount() === resultsFiltered().length ? clearSelection() : selectAll()"
         >
-          {{ selectedCount() === results().length ? 'Clear all' : 'Select all' }}
+          {{ selectedCount() === resultsFiltered().length ? 'Clear all' : 'Select all' }}
         </button>
       </div>
       @if (cached()) {
         <p class="mt-1 text-xs text-muted">Cached results — no credit used.</p>
       }
 
+      @if (resultsFiltered().length === 0) {
+        <p class="mt-4 rounded-lg border border-line bg-surface p-4 text-sm text-muted">
+          No results match these filters. <button type="button" class="font-medium text-accent" (click)="clearResultFilters()">Clear filters</button>
+        </p>
+      }
+
       <ul class="mt-3 space-y-2">
-        @for (lead of results(); track lead.id) {
+        @for (lead of resultsFiltered(); track lead.id) {
           <li>
             <label
               class="flex cursor-pointer items-start gap-3 rounded-lg border bg-surface p-4 transition-colors duration-200"
