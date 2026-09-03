@@ -190,8 +190,13 @@ export class MailboxesService {
     }
   }
 
-  /** Base URL of the web app, used to redirect back after the OAuth callback. */
+  /** Base URL of the web app, used to redirect back after the OAuth callback.
+   *  Honors PUBLIC_WEB_URL when set (production/tunnel), falls back to
+   *  http://localhost:${WEB_PORT} for local dev. Without this, a deployed API
+   *  would redirect users to http://localhost:4200 after connecting Gmail. */
   webBaseUrl(): string {
+    const publicUrl = this.config.get<string>('PUBLIC_WEB_URL')?.trim();
+    if (publicUrl) return publicUrl.replace(/\/$/, '');
     const port = this.config.get<string>('WEB_PORT') ?? '4200';
     return `http://localhost:${port}`;
   }
