@@ -8,14 +8,15 @@
 import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
 import { SIGNUP_URL, CTA_MICROCOPY } from '@/lib/site';
-import { CREDIT_PACKS, CREDIT_COSTS } from '@extrovertai/shared';
+import { CREDIT_PACKS, CREDIT_COSTS, CREDIT_USD_CENTS } from '@extrovertai/shared';
 
 const usd = (cents: number) => `$${(cents / 100).toLocaleString('en-US')}`;
 
-// Marketing list value of one credit (~$0.20). This is the display anchor for the
-// site; the product's internal billing anchor lives in @extrovertai/shared and is
-// not touched here. Packs (real prices from shared) come in below this list value.
-const CREDIT_LIST_USD = '$0.20';
+// Per-credit anchor shown to prospects, derived from the product's actual
+// per-credit floor in @extrovertai/shared so the number can never drift from
+// truth (previously a hardcoded $0.20 — 2× the real Starter rate). Packs
+// below match or beat this rate depending on volume.
+const CREDIT_LIST_USD = `$${(CREDIT_USD_CENTS / 100).toFixed(2)}`;
 
 // Best-value pack = lowest price per credit (a computed fact, honest highlight).
 const bestPackId = [...CREDIT_PACKS].sort(
