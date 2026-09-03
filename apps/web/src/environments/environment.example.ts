@@ -8,4 +8,5 @@ export const environment = {
   supabaseUrl: '',
   supabaseAnonKey: '',
   apiUrl: 'http://localhost:3000',
+  devAuthBypass: false,
 };

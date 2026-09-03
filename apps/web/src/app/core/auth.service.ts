@@ -91,10 +91,24 @@ export class AuthService {
     return { error };
   }
 
-  signIn(email: string, password: string): Promise<{ error: AuthError | null }> {
-    return this.supabase.auth
-      .signInWithPassword({ email, password })
-      .then(({ error }) => ({ error }));
+  async signIn(email: string, password: string): Promise<{ error: AuthError | null }> {
+    const { error } = await this.supabase.auth.signInWithPassword({ email, password });
+    if (!error) return { error: null };
+    // DEV-ONLY: with DEV_AUTH_BYPASS=true, if the email is unknown we silently
+    // create the account and retry sign-in — so demos can use any credentials
+    // without a real signup flow. Requires "Confirm email" OFF in Supabase.
+    if (environment.devAuthBypass && this.looksLikeInvalidCreds(error)) {
+      const { error: signUpErr } = await this.supabase.auth.signUp({ email, password });
+      if (signUpErr) return { error: signUpErr };
+      const { error: retryErr } = await this.supabase.auth.signInWithPassword({ email, password });
+      return { error: retryErr };
+    }
+    return { error };
+  }
+
+  private looksLikeInvalidCreds(error: AuthError): boolean {
+    const msg = error.message.toLowerCase();
+    return msg.includes('invalid login') || msg.includes('invalid credentials');
   }
 
   async signOut(): Promise<void> {
