@@ -38,7 +38,6 @@ export const environment = {
   supabaseUrl: ${JSON.stringify(env.SUPABASE_URL || '')},
   supabaseAnonKey: ${JSON.stringify(env.SUPABASE_ANON_KEY || '')},
   apiUrl: ${JSON.stringify(`http://localhost:${apiPort}`)},
-  devAuthBypass: ${String(env.DEV_AUTH_BYPASS).toLowerCase() === 'true'},
 };
 `;
 
