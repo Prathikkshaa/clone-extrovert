@@ -9,7 +9,17 @@ import { Reveal } from '@/components/reveal';
 import { FAQ_ITEMS } from '@/lib/faq';
 
 export function Faq({ withHeading = true }: { withHeading?: boolean }) {
-  const [open, setOpen] = useState<number | null>(0);
+  // The questions people worry about most (deliverability, lead source + legality,
+  // and "do I need to be technical?") open by default so the answers - and the named
+  // data source - are visible without a click. The rest stay collapsed.
+  const [open, setOpen] = useState<Set<number>>(() => new Set([0, 1, 2]));
+  const toggle = (i: number) =>
+    setOpen((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
 
   return (
     <section className="shell py-section-y">
@@ -29,7 +39,7 @@ export function Faq({ withHeading = true }: { withHeading?: boolean }) {
         <Reveal delay={0.05}>
           <ul className="divide-y divide-line border-y border-line">
             {FAQ_ITEMS.map((item, i) => {
-              const isOpen = open === i;
+              const isOpen = open.has(i);
               const btnId = `faq-q-${i}`;
               const panelId = `faq-a-${i}`;
               return (
@@ -40,7 +50,7 @@ export function Faq({ withHeading = true }: { withHeading?: boolean }) {
                       id={btnId}
                       aria-expanded={isOpen}
                       aria-controls={panelId}
-                      onClick={() => setOpen(isOpen ? null : i)}
+                      onClick={() => toggle(i)}
                       className="flex w-full items-center justify-between gap-4 py-5 text-left"
                     >
                       <span className="text-heading-sm text-ink">{item.q}</span>

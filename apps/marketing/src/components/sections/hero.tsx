@@ -39,6 +39,9 @@ export function Hero() {
             </CtaButton>
           </div>
           <p className="mt-3 text-body-sm text-muted">{CTA_MICROCOPY}</p>
+          <p className="mt-2 text-body-sm text-muted">
+            Connect your inbox once - no code, nothing to install. Works in any country and city.
+          </p>
         </Reveal>
       </div>
 
