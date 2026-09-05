@@ -66,22 +66,45 @@ homepage + blog contain no "Google Maps" / source disclosure.
 
 ---
 
-## 🔄 In progress (read-only audit subagents running)
+## ✅ Completed — SEO / AEO / GEO batch — `645ecb2`
+From two read-only audit subagents (technical SEO; AEO/GEO + blog strategy).
 
-- **Technical SEO audit** — per-page metadata/canonical/OG, `BlogPosting` schema on
-  posts, sitemap `dateModified`, `next.config` (multi-lockfile `outputFileTracingRoot`),
-  H1/heading structure, internal linking, breadcrumbs.
-- **AEO/GEO + blog-strategy audit** — `llms.txt` (to add), AI-crawler robots coverage,
-  answer-extractability, GEO citability/entity definition, schema gaps, and an
-  8–12 post source-safe blog program in topic clusters.
+- **P1 canonicals** — `/pricing`, `/how-it-works`, `/about`, `/blog` were inheriting
+  `canonical: '/'` (self-canonicalizing to the homepage → deindex risk). Added
+  self-referential canonicals to each.
+- **P1 `/llms.txt`** — new build-time static route (`src/app/llms.txt/route.ts`)
+  with a curated, **source-safe** entity summary for answer engines; reads from
+  single sources (`APP_NAME`, `SITE_URL`, `SITE_DESCRIPTION`, `FREE_SIGNUP_CREDITS`).
+- **P2 `next.config.mjs`** — `outputFileTracingRoot` (silences multi-lockfile
+  warning / wrong-root tracing) + security headers (HSTS, nosniff, Referrer-Policy,
+  X-Frame-Options, Permissions-Policy).
+- **P2 sitemap** — dropped noindex `/privacy` and `/terms`.
+- **P2 blog schema** — `BlogPosting` now has `image` + real `dateModified` (new
+  optional field; existing post marked modified 2026-09-05); OG `modifiedTime`;
+  added **BreadcrumbList** JSON-LD (Home › Blog › Post).
+- **P2 `WebSite` JSON-LD** site-wide (no SearchAction — no search endpoint yet).
+- **P2 internal linking** — in-content links from posts to `/how-it-works` + `/pricing`.
 
-## ⏳ Planned (pending the reports above, then implement on go-ahead)
+**Verification:** `next build` clean (15 routes, `/llms.txt` static, lockfile
+warning gone), `tsc` + `next lint` clean; headers, canonical, llms.txt and
+BlogPosting/BreadcrumbList/WebSite schema confirmed live via curl.
 
-- Add `llms.txt`; confirm `robots.txt` (already allow-lists AI crawlers) references it.
-- Per-page SEO metadata gaps (title/description/canonical/OG per route).
-- `BlogPosting`/`Article` + `BreadcrumbList` JSON-LD on blog posts.
-- Sitemap `dateModified` per post; `next.config` root fix.
-- Blog content program for SEO/AEO/GEO.
+## ⏳ Planned — needs owner input or is a content program (not yet done)
+
+- **Real founder/author name** — `FOUNDER_NAME = 'the founder'` flows into
+  BlogPosting `author` + Organization `founder` (weak E-E-A-T). Needs a real name.
+- **Organization `sameAs`** — add real social profile URLs (X, LinkedIn) for entity
+  trust. Needs the URLs.
+- **Deploy env** — set `NEXT_PUBLIC_SITE_URL` + `NEXT_PUBLIC_APP_URL` in Vercel;
+  otherwise every absolute URL ships as `extrovertai.example`.
+- **Quotable stats block + one-sentence entity definition** — biggest remaining GEO
+  lever (product-truth numbers, no fabricated proof). Design/content decision.
+- **Question-shaped H2s** on `/how-it-works` + `/pricing`; definitional/comparison
+  content blocks.
+- **Blog content program** — 8–12 posts in 3 clusters (finding leads / cold email
+  that lands / compliance & economics), source-safe. AEO post template (TL;DR-first,
+  key-takeaways, HowTo schema).
+- **Social proof / testimonials** (audit item 1) — needs real customer quotes/metrics.
 
 ---
 
