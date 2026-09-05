@@ -3,6 +3,7 @@ import { PageHero } from '@/components/page-hero';
 import { HowItWorks } from '@/components/sections/how-it-works';
 import { Differentiators } from '@/components/sections/differentiators';
 import { Demo } from '@/components/sections/demo';
+import { ByTheNumbers } from '@/components/sections/by-the-numbers';
 import { FinalCta } from '@/components/sections/final-cta';
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function HowItWorksPage() {
       <HowItWorks />
       <Differentiators />
       <Demo />
+      <ByTheNumbers />
       <FinalCta />
     </>
   );
