@@ -8,20 +8,28 @@
 import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
 import { SIGNUP_URL, CTA_MICROCOPY } from '@/lib/site';
-import { CREDIT_PACKS, CREDIT_COSTS, CREDIT_USD_CENTS } from '@extrovertai/shared';
+import { CREDIT_PACKS, CREDIT_COSTS, FREE_SIGNUP_CREDITS } from '@extrovertai/shared';
 
 const usd = (cents: number) => `$${(cents / 100).toLocaleString('en-US')}`;
 
-// Per-credit anchor shown to prospects, derived from the product's actual
-// per-credit floor in @extrovertai/shared so the number can never drift from
-// truth (previously a hardcoded $0.20 — 2× the real Starter rate). Packs
-// below match or beat this rate depending on volume.
-const CREDIT_LIST_USD = `$${(CREDIT_USD_CENTS / 100).toFixed(2)}`;
-
 // Best-value pack = lowest price per credit (a computed fact, honest highlight).
-const bestPackId = [...CREDIT_PACKS].sort(
+const bestPack = [...CREDIT_PACKS].sort(
   (a, b) => a.priceUsdCents / a.credits - b.priceUsdCents / b.credits,
-)[0].id;
+)[0];
+const bestPackId = bestPack.id;
+
+// Lowest per-credit price across all packs, derived (not hardcoded). We advertise
+// "from $X/credit" instead of a single "1 credit ≈ $0.10" anchor, because the packs
+// are NOT all $0.10 — they get cheaper with volume, and the old "≈" hid that.
+const LOWEST_PER_CREDIT_USD = `$${(bestPack.priceUsdCents / bestPack.credits / 100).toFixed(3)}`;
+
+// Worked example, computed from the real per-action costs so it can never drift:
+// one lead taken all the way through = find + research + write a sequence + send.
+const CREDITS_PER_LEAD =
+  CREDIT_COSTS.search + CREDIT_COSTS.enrichment + CREDIT_COSTS.draft + CREDIT_COSTS.send;
+// Anchor the example on the popular "Growth" pack when present, else the first pack.
+const examplePack = CREDIT_PACKS.find((p) => p.popular) ?? CREDIT_PACKS[0];
+const EXAMPLE_LEADS = Math.round(examplePack.credits / CREDITS_PER_LEAD);
 
 // Who each pack suits, so customers self-select their best match.
 const SUITED_FOR: Record<string, string> = {
@@ -50,8 +58,8 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
           <div>
             <p className="text-heading-md text-ink">Free to start</p>
             <p className="mt-2 max-w-prose text-body text-muted">
-              Create an account and get a batch of free credits - enough to find real leads,
-              write your first emails, and send them. No card needed.
+              Create an account and get {FREE_SIGNUP_CREDITS} free credits - enough to find real
+              leads, research them, write your first emails, and send them. No card needed.
             </p>
           </div>
           <div className="shrink-0">
@@ -67,7 +75,7 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
       <Reveal delay={0.1} className="mt-8">
         <div className="rounded-xl border border-line bg-surface p-6 md:p-8">
           <p className="text-heading-sm text-ink">
-            One simple unit: credits. 1 credit ≈ {CREDIT_LIST_USD}.
+            One simple unit: credits. From {LOWEST_PER_CREDIT_USD}/credit - cheaper by the pack.
           </p>
           <p className="mt-2 text-body text-muted">Credits cover the whole loop, pay as you go:</p>
           <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -88,6 +96,13 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
               </li>
             ))}
           </ul>
+          <p className="mt-4 text-body-sm text-muted">
+            So one lead taken all the way - found, researched, written, and sent - is about{' '}
+            <span className="font-medium text-ink">{CREDITS_PER_LEAD} credits</span>. The{' '}
+            {usd(examplePack.priceUsdCents)} {examplePack.label} pack (
+            {examplePack.credits.toLocaleString('en-US')} credits) works roughly{' '}
+            <span className="font-medium text-ink">{EXAMPLE_LEADS} leads</span> end to end.
+          </p>
         </div>
       </Reveal>
 
@@ -133,7 +148,8 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
 
       <Reveal delay={0.05} className="mt-6">
         <p className="text-body-sm text-muted">
-          Credits never expire while your account is active. Prices in USD.
+          Credits never expire while your account is active. Billed in USD; cards accepted from
+          any country.
         </p>
       </Reveal>
     </section>

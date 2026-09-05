@@ -100,3 +100,14 @@ export function findCreditPack(id: string): CreditPack | undefined {
  * at zero the credit gate (File 06) blocks paid actions and the UI prompts a top-up.
  */
 export const LOW_BALANCE_THRESHOLD = 20;
+
+/**
+ * Free credits granted once to a brand-new account. Surfaced on the marketing site
+ * so "start free" states a real number instead of a vague "batch of credits".
+ *
+ * MUST match the API's signup grant (apps/api users.service.ts DEFAULT_SIGNUP_CREDITS
+ * and the SIGNUP_CREDITS env default). Kept here as the single value the public site
+ * reads; if you change the grant, change it in both places (or wire the API to import
+ * this).
+ */
+export const FREE_SIGNUP_CREDITS = 100;

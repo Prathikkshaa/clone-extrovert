@@ -54,7 +54,27 @@ function ComplianceVisual() {
         <div className="h-full w-[45%] rounded-full bg-accent" />
       </div>
       <div className="mt-4 border-t border-line pt-3 text-[0.78rem] text-muted">
-        Unsubscribe · 123 Main St, Austin, TX - added to every email automatically
+        Sent one at a time · randomized spacing · bounces watched
+      </div>
+    </div>
+  );
+}
+
+function ComplianceToolsVisual() {
+  return (
+    <div className="rounded-xl border border-line bg-surface p-5 shadow-[0_20px_50px_-30px_rgba(26,26,24,0.3)]">
+      <p className="text-body-sm text-muted">Footer added to every email</p>
+      <div className="mt-3 space-y-2 text-body-sm text-ink/80">
+        <p>
+          <span className="text-accent underline">Unsubscribe</span> · one click, honoured
+          instantly
+        </p>
+        <p>Your business mailing address</p>
+      </div>
+      <div className="mt-4 flex items-center gap-2 border-t border-line pt-3 text-[0.78rem]">
+        <span className="rounded-full bg-positive-soft px-2.5 py-1 font-medium text-positive">
+          Opt-outs suppressed automatically
+        </span>
       </div>
     </div>
   );
@@ -97,10 +117,16 @@ const ROWS: Row[] = [
     visual: <ProductPanel />,
   },
   {
-    eyebrow: 'Compliant by default',
-    title: 'Stays out of spam, and legal, without you thinking about it.',
-    copy: 'Sends from your own inbox, throttled and warmed up so you keep your sender reputation. One-click unsubscribe and a physical address are added to every email automatically.',
+    eyebrow: 'Built for deliverability',
+    title: 'Sends the way a careful human does - so you stay out of spam.',
+    copy: 'Every email goes from your own Gmail or Outlook, not a shared blast server, so you keep your own reputation. New inboxes start around 30 sends a day and ramp as they warm; messages go out one at a time with randomized spacing, not in a burst; and bounces are watched so a bad address can’t drag you down.',
     visual: <ComplianceVisual />,
+  },
+  {
+    eyebrow: 'Compliance tools built in',
+    title: 'One-click unsubscribe and your address on every email - region-aware.',
+    copy: 'Each send carries a working one-click unsubscribe and a physical mailing address, and opt-outs are suppressed automatically. That covers CAN-SPAM in the US; for the UK/EU, outreach to businesses falls under PECR and GDPR, where a relevant offer to a business address can rest on legitimate interest. We give you the tools - you choose the regions and offers you send to.',
+    visual: <ComplianceToolsVisual />,
   },
   {
     eyebrow: 'One tool, not five',

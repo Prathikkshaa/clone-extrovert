@@ -7,11 +7,11 @@ export type FaqItem = { q: string; a: string };
 export const FAQ_ITEMS: FaqItem[] = [
   {
     q: 'Will my emails actually land, or end up in spam?',
-    a: 'They send from your own inbox (Gmail or Outlook), not a shared blast server - so you keep your own sender reputation. New inboxes are warmed up gradually and every send is throttled with natural spacing, which is exactly what keeps you out of spam folders.',
+    a: 'They send from your own inbox (Gmail or Outlook), not a shared blast server - so you keep your own sender reputation. New inboxes start at a conservative daily cap (around 30 sends) and ramp up as they warm; sends go out one at a time with natural, randomized spacing rather than in a burst; and bounces are watched so a bad address doesn’t drag your reputation down. That behaviour - your own inbox, a slow ramp, human-like pacing - is exactly what keeps you out of spam folders.',
   },
   {
     q: 'Where do the leads come from? Is this legal?',
-    a: 'Leads come from public business listings on Google Maps and each business’s own public website. You reach businesses at their public contact address about a genuine offer, and every email includes one-click unsubscribe and a physical mailing address - the requirements for compliant B2B outreach.',
+    a: 'Leads come from public business listings on Google Maps and each business’s own public website - the same information anyone can look up. You reach businesses at their public contact address about a genuine, relevant offer, and every email carries one-click unsubscribe plus a physical mailing address. Your obligations depend on where you and the recipient are: in the US that satisfies CAN-SPAM; in the UK/EU, outreach to businesses falls under PECR and GDPR, where a relevant offer to a business address can rest on legitimate interest and the unsubscribe honours the opt-out. We give you the compliance tools (opt-out, address, suppression); you decide the regions and offers you send to.',
   },
   {
     q: 'Do I need to be technical?',
@@ -23,6 +23,6 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: 'What does it cost?',
-    a: 'You start free with a batch of credits - enough to find leads, write emails, and send them. After that you buy credits as you need them and only pay for what you use: finding, researching, writing, and sending. No subscription, no seats.',
+    a: 'You start free with 100 credits - no card - enough to find, research, write, and send to a first batch of real leads. After that you buy credits as you need them and only pay for what you use: find a lead (1 credit), research it (2), write a full sequence (1), send an email (1). A lead taken all the way through is about 5 credits, so a $45 pack of 550 credits works roughly 110 leads end to end. No subscription, no seats, and credits never expire while your account is active. Billed in USD; cards accepted from any country.',
   },
 ];
