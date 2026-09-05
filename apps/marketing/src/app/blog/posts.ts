@@ -47,23 +47,23 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'p',
-        text: 'It also filters out the businesses that already bought what you sell. Reaching out to a plumber who has a slick website and an agency on retainer is a hard sell. Reaching out to a well-reviewed plumber whose only web presence is a Google Maps listing is a warm one.',
+        text: 'It also filters out the businesses that already bought what you sell. Reaching out to a plumber who has a slick website and an agency on retainer is a hard sell. Reaching out to a well-reviewed plumber whose only web presence is a basic public listing is a warm one.',
       },
       {
         type: 'h2',
-        text: 'Where to find businesses without a website',
+        text: 'Where these businesses show up',
       },
       {
         type: 'p',
-        text: 'The single best source is Google Maps (Google Business Profiles). Almost every local business appears there, and each listing shows whether the business has linked a website. A few reliable ways to work through it:',
+        text: 'Businesses with no website still leave a public trail. They have real customers, so they show up wherever those customers look for them, and that public presence usually makes it obvious whether a business has a real site behind it or not. The problem is that this information is scattered and inconsistent, there is no tidy "no website" button to press, and you end up checking businesses one at a time. As you work through a market, these are the signals worth paying attention to:',
       },
       {
         type: 'ul',
         items: [
-          'Search a specific trade plus a city, for example "roofers in Austin, TX", and scan the listings for ones with no website link.',
           'Work one industry at a time. Trades like roofing, plumbing, concrete, landscaping, and electrical skew toward missing or outdated websites.',
-          'Note the businesses that clearly have demand but no site: lots of reviews, a good rating, an active phone number, but no website field.',
-          'Check nearby towns and suburbs, not just the city center. Competition for these leads is lower the further you get from downtown.',
+          'Focus on businesses that clearly have demand but nowhere to send a customer online: lots of reviews, a strong rating, an active phone number, but no real site.',
+          'Look beyond the city center. Competition for these leads is lower in nearby towns and suburbs.',
+          'Prioritise categories customers research before buying - contractors, clinics, restaurants, professional services - where a missing website costs the most.',
         ],
       },
       {
@@ -110,7 +110,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'p',
-        text: "Doing this by hand works, but it is slow: searching Maps, copying details into a spreadsheet, researching each business, and writing every email from scratch. That is the exact loop ExtrovertAI automates. You search an industry and city, filter for the no-website signal, and it finds the leads, pulls the details, and drafts personalized outreach grounded in each business's own listing and reviews, then sends it from your inbox. You can try it free and run a real search for your own niche before paying anything.",
+        text: "Doing this by hand works, but it is slow: checking businesses one by one, copying details into a spreadsheet, researching each one, and writing every email from scratch. That is the exact loop ExtrovertAI automates. You search an industry and city, filter for the no-website signal, and it finds the leads, pulls the details, and drafts personalized outreach grounded in each business's own public details and reviews, then sends it from your inbox. You can try it free and run a real search for your own niche before paying anything.",
       },
     ],
   },
