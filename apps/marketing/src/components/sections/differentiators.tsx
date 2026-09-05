@@ -141,7 +141,11 @@ export function Differentiators() {
     <section className="shell py-section-y">
       <Reveal className="max-w-prose">
         <p className="text-eyebrow uppercase text-accent">Why it works</p>
-        <h2 className="mt-3 text-display-md text-ink">Built to kill the reasons cold outreach fails.</h2>
+        <h2 className="mt-3 text-display-md text-ink">Why does this outreach actually work?</h2>
+        <p className="mt-4 text-body-lg text-muted">
+          It&rsquo;s built to kill the reasons cold outreach fails - one specific objection at a
+          time.
+        </p>
       </Reveal>
 
       <div className="mt-14 flex flex-col gap-16 md:gap-24">
