@@ -6,7 +6,11 @@ import type { Metadata, Viewport } from 'next';
 import { headingFont, bodyFont } from '@/lib/fonts';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
-import { OrganizationJsonLd, SoftwareApplicationJsonLd } from '@/components/structured-data';
+import {
+  OrganizationJsonLd,
+  SoftwareApplicationJsonLd,
+  WebSiteJsonLd,
+} from '@/components/structured-data';
 import { APP_NAME, SITE_URL, SITE_DESCRIPTION } from '@/lib/site';
 import './globals.css';
 
@@ -67,6 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main">{children}</main>
         <SiteFooter />
         {/* Site-wide JSON-LD (AEO). FAQPage JSON-LD is added on pages with the FAQ. */}
+        <WebSiteJsonLd />
         <OrganizationJsonLd />
         <SoftwareApplicationJsonLd />
       </body>

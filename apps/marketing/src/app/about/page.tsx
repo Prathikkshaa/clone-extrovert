@@ -8,6 +8,7 @@ import { APP_NAME } from '@/lib/site';
 export const metadata: Metadata = {
   title: 'About',
   description: `Why ${APP_NAME} exists - built by someone who had the empty-pipeline problem, being built in the open, early and honest about it.`,
+  alternates: { canonical: '/about' },
 };
 
 // About = founder story expanded + honest "we're new" tone (M00 §7). NO fabricated

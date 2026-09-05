@@ -17,6 +17,8 @@ export type BlogPost = {
   excerpt: string;
   /** ISO date. */
   datePublished: string;
+  /** ISO date of the last meaningful edit. Falls back to datePublished when unset. */
+  dateModified?: string;
   readMinutes: number;
   body: Block[];
 };
@@ -31,6 +33,7 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       'Businesses with no website are one of the clearest buying signals there is. Here is how to find them, qualify them, and reach out in a way that actually gets replies.',
     datePublished: '2026-07-01',
+    dateModified: '2026-09-05',
     readMinutes: 6,
     body: [
       {

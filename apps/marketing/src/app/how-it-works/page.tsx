@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: 'How it works',
   description:
     'The full loop: find local businesses with buying signals, let AI write outreach from their site and reviews, send safely from your own inbox, and book meetings.',
+  alternates: { canonical: '/how-it-works' },
 };
 
 // Depth for researchers (M00 §8): the 4 steps + the objection-answering
