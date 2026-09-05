@@ -89,21 +89,37 @@ From two read-only audit subagents (technical SEO; AEO/GEO + blog strategy).
 warning gone), `tsc` + `next lint` clean; headers, canonical, llms.txt and
 BlogPosting/BreadcrumbList/WebSite schema confirmed live via curl.
 
-## ⏳ Planned — needs owner input or is a content program (not yet done)
+## ✅ Completed — GEO stats, question-H2s & blog program — `d9412a8`, `c89db84`, `d093852`
+Implemented via subagent; `tsc` + `next lint` + `next build` (18 routes) all clean;
+no forbidden source terms anywhere (leads = "public business information anyone can
+look up").
+
+- **Quotable stats + entity definition (GEO)** — new `by-the-numbers.tsx` section on
+  `/how-it-works` with 6 extractable, self-contained facts (100 free credits ·
+  ~5 credits/lead · 550 credits ≈ 110 leads ($45) · ~30 emails/day ramping ·
+  3-email sequence · 0 subscriptions), derived from `FREE_SIGNUP_CREDITS`/`CREDIT_PACKS`.
+  Plus a literal "ExtrovertAI is a…" lead sentence on `/about` for LLM entity extraction.
+- **Question-shaped H2s (AEO)** on the shared sections — "How does it work?" (answer:
+  "Four steps from search to booked…") and "Why does this outreach actually work?"
+  (answer: "…built to kill the reasons cold outreach fails…").
+- **Blog program** — 3 source-safe pillar posts added to `blog/posts.ts`:
+  `how-to-find-local-business-leads`, `why-cold-emails-go-to-spam`, `is-cold-email-legal`.
+  Each uses the AEO template: answer-first TL;DR, question H2s, a "Key takeaways" list,
+  soft closing CTA.
+
+## ⏳ Planned — needs owner input or is a bigger effort (not yet done)
 
 - **Real founder/author name** — `FOUNDER_NAME = 'the founder'` flows into
   BlogPosting `author` + Organization `founder` (weak E-E-A-T). Needs a real name.
 - **Organization `sameAs`** — add real social profile URLs (X, LinkedIn) for entity
   trust. Needs the URLs.
 - **Deploy env** — set `NEXT_PUBLIC_SITE_URL` + `NEXT_PUBLIC_APP_URL` in Vercel;
-  otherwise every absolute URL ships as `extrovertai.example`.
-- **Quotable stats block + one-sentence entity definition** — biggest remaining GEO
-  lever (product-truth numbers, no fabricated proof). Design/content decision.
-- **Question-shaped H2s** on `/how-it-works` + `/pricing`; definitional/comparison
-  content blocks.
-- **Blog content program** — 8–12 posts in 3 clusters (finding leads / cold email
-  that lands / compliance & economics), source-safe. AEO post template (TL;DR-first,
-  key-takeaways, HowTo schema).
+  otherwise every absolute URL ships as `extrovertai.example`. (Launch-blocker.)
+- **Remaining blog posts** — ~10 more across the 3 clusters (supporting posts under
+  each pillar); optional `HowTo` schema + `Block`-type extensions (dedicated TL;DR /
+  key-takeaways block types).
+- **Question-H2s / comparison content** on `/pricing` (it already carries the FAQ);
+  definitional "what is X" standalone snippets.
 - **Social proof / testimonials** (audit item 1) — needs real customer quotes/metrics.
 
 ---
