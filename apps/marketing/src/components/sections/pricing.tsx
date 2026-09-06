@@ -115,17 +115,15 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
             ))}
           </ul>
           <p className="mt-4 text-body-sm text-muted">
-            So a lead taken all the way - found, researched, written, and its full 3-email
-            sequence sent - runs about{' '}
+            A full lead - found, researched, written, sent - runs about{' '}
             <span className="font-medium text-ink">
               {CREDITS_PER_LEAD_LOW}&ndash;{CREDITS_PER_LEAD_HIGH} credits
-            </span>{' '}
-            (fewer if they reply early). The {usd(examplePack.priceUsdCents)} {examplePack.label}{' '}
-            pack ({examplePack.credits.toLocaleString('en-US')} credits) works roughly{' '}
+            </span>
+            . So the {usd(examplePack.priceUsdCents)} {examplePack.label} pack &asymp;{' '}
             <span className="font-medium text-ink">
               {exampleLeads.low}&ndash;{exampleLeads.high} leads
-            </span>{' '}
-            end to end.
+            </span>
+            .
           </p>
         </div>
       </Reveal>
