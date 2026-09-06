@@ -82,10 +82,10 @@ export function HowItWorks() {
     <section className="shell py-section-y">
       <Reveal className="max-w-prose">
         <p className="text-eyebrow uppercase text-accent">How it works</p>
-        <h2 className="mt-3 text-display-md text-ink">Four steps from search to booked.</h2>
+        <h2 className="mt-3 text-display-md text-ink">How does it work?</h2>
         <p className="mt-4 text-body-lg text-muted">
-          No new skill to learn. You point it at a market; it does the finding, writing, and
-          sending - you show up to the meetings.
+          Four steps from search to booked. You point it at a market; it does the finding,
+          writing, and sending - you show up to the meetings. No new skill to learn.
         </p>
       </Reveal>
 

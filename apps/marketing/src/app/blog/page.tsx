@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: 'Blog',
   description:
     'Practical playbooks on finding local business leads, writing cold email that lands, and booking meetings without a full-time sales motion.',
+  alternates: { canonical: '/blog' },
 };
 
 const dateFmt = (iso: string) =>

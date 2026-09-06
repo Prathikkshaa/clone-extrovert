@@ -12,6 +12,23 @@ function JsonLd({ data }: { data: Record<string, unknown> }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json }} />;
 }
 
+/** The site entity (helps answer engines disambiguate the brand + its pages).
+ *  No SearchAction: there is no on-site search endpoint to declare yet. */
+export function WebSiteJsonLd() {
+  return (
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: APP_NAME,
+        url: SITE_URL,
+        description: SITE_DESCRIPTION,
+        publisher: { '@type': 'Organization', name: APP_NAME },
+      }}
+    />
+  );
+}
+
 /** The brand. Logo is a placeholder path (swap-list). */
 export function OrganizationJsonLd() {
   return (

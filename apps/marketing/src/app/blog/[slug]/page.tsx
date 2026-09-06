@@ -27,6 +27,7 @@ export async function generateMetadata({
       title: post.title,
       description: post.description,
       publishedTime: post.datePublished,
+      modifiedTime: post.dateModified ?? post.datePublished,
     },
   };
 }
@@ -57,18 +58,33 @@ export default async function BlogPostPage({
   const post = getPost(slug);
   if (!post) notFound();
 
-  // BlogPosting JSON-LD (AEO) - built from the post's own fields.
+  // BlogPosting JSON-LD (AEO) - built from the post's own fields. `image` uses the
+  // site OG image (per-post cards can be added later); `dateModified` reflects real
+  // edits so answer engines don't treat updated posts as stale.
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.description,
+    image: `${SITE_URL}/opengraph-image`,
     datePublished: post.datePublished,
-    dateModified: post.datePublished,
+    dateModified: post.dateModified ?? post.datePublished,
     author: { '@type': 'Person', name: FOUNDER_NAME },
     publisher: { '@type': 'Organization', name: APP_NAME },
     mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
     url: `${SITE_URL}/blog/${post.slug}`,
+  };
+
+  // Breadcrumb JSON-LD (Home > Blog > Post) - rich results + navigation context
+  // for answer engines.
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: `${SITE_URL}/blog` },
+      { '@type': 'ListItem', position: 3, name: post.title, item: `${SITE_URL}/blog/${post.slug}` },
+    ],
   };
 
   return (
@@ -76,6 +92,10 @@ export default async function BlogPostPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, '\\u003c') }}
       />
       <Reveal>
         <Link href="/blog" className="text-body-sm text-accent hover:text-accent-strong">
@@ -90,6 +110,24 @@ export default async function BlogPostPage({
           {post.body.map((block, i) => (
             <BlockView key={i} block={block} />
           ))}
+        </div>
+
+        {/* In-content links to money pages (SEO internal linking + conversion). */}
+        <div className="mt-12 rounded-xl border border-line bg-surface p-6">
+          <p className="text-body-lg text-ink">
+            {APP_NAME} runs this whole loop for you - find, personalize, send, and book.
+          </p>
+          <p className="mt-2 text-body text-muted">
+            See{' '}
+            <Link href="/how-it-works" className="text-accent hover:text-accent-strong">
+              how it works
+            </Link>{' '}
+            or check the{' '}
+            <Link href="/pricing" className="text-accent hover:text-accent-strong">
+              pricing
+            </Link>{' '}
+            - free to start, no card needed.
+          </p>
         </div>
       </Reveal>
     </article>

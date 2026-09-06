@@ -16,8 +16,10 @@ const STORAGE_KEY = 'extrovertai.theme-mode';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeModeService {
-  /** The user's stored choice (light | dark | system). */
-  readonly mode = signal<ThemeMode>('system');
+  /** The user's stored choice (light | dark | system). Defaults to 'light' when
+   *  no preference is stored so first-time visitors land on light mode
+   *  regardless of the OS theme. */
+  readonly mode = signal<ThemeMode>('light');
   /** The mode currently applied to the document (light | dark). */
   readonly resolved = signal<ResolvedMode>('light');
 
@@ -70,6 +72,6 @@ export class ThemeModeService {
     } catch {
       /* ignore */
     }
-    return 'system';
+    return 'light';
   }
 }

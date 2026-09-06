@@ -8,6 +8,7 @@ import { APP_NAME } from '@/lib/site';
 export const metadata: Metadata = {
   title: 'About',
   description: `Why ${APP_NAME} exists - built by someone who had the empty-pipeline problem, being built in the open, early and honest about it.`,
+  alternates: { canonical: '/about' },
 };
 
 // About = founder story expanded + honest "we're new" tone (M00 §7). NO fabricated
@@ -22,6 +23,11 @@ export default function AboutPage() {
 
       <section className="shell max-w-prose py-12">
         <Reveal className="space-y-5 text-body-lg text-ink/90">
+          <p className="text-heading-md font-medium text-ink">
+            {APP_NAME} is a cold-email and local-business lead-generation tool that finds local
+            businesses worth reaching, writes personalized outreach in your voice, and sends it
+            from your own inbox.
+          </p>
           <p>
             {APP_NAME} started because the existing options all missed. Lead databases were
             stale and pricey. &ldquo;AI&rdquo; writers produced obvious spam. Cold-email platforms

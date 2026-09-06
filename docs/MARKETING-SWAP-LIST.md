@@ -27,7 +27,7 @@
 | 14 | **Favicon / logo** | none yet (wordmark is text + accent dot) | A favicon (`src/app/icon.png`) + logo mark if desired. | No |
 | 15 | **Real proof slot** | `src/components/sections/founder-note.tsx` (empty, labeled `SWAP-SLOT`) | Real testimonials / results / logos **once they exist** — never fabricated (M00 §7). | No |
 | 16 | **More blog posts** | `src/app/blog/posts.ts` (one real SEO post shipped) | Add more posts (each is one typed `BlogPost` entry; the index, `[slug]` route, sitemap, and `BlogPosting` JSON-LD all read from here). Swap the typed array for MDX/a CMS when volume grows. | No |
-| 17 | **Reconcile credit value vs pack prices** | `src/components/sections/pricing.tsx` (`CREDIT_LIST_USD = '$0.20'`) | The site states "1 credit ≈ $0.20" (marketing list value), but the real packs from `@extrovertai/shared` price credits BELOW that (Starter $10/100 = $0.10, Scale ≈ $0.074). Decide before launch: keep $0.20 as a "list value / packs are a discount" framing, or raise the real pack prices in shared (File 14) so the numbers align. | **Recommended** |
+| 17 | ~~Reconcile credit value vs pack prices~~ **RESOLVED** | `src/components/sections/pricing.tsx` | Anchor is now derived from `CREDIT_USD_CENTS` in `@extrovertai/shared` (currently $0.10 = the Starter rate), so the number can never drift from truth. Packs match or beat this rate depending on volume. Change the anchor in the future by editing `CREDIT_USD_CENTS`. | Done |
 
 ## Status: NOT placeholder (already final)
 

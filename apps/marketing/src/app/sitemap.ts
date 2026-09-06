@@ -7,7 +7,10 @@ import { BLOG_POSTS } from './blog/posts';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const staticRoutes = ['', '/pricing', '/how-it-works', '/about', '/blog', '/privacy', '/terms'];
+  // /privacy and /terms are intentionally omitted: both are noindex placeholders,
+  // and listing noindex URLs in the sitemap is a conflicting signal. Add them back
+  // (and remove their noindex) once real legal text lands.
+  const staticRoutes = ['', '/pricing', '/how-it-works', '/about', '/blog'];
 
   const pages: MetadataRoute.Sitemap = staticRoutes.map((path) => ({
     url: `${SITE_URL}${path}`,

@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: 'Pricing',
   description:
     'Start free, then pay only for what you use. Simple credit pricing that covers finding, researching, writing, and sending - no seats, no subscription.',
+  alternates: { canonical: '/pricing' },
 };
 
 export default function PricingPage() {
