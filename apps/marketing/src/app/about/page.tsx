@@ -18,102 +18,21 @@ export const metadata: Metadata = {
 // wrapping text-* class). Decorative motifs are aria-hidden. Thin strokes, rounded
 // caps, minimal - matching the site's quiet editorial house style. ---
 
-// Small generic line icons for the business "chips" (no real brand logos).
-function IconCafe() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 9h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V9Z" />
-      <path d="M16 10h2a2 2 0 0 1 0 4h-2" />
-      <path d="M8 3v2M11 3v2" />
-    </svg>
-  );
-}
 
-function IconClinic() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
-      <rect x="5" y="4" width="14" height="16" rx="2" />
-      <path d="M12 8v6M9 11h6" />
-    </svg>
-  );
-}
-
-function IconGym() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10" />
-    </svg>
-  );
-}
-
-function IconStore() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 9 5 4h14l1 5a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-3 0Z" />
-      <path d="M5 11v8h14v-8" />
-    </svg>
-  );
-}
-
-type Chip = { label: string; Icon: ComponentType };
-
-const HERO_CHIPS: Chip[] = [
-  { label: 'Cafe', Icon: IconCafe },
-  { label: 'Clinic', Icon: IconClinic },
-  { label: 'Gym', Icon: IconGym },
-  { label: 'Store', Icon: IconStore },
-];
-
-// A) Hero composition: Milo "calling out" to local businesses. Milo is the focal
-// image; thin dashed accent connectors reach out (behind the chips) to a column of
-// generic business chips.
+// A) Hero visual: the rendered "Milo calling out to local businesses" scene
+// (Milo + the isometric city with connected business cards). Single optimized
+// image, eager-loaded above the fold with explicit dimensions (no CLS).
 function HeroMilo() {
   return (
-    <div className="relative rounded-xl border border-line bg-surface p-8">
-      <div className="grid grid-cols-[auto_1fr] items-center gap-6">
-        {/* Focal Milo, calling out */}
-        <img
-          src="/milo/milo-speaking.webp"
-          width={336}
-          height={498}
-          alt="Milo, the ExtrovertAI mascot"
-          loading="eager"
-          fetchPriority="high"
-          className="h-auto w-full max-w-[180px]"
-        />
-        {/* Chips, with dashed connectors layered behind */}
-        <div className="relative">
-          {/* dashed accent connectors, hidden on mobile to avoid mess */}
-          <svg
-            viewBox="0 0 120 220"
-            className="pointer-events-none absolute inset-0 hidden h-full w-full text-accent md:block"
-            fill="none"
-            aria-hidden="true"
-            preserveAspectRatio="none"
-          >
-            <g stroke="currentColor" strokeWidth={1.25} strokeDasharray="4 4" strokeLinecap="round">
-              <path d="M0 110 C 30 30, 60 28, 108 28" />
-              <path d="M0 110 C 30 90, 60 82, 108 82" />
-              <path d="M0 110 C 30 130, 60 138, 108 138" />
-              <path d="M0 110 C 30 190, 60 192, 108 192" />
-            </g>
-          </svg>
-          <ul className="relative flex flex-col gap-3">
-            {HERO_CHIPS.map((c) => (
-              <li
-                key={c.label}
-                className="inline-flex w-fit items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2 text-body-sm text-ink"
-              >
-                <span className="text-muted">
-                  <c.Icon />
-                </span>
-                {c.label}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
+    <img
+      src="/milo/milo-hero-scene.webp"
+      width={912}
+      height={750}
+      alt="Milo, the ExtrovertAI mascot, reaching out to local businesses across a city"
+      loading="eager"
+      fetchPriority="high"
+      className="h-auto w-full rounded-2xl"
+    />
   );
 }
 
