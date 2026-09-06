@@ -1,10 +1,7 @@
 import type { Metadata } from 'next';
-import { PageHero } from '@/components/page-hero';
 import { Pricing } from '@/components/sections/pricing';
-import { PricingRoiBand } from '@/components/sections/pricing-enterprise';
-import { PricingCalculator } from '@/components/sections/pricing-calculator';
 import {
-  AlternativesStrip,
+  PricingRoiBand,
   ComparisonMatrix,
   EnterpriseCard,
 } from '@/components/sections/pricing-enterprise';
@@ -27,15 +24,9 @@ export default function PricingPage() {
   return (
     <>
       <FaqJsonLd />
-      <PageHero eyebrow="Pricing" title="Pay for what you use - no five-tool stack.">
-        Start free with credits included. Buy more only when you need them. Every number below
-        is the real price - nothing hidden.
-      </PageHero>
 
       <PricingRoiBand />
       <Pricing withHeading={false} />
-      <PricingCalculator />
-      <AlternativesStrip />
       <ComparisonMatrix />
       <EnterpriseCard />
 

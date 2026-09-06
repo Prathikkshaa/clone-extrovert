@@ -5,10 +5,12 @@
 // computed from the real prices (a fact), never a fake "most popular" claim.
 //
 // Reused on the landing page and the /pricing page. Copy is DIRECTION.
+import { Fragment } from 'react';
 import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
 import { SIGNUP_URL } from '@/lib/site';
 import { CtaMicrocopy } from '@/components/cta-microcopy';
+import { STEP_ICONS } from '@/components/sections/pricing-enterprise';
 import { CREDIT_PACKS, CREDIT_COSTS, FREE_SIGNUP_CREDITS } from '@extrovertai/shared';
 import {
   usd,
@@ -79,33 +81,57 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
         </div>
       </Reveal>
 
-      {/* Credit model - explained simply. */}
+      {/* How credits work - the whole loop, priced (matches the approved comp):
+          value copy on the left, the Find -> Research -> Write -> Send flow with
+          per-action credit chips on the right. Icons shared with the hero. */}
       <Reveal delay={0.1} className="mt-8">
-        <div className="rounded-xl border border-line bg-surface p-6 md:p-8">
-          <p className="text-heading-sm text-ink">
-            One simple unit: credits. From {LOWEST_PER_CREDIT_USD}/credit - cheaper by the pack.
-          </p>
-          <p className="mt-2 text-body text-muted">Credits cover the whole loop, pay as you go:</p>
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { label: 'Find a lead', cost: CREDIT_COSTS.search },
-              { label: 'Research it', cost: CREDIT_COSTS.enrichment },
-              { label: 'Write a full sequence', cost: CREDIT_COSTS.draft },
-              { label: 'Send an email', cost: CREDIT_COSTS.send },
-            ].map((row) => (
-              <li
-                key={row.label}
-                className="flex items-center justify-between gap-3 rounded-md border border-line bg-canvas px-3 py-2.5"
-              >
-                <span className="text-body-sm text-ink">{row.label}</span>
-                <span className="shrink-0 rounded-full bg-accent-soft px-2.5 py-1 text-[0.78rem] font-medium text-accent">
-                  {row.cost} {row.cost === 1 ? 'credit' : 'credits'}
-                </span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 text-body-sm text-muted">
-            A full lead - found, researched, written, sent - runs about{' '}
+        <div className="rounded-2xl border border-line bg-surface p-6 md:p-8">
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.7fr] lg:items-center lg:gap-10">
+            {/* Left: heading */}
+            <div>
+              <p className="text-eyebrow uppercase text-accent">How credits work</p>
+              <h3 className="mt-3 text-heading-lg text-ink">One simple unit: credits.</h3>
+              <p className="mt-3 text-body text-muted">
+                Credits cover the whole loop, pay as you go. From {LOWEST_PER_CREDIT_USD}/credit —
+                cheaper by the pack.
+              </p>
+            </div>
+
+            {/* Right: the priced loop */}
+            <ol className="flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-1.5">
+              {[
+                { icon: 'search' as const, label: 'Find a lead', cost: CREDIT_COSTS.search },
+                { icon: 'research' as const, label: 'Research it', cost: CREDIT_COSTS.enrichment },
+                { icon: 'write' as const, label: 'Write a full sequence', cost: CREDIT_COSTS.draft },
+                { icon: 'send' as const, label: 'Send an email', cost: CREDIT_COSTS.send },
+              ].map((row, i, arr) => {
+                const Icon = STEP_ICONS[row.icon];
+                return (
+                  <Fragment key={row.label}>
+                    <li className="flex flex-1 flex-col items-center rounded-xl border border-line bg-canvas px-3 py-4 text-center">
+                      <span className="grid h-10 w-10 place-items-center rounded-full bg-accent-soft text-accent">
+                        <Icon />
+                      </span>
+                      <span className="mt-3 text-body-sm font-medium leading-tight text-ink">
+                        {row.label}
+                      </span>
+                      <span className="mt-2 rounded-full bg-accent-soft px-2.5 py-0.5 text-[0.72rem] font-medium text-accent">
+                        {row.cost} {row.cost === 1 ? 'credit' : 'credits'}
+                      </span>
+                    </li>
+                    {i < arr.length - 1 ? (
+                      <li aria-hidden className="hidden items-center justify-center text-muted/50 sm:flex">
+                        <span className="px-0.5 text-lg">→</span>
+                      </li>
+                    ) : null}
+                  </Fragment>
+                );
+              })}
+            </ol>
+          </div>
+
+          <p className="mt-6 border-t border-line pt-5 text-body-sm text-muted">
+            A full lead — found, researched, written, sent — runs about{' '}
             <span className="font-medium text-ink">
               {CREDITS_PER_LEAD_LOW}&ndash;{CREDITS_PER_LEAD_HIGH} credits
             </span>

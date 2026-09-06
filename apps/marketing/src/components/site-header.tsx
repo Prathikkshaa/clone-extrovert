@@ -20,7 +20,8 @@ export function SiteHeader() {
     // Track scroll (for the hairline border) and whether the header currently
     // overlaps a `.on-dark` section - if so, the nav flips to light so it stays
     // readable, without ever painting a solid bar.
-    const probe = 28; // ~vertical center of the header row
+    const probe = 40; // ~vertical center of the header row (must land inside a
+    // dark hero that starts flush under the sticky header)
     const update = () => {
       setScrolled(window.scrollY > 8);
       let dark = false;

@@ -106,7 +106,7 @@
   /* The shell's horizontal measure + gutters (asymmetry-ready, not forced-center). */
   .shell {
     width: 100%;
-    max-width: var(--max-w, 72rem);
+    max-width: var(--max-w, 80rem);
     margin-inline: auto;
     padding-inline: clamp(1.25rem, 0.5rem + 3vw, 2.5rem);
   }
