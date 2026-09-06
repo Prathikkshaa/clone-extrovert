@@ -12,6 +12,7 @@ const base =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
 
 const sizes = {
+  sm: 'h-9 px-3.5 text-body-sm',
   md: 'h-11 px-5 text-body',
   lg: 'h-12 px-7 text-body-lg',
 } as const;
@@ -36,8 +37,8 @@ export function CtaButton({
   className?: string;
 }) {
   const cls = [base, sizes[size], variants[variant], className].filter(Boolean).join(' ');
-  // External (product app) links get a full navigation; internal use Next Link.
-  const isExternal = href.startsWith('http');
+  // External (product app) links + mailto get a plain anchor; internal use Next Link.
+  const isExternal = /^(https?:|mailto:)/.test(href);
   if (isExternal) {
     return (
       <a href={href} className={cls}>

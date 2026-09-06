@@ -31,11 +31,11 @@ export function Demo() {
         </Reveal>
 
         {/* Peak-intent CTA - do not omit (M00 §11). */}
-        <Reveal delay={0.05} className="mt-10 flex flex-col items-start gap-3">
+        <Reveal delay={0.05} className="mt-10 flex flex-col items-center gap-3 text-center">
           <CtaButton href={SIGNUP_URL} size="lg">
             Start free
           </CtaButton>
-          <CtaMicrocopy />
+          <CtaMicrocopy className="text-center" />
         </Reveal>
       </div>
     </section>
