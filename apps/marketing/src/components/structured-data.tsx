@@ -3,7 +3,7 @@
 // FACTUAL and derived from single sources (APP_NAME, SITE_*, FAQ_ITEMS, the real
 // File 14 pack prices) - no fabricated ratings, review counts, or user numbers.
 import { APP_NAME, SITE_URL, SITE_DESCRIPTION, FOUNDER_NAME } from '@/lib/site';
-import { FAQ_ITEMS } from '@/lib/faq';
+import { FAQ_ITEMS, type FaqItem } from '@/lib/faq';
 import { CREDIT_PACKS } from '@extrovertai/shared';
 
 function JsonLd({ data }: { data: Record<string, unknown> }) {
@@ -84,13 +84,13 @@ export function SoftwareApplicationJsonLd() {
 }
 
 /** FAQ - built from the SAME array the page renders, so they can never drift. */
-export function FaqJsonLd() {
+export function FaqJsonLd({ items = FAQ_ITEMS }: { items?: FaqItem[] } = {}) {
   return (
     <JsonLd
       data={{
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
-        mainEntity: FAQ_ITEMS.map((item) => ({
+        mainEntity: items.map((item) => ({
           '@type': 'Question',
           name: item.q,
           acceptedAnswer: { '@type': 'Answer', text: item.a },

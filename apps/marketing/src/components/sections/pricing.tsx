@@ -48,9 +48,17 @@ const BEST_FOR: Record<string, string[]> = {
   scale: ['Always-on, high-volume outreach', 'Multiple clients & inboxes', 'Lowest price per credit'],
 };
 
-export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
+export function Pricing({
+  withHeading = true,
+  withPacks = true,
+  withFreeTier = true,
+}: {
+  withHeading?: boolean;
+  withPacks?: boolean;
+  withFreeTier?: boolean;
+}) {
   return (
-    <section className="shell py-section-y">
+    <section className={`shell pb-12 ${withHeading ? 'pt-section-y' : 'pt-10'}`}>
       {withHeading ? (
         <Reveal className="max-w-prose">
           <p className="text-eyebrow uppercase text-accent">Pricing</p>
@@ -62,24 +70,28 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
         </Reveal>
       ) : null}
 
-      {/* Free tier - lead with it (M00 §3). */}
-      <Reveal delay={0.05} className="mt-10">
-        <div className="flex flex-col items-start justify-between gap-6 rounded-xl border border-accent/40 bg-accent-soft/50 p-6 md:flex-row md:items-center md:p-8">
-          <div>
-            <p className="text-heading-md text-ink">Free to start</p>
-            <p className="mt-2 max-w-prose text-body text-muted">
-              Create an account and get {FREE_SIGNUP_CREDITS} free credits - enough to find real
-              leads, research them, write your first emails, and send them. No card needed.
-            </p>
+      {/* Free tier - lead with it (M00 §3). Shown on the homepage; on /pricing the
+          hero already carries free-to-start, so it is hidden there and folded into
+          the "How credits work" card footer instead (no flow-breaking band). */}
+      {withFreeTier ? (
+        <Reveal delay={0.05} className="mt-10">
+          <div className="flex flex-col items-start justify-between gap-6 rounded-xl border border-accent/40 bg-accent-soft/50 p-6 md:flex-row md:items-center md:p-8">
+            <div>
+              <p className="text-heading-md text-ink">Free to start</p>
+              <p className="mt-2 max-w-prose text-body text-muted">
+                Create an account and get {FREE_SIGNUP_CREDITS} free credits - enough to find real
+                leads, research them, write your first emails, and send them. No card needed.
+              </p>
+            </div>
+            <div className="shrink-0">
+              <CtaButton href={SIGNUP_URL} size="lg">
+                Start free
+              </CtaButton>
+              <CtaMicrocopy className="mt-2" />
+            </div>
           </div>
-          <div className="shrink-0">
-            <CtaButton href={SIGNUP_URL} size="lg">
-              Start free
-            </CtaButton>
-            <CtaMicrocopy className="mt-2" />
-          </div>
-        </div>
-      </Reveal>
+        </Reveal>
+      ) : null}
 
       {/* How credits work - the whole loop, priced (matches the approved comp):
           value copy on the left, the Find -> Research -> Write -> Send flow with
@@ -92,7 +104,7 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
               <p className="text-eyebrow uppercase text-accent">How credits work</p>
               <h3 className="mt-3 text-heading-lg text-ink">One simple unit: credits.</h3>
               <p className="mt-3 text-body text-muted">
-                Credits cover the whole loop, pay as you go. From {LOWEST_PER_CREDIT_USD}/credit —
+                Credits cover the whole loop, pay as you go. From {LOWEST_PER_CREDIT_USD}/credit,
                 cheaper by the pack.
               </p>
             </div>
@@ -130,8 +142,8 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
             </ol>
           </div>
 
-          <p className="mt-6 border-t border-line pt-5 text-body-sm text-muted">
-            A full lead — found, researched, written, sent — runs about{' '}
+          <p className="mt-6 border-t border-line pt-5 text-center text-body-sm text-muted">
+            A full lead, found, researched, written and sent, runs about{' '}
             <span className="font-medium text-ink">
               {CREDITS_PER_LEAD_LOW}&ndash;{CREDITS_PER_LEAD_HIGH} credits
             </span>
@@ -141,10 +153,27 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
             </span>
             .
           </p>
+
+          {/* Compact free-start nudge (only when the standalone band is hidden, i.e.
+              on /pricing where the hero already carries free-to-start). */}
+          {!withFreeTier ? (
+            <div className="mt-5 flex flex-col items-center justify-center gap-3 border-t border-line pt-5 text-center sm:flex-row sm:gap-4">
+              <p className="text-body-sm text-ink">
+                <span className="font-medium">Start free with {FREE_SIGNUP_CREDITS} credits</span>. No
+                card, no commitment.
+              </p>
+              <CtaButton href={SIGNUP_URL} size="sm">
+                Start free
+              </CtaButton>
+            </div>
+          ) : null}
         </div>
       </Reveal>
 
-      {/* Top-up packs - real prices from shared; each shows who it suits. */}
+      {/* Top-up packs - shown on the homepage; hidden on /pricing where the
+          comparison matrix is the single pack view (no duplication). */}
+      {withPacks ? (
+        <>
       <div className="mt-8 grid gap-5 md:grid-cols-3">
         {CREDIT_PACKS.map((pack, i) => {
           const best = pack.id === bestPackId;
@@ -225,6 +254,8 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
           any country.
         </p>
       </Reveal>
+        </>
+      ) : null}
     </section>
   );
 }

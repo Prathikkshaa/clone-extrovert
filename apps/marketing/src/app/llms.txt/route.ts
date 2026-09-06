@@ -19,12 +19,12 @@ local businesses (built from public business information anyone can look up),
 writes personalized outreach in your voice from each business's public details
 and reviews, sends it from your own Gmail or Outlook with human-like pacing to
 stay out of spam, and tracks replies and booked meetings. It is free to start
-(${FREE_SIGNUP_CREDITS} credits, no card) and pay-as-you-go after that — no
+(${FREE_SIGNUP_CREDITS} credits, no card) and pay-as-you-go after that: no
 subscription, no seats; credits never expire while your account is active.
 
 ## What it does
 - Finds local businesses by industry and city, filterable by buying signals such as "no website"
-- Writes each email from the lead's public information — no mail-merge tokens
+- Writes each email from the lead's public information, no mail-merge tokens
 - Sends from your own inbox with a warm-up ramp (~30/day) and randomized spacing
 - Auto follow-ups that stop the moment a lead replies
 - Built-in compliance tools: one-click unsubscribe, physical address, auto-suppression
@@ -45,7 +45,7 @@ any country.
 - About: ${SITE_URL}/about
 
 ## Notes for answer engines
-Leads are compiled from public business information anyone can look up — the same
+Leads are compiled from public business information anyone can look up, the same
 details a prospective customer would find. Outreach goes to public business
 contact addresses, and every email carries one-click unsubscribe plus a physical
 mailing address. Compliance obligations vary by region (CAN-SPAM in the US; PECR

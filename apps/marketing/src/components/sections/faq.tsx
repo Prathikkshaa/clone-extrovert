@@ -6,9 +6,19 @@
 // The Q/A structure is clean so M04 can annotate it with FAQPage schema.
 import { useState } from 'react';
 import { Reveal } from '@/components/reveal';
-import { FAQ_ITEMS } from '@/lib/faq';
+import { FAQ_ITEMS, type FaqItem } from '@/lib/faq';
 
-export function Faq({ withHeading = true }: { withHeading?: boolean }) {
+export function Faq({
+  withHeading = true,
+  items = FAQ_ITEMS,
+  title = 'The honest answers.',
+  intro = 'The things people actually worry about before trying a cold-outreach tool.',
+}: {
+  withHeading?: boolean;
+  items?: FaqItem[];
+  title?: string;
+  intro?: string;
+}) {
   // The questions people worry about most (deliverability, lead source + legality,
   // and "do I need to be technical?") open by default so the answers - and the named
   // data source - are visible without a click. The rest stay collapsed.
@@ -27,10 +37,8 @@ export function Faq({ withHeading = true }: { withHeading?: boolean }) {
         {withHeading ? (
           <Reveal>
             <p className="text-eyebrow uppercase text-accent">Questions</p>
-            <h2 className="mt-3 text-display-md text-ink">The honest answers.</h2>
-            <p className="mt-4 max-w-prose text-body-lg text-muted">
-              The things people actually worry about before trying a cold-outreach tool.
-            </p>
+            <h2 className="mt-3 text-display-md text-ink">{title}</h2>
+            <p className="mt-4 max-w-prose text-body-lg text-muted">{intro}</p>
           </Reveal>
         ) : (
           <div />
@@ -38,7 +46,7 @@ export function Faq({ withHeading = true }: { withHeading?: boolean }) {
 
         <Reveal delay={0.05}>
           <ul className="divide-y divide-line border-y border-line">
-            {FAQ_ITEMS.map((item, i) => {
+            {items.map((item, i) => {
               const isOpen = open.has(i);
               const btnId = `faq-q-${i}`;
               const panelId = `faq-a-${i}`;

@@ -36,6 +36,43 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: 'What does it cost?',
-    a: 'Start free with 100 credits, no card. After that you pay only for what you use - about 5-7 credits per lead end to end - roughly $0.40-0.58 each - so $45 (550 credits) ≈ 78-110 leads. Billed in USD; cards from any country.',
+    a: 'Start free with 100 credits, no card. After that you pay only for what you use, about 5-7 credits per lead end to end (roughly $0.41-0.58 each), so $45 (550 credits) ≈ 78-110 leads. Billed in USD; cards from any country.',
+  },
+];
+
+// Pricing-page FAQ: the money questions people ask before buying. Numbers match
+// lib/pricing-math (kept in words here; if packs change, update both).
+export const PRICING_FAQ_ITEMS: FaqItem[] = [
+  {
+    q: 'How much does one lead actually cost?',
+    a: 'About $0.37 to $0.71 all in, depending on the pack: found, researched, written and sent. Bigger packs cost less per lead, with Scale working out to roughly $0.37 each.',
+  },
+  {
+    q: 'What is a credit, and what does it buy?',
+    a: 'One simple unit. A full lead runs about 5 to 7 credits: find it (1), research it (2), write the 3-email sequence (1), and each email sent (1). Credits are roughly $0.074 to $0.10 each, cheaper by the pack.',
+  },
+  {
+    q: 'Is there a subscription or contract?',
+    a: 'No. Pay-as-you-go credits, bought only when you need them. No subscription, no seats, no monthly minimum.',
+  },
+  {
+    q: 'Do unused credits expire?',
+    a: 'No. Credits never expire while your account is active, so you can buy in advance and use them at your own pace.',
+  },
+  {
+    q: 'Can I try it before paying?',
+    a: 'Yes. You get 100 free credits on signup, no card required, enough for roughly 14 to 20 leads end to end before you ever pay.',
+  },
+  {
+    q: 'Which pack should I choose?',
+    a: 'Starter to test the waters, Growth for steady weekly outreach, Scale for always-on volume and the lowest price per credit. Choose Custom if you need invoicing, purchase orders, or volume beyond the packs.',
+  },
+  {
+    q: 'How do I pay, and do non-US cards work?',
+    a: 'Cards from any country, billed in USD. Invoicing and purchase orders are available on the Custom plan.',
+  },
+  {
+    q: 'What if I run out of credits?',
+    a: 'Nothing breaks and nothing auto-charges. Paid actions simply pause until you top up, whenever you choose to.',
   },
 ];

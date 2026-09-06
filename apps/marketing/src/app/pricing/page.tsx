@@ -1,13 +1,10 @@
 import type { Metadata } from 'next';
 import { Pricing } from '@/components/sections/pricing';
-import {
-  PricingRoiBand,
-  ComparisonMatrix,
-  EnterpriseCard,
-} from '@/components/sections/pricing-enterprise';
+import { PricingRoiBand, ComparisonMatrix } from '@/components/sections/pricing-enterprise';
 import { Faq } from '@/components/sections/faq';
 import { FinalCta } from '@/components/sections/final-cta';
 import { FaqJsonLd } from '@/components/structured-data';
+import { PRICING_FAQ_ITEMS } from '@/lib/faq';
 
 export const metadata: Metadata = {
   title: 'Pricing',
@@ -23,14 +20,17 @@ export const metadata: Metadata = {
 export default function PricingPage() {
   return (
     <>
-      <FaqJsonLd />
+      <FaqJsonLd items={PRICING_FAQ_ITEMS} />
 
       <PricingRoiBand />
-      <Pricing withHeading={false} />
+      <Pricing withHeading={false} withPacks={false} withFreeTier={false} />
       <ComparisonMatrix />
-      <EnterpriseCard />
 
-      <Faq />
+      <Faq
+        items={PRICING_FAQ_ITEMS}
+        title="Pricing, answered."
+        intro="The money questions people ask before they start."
+      />
       <FinalCta />
     </>
   );

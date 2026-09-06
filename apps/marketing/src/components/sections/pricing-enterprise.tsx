@@ -85,7 +85,7 @@ export function PricingRoiBand() {
   const stats = [
     { big: LOWEST_COST_PER_LEAD, unit: 'a lead', label: 'found, researched, written & sent' },
     { big: `${CREDITS_PER_LEAD_LOW}–${CREDITS_PER_LEAD_HIGH}`, unit: 'credits', label: 'per lead, end to end' },
-    { big: '100', unit: 'free credits', label: 'to start — no card required' },
+    { big: '100', unit: 'free credits', label: 'to start, no card required' },
   ];
 
   return (
@@ -105,7 +105,7 @@ export function PricingRoiBand() {
               <span className="text-white/45">not a headcount.</span>
             </h1>
             <p className="mt-5 max-w-md text-body-lg text-white/70">
-              Start free with 100 credits. After that you only pay for what you use — from{' '}
+              Start free with 100 credits. After that you only pay for what you use, from{' '}
               {LOWEST_COST_PER_LEAD} a lead, found, researched, written and sent. No seats, no
               subscription, nothing hidden.
             </p>
@@ -121,21 +121,21 @@ export function PricingRoiBand() {
               artwork; the stairs he stands on are drawn behind his feet. Lives in
               its own grid column so it never overlaps the headline or the card. */}
           <div className="hidden self-end xl:block" aria-hidden>
-            <div className="relative w-full pb-8">
-              {/* staircase Milo stands on: two dark-green steps with lit top edges,
-                  the lower one wider and shifted forward-left (descending). */}
-              <div className="absolute inset-x-0 bottom-0 z-0 flex flex-col items-center">
-                <div className="h-9 w-40 rounded-[5px] bg-[#1a2a26] shadow-[inset_0_1.5px_0_rgba(255,255,255,0.14)]" />
-                <div className="-mt-3.5 mr-14 h-9 w-56 rounded-[5px] bg-[#122320] shadow-[inset_0_1.5px_0_rgba(255,255,255,0.09)]" />
-              </div>
+            <div className="relative w-full">
+              {/* Milo stands ON the stairs: the artwork sits on top, the two steps
+                  flow directly beneath his feet (tucked up so he rests on them). */}
               <img
                 src="/milo/milo-hero-bubble.webp"
                 alt=""
                 width={300}
                 height={246}
                 loading="eager"
-                className="relative z-10 -mb-3 w-full"
+                className="relative z-10 w-full"
               />
+              <div className="relative z-0 -mt-6 flex flex-col items-center">
+                <div className="h-8 w-40 rounded-[5px] bg-[#1a2a26] shadow-[inset_0_1.5px_0_rgba(255,255,255,0.14)]" />
+                <div className="-mt-2 h-8 w-56 rounded-[5px] bg-[#122320] shadow-[inset_0_1.5px_0_rgba(255,255,255,0.09)]" />
+              </div>
             </div>
           </div>
 
@@ -197,6 +197,22 @@ export function PricingRoiBand() {
             </div>
           ))}
         </dl>
+
+        {/* ROI reframe - illustrative, not a fabricated stat (honesty rule). */}
+        <p className="mx-auto mt-8 max-w-4xl text-center text-body-sm text-white/60">
+          Do the math: one client you win usually covers hundreds of leads. You set the offer; we keep the cost per lead in cents.
+        </p>
+        {/* Key positioning: one tool replaces the whole stack. */}
+        <div className="mx-auto mt-5 flex max-w-2xl flex-wrap items-center justify-center gap-x-3 gap-y-2 text-body-sm">
+          {['Lead lists', 'Email finder', 'Copywriter', 'Cold-email tool', 'Scheduler'].map((t) => (
+            <span key={t} className="text-white/40 line-through">
+              {t}
+            </span>
+          ))}
+          <span className="rounded-full bg-accent/15 px-3 py-1 font-medium text-accent-strong">
+            One tool, pay for what you use
+          </span>
+        </div>
       </div>
     </section>
   );
@@ -245,13 +261,14 @@ export function ComparisonMatrix() {
     best?: boolean;
     custom?: boolean;
     baked?: boolean; // artwork already includes its speech bubble
+    bestFor: string[];
   };
   const byId = Object.fromEntries(CREDIT_PACKS.map((p) => [p.id, p])) as Record<string, CreditPack>;
   const columns: Col[] = [
-    { id: 'starter', name: 'Starter', tagline: 'Try it out.', img: 'milo-hero', bubble: 'A great place to start.', pack: byId['starter'] },
-    { id: 'growth', name: 'Growth', tagline: 'For steady progress.', img: 'milo-typing', bubble: 'For consistent outreach.', pack: byId['growth'] },
-    { id: 'scale', name: 'Scale', tagline: 'For high-volume outreach.', img: 'milo-scale-full', bubble: 'More meetings. Less cost.', pack: byId['scale'], best: true, baked: true },
-    { id: 'custom', name: 'Custom', tagline: 'Built for your needs.', img: 'milo-custom-full', bubble: "Need more? Let's tailor it for you.", custom: true, baked: true },
+    { id: 'starter', name: 'Starter', tagline: 'Try it out.', img: 'milo-hero', bubble: 'A great place to start.', pack: byId['starter'], bestFor: ['Your first outreach test', 'A single niche or city', 'Replies before you commit'] },
+    { id: 'growth', name: 'Growth', tagline: 'For steady progress.', img: 'milo-typing', bubble: 'For consistent outreach.', pack: byId['growth'], bestFor: ['Weekly campaigns', 'One or two niches', 'Solo consultants & freelancers'] },
+    { id: 'scale', name: 'Scale', tagline: 'For high-volume outreach.', img: 'milo-scale-full', bubble: 'More meetings. Less cost.', pack: byId['scale'], best: true, baked: true, bestFor: ['Always-on, high volume', 'Multiple clients & inboxes', 'Lowest price per credit'] },
+    { id: 'custom', name: 'Custom', tagline: 'Built for your needs.', img: 'milo-custom-full', bubble: "Need more? Let's tailor it for you.", custom: true, baked: true, bestFor: ['Volume beyond the packs', 'Invoicing & purchase orders', 'Help to launch'] },
   ];
   const rows: { label: string; icon: keyof typeof ROW_ICONS; value: (c: Col) => ReactNode }[] = [
     { label: 'Price', icon: 'tag', value: (c) => (c.pack ? usd(c.pack.priceUsdCents) : "Let's talk") },
@@ -268,14 +285,14 @@ export function ComparisonMatrix() {
       } },
     { label: '$ / credit', icon: 'percent', value: (c) => (c.pack ? `$${(c.pack.priceUsdCents / c.pack.credits / 100).toFixed(3)}` : `From ${LOWEST_PER_CREDIT_USD}`) },
     { label: 'Credits expire', icon: 'clock', value: () => 'Never' },
-    { label: 'Invoicing & POs', icon: 'doc', value: (c) => (c.custom ? 'Yes' : '—') },
+    { label: 'Invoicing & POs', icon: 'doc', value: (c) => (c.custom ? 'Yes' : '–') },
   ];
 
   // Per-cell highlight for the Scale column (continuous bordered box).
   const hi = (c: Col, extra = '') => (c.best ? `bg-accent-soft/50 border-x border-accent ${extra}` : '');
 
   return (
-    <section className="relative overflow-hidden bg-canvas py-section-y">
+    <section className="relative overflow-hidden bg-canvas pb-section-y pt-8">
       {/* header */}
       <div className="shell relative">
         <div className="relative text-center">
@@ -285,26 +302,18 @@ export function ComparisonMatrix() {
             Nothing hidden. No estimates buried in the fine print. Every number comes from the same
             credit cost you actually pay.
           </p>
-          {/* flying Milo with bubble, xl only */}
-          <div className="absolute -top-4 right-0 hidden items-start gap-2 xl:flex" aria-hidden>
-            <div className="relative mt-4 max-w-[9rem] rounded-2xl bg-surface px-3.5 py-2 text-left text-[0.8rem] font-medium leading-tight text-ink shadow-card">
-              Same power. Lower cost as you scale.
-              <span className="absolute -right-1.5 top-5 h-3 w-3 rotate-45 bg-surface" />
-            </div>
-            <img src="/milo/milo-flying.webp" alt="" width={96} height={92} className="h-auto w-[76px]" />
-          </div>
         </div>
 
         {/* the grid */}
-        <Reveal className="mt-12 overflow-x-auto pb-2">
-          <div className="grid min-w-[860px] grid-cols-[minmax(150px,0.85fr)_repeat(4,minmax(0,1fr))] items-stretch">
+        <Reveal className="mt-10 overflow-x-auto pb-2">
+          <div className="grid min-w-[720px] grid-cols-[minmax(150px,0.85fr)_repeat(4,minmax(0,1fr))] items-stretch">
             {/* Row 0: mascots + bubbles */}
             <div />
             {columns.map((c) =>
               c.baked ? (
                 // Artwork already carries its speech bubble - show it whole.
                 <div key={c.id} className="flex items-end justify-center px-2 pb-2">
-                  <img src={`/milo/${c.img}.webp`} alt="" className="h-auto w-full max-w-[230px]" />
+                  <img src={`/milo/${c.img}.webp`} alt="" className="h-auto w-full max-w-[150px]" />
                 </div>
               ) : (
                 <div key={c.id} className="flex flex-col items-center justify-end px-3 pb-3">
@@ -312,7 +321,7 @@ export function ComparisonMatrix() {
                     {c.bubble}
                     <span className="absolute -bottom-1 left-1/2 h-2.5 w-2.5 -translate-x-1/2 rotate-45 bg-surface" />
                   </div>
-                  <img src={`/milo/${c.img}.webp`} alt="" width={100} height={100} className="h-[84px] w-auto" />
+                  <img src={`/milo/${c.img}.webp`} alt="" width={100} height={100} className="h-[56px] w-auto" />
                 </div>
               ),
             )}
@@ -322,7 +331,7 @@ export function ComparisonMatrix() {
             {columns.map((c) => (
               <div
                 key={c.id}
-                className={`relative px-4 pb-4 pt-4 text-center ${hi(c, 'rounded-t-2xl border-t')}`}
+                className={`relative px-3 pb-3 pt-3 text-center ${hi(c, 'rounded-t-2xl border-t')}`}
               >
                 {c.best ? (
                   <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent px-3 py-0.5 text-[0.66rem] font-medium text-white">
@@ -339,14 +348,14 @@ export function ComparisonMatrix() {
               const Icon = ROW_ICONS[r.icon];
               return (
                 <Fragment key={r.label}>
-                  <div className="flex items-center gap-2.5 border-t border-line px-2 py-3.5 text-body-sm font-medium text-ink">
+                  <div className="flex items-center gap-2.5 border-t border-line px-2 py-2.5 text-body-sm font-medium text-ink">
                     <Icon />
                     {r.label}
                   </div>
                   {columns.map((c) => (
                     <div
                       key={c.id}
-                      className={`flex items-center justify-center border-t border-line px-4 py-3.5 text-center text-body-sm ${
+                      className={`flex items-center justify-center border-t border-line px-4 py-2.5 text-center text-body-sm ${
                         c.best ? 'font-medium text-ink' : 'text-ink/80'
                       } ${hi(c)}`}
                     >
@@ -357,10 +366,33 @@ export function ComparisonMatrix() {
               );
             })}
 
+            {/* Best for - self-selection copy folded in from the old pack cards */}
+            <div className="flex items-start gap-2.5 border-t border-line px-2 py-2.5 text-body-sm font-medium text-ink">
+              <span className="mt-0.5">
+                <IconGift />
+              </span>
+              Best for
+            </div>
+            {columns.map((c) => (
+              <div
+                key={c.id}
+                className={`border-t border-line px-4 py-2.5 text-body-sm text-ink/80 ${hi(c)}`}
+              >
+                <ul className="space-y-1">
+                  {c.bestFor.map((b) => (
+                    <li key={b} className="flex gap-2">
+                      <span aria-hidden className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent" />
+                      <span>{b}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+
             {/* CTA row (bottom of the highlighted box) */}
             <div className="px-2 pt-5" />
             {columns.map((c) => (
-              <div key={c.id} className={`px-3 pb-5 pt-5 ${hi(c, 'rounded-b-2xl border-b')}`}>
+              <div key={c.id} className={`px-3 pb-4 pt-3 ${hi(c, 'rounded-b-2xl border-b')}`}>
                 {c.custom ? (
                   <CtaButton href={CONTACT_URL} variant="secondary" size="sm" className="w-full">
                     Talk to us
