@@ -176,6 +176,8 @@ export function HowItWorks() {
                 aria-selected={isActive}
                 aria-controls="hiw-panel"
                 tabIndex={isActive ? 0 : -1}
+                onMouseEnter={() => setActive(i)}
+                onFocus={() => setActive(i)}
                 onClick={() => setActive(i)}
                 onKeyDown={onKeyDown}
                 className={[
