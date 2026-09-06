@@ -23,19 +23,37 @@ const bestPackId = bestPack.id;
 // are NOT all $0.10 — they get cheaper with volume, and the old "≈" hid that.
 const LOWEST_PER_CREDIT_USD = `$${(bestPack.priceUsdCents / bestPack.credits / 100).toFixed(3)}`;
 
-// Worked example, computed from the real per-action costs so it can never drift:
-// one lead taken all the way through = find + research + write a sequence + send.
-const CREDITS_PER_LEAD =
-  CREDIT_COSTS.search + CREDIT_COSTS.enrichment + CREDIT_COSTS.draft + CREDIT_COSTS.send;
-// Anchor the example on the popular "Growth" pack when present, else the first pack.
-const examplePack = CREDIT_PACKS.find((p) => p.popular) ?? CREDIT_PACKS[0];
-const EXAMPLE_LEADS = Math.round(examplePack.credits / CREDITS_PER_LEAD);
+// Honest per-lead credit math, computed from the real per-action costs so it can
+// never drift. A lead is found (search), researched (enrichment), and its 3-email
+// sequence written once (draft). SENDS vary: follow-ups stop the moment a lead
+// replies, so at best 1 email sends, at worst all 3 do.
+const CREDITS_PER_LEAD_BASE =
+  CREDIT_COSTS.search + CREDIT_COSTS.enrichment + CREDIT_COSTS.draft;
+const CREDITS_PER_LEAD_LOW = CREDITS_PER_LEAD_BASE + CREDIT_COSTS.send; // reply came early
+const CREDITS_PER_LEAD_HIGH = CREDITS_PER_LEAD_BASE + 3 * CREDIT_COSTS.send; // full sequence
 
-// Who each pack suits, so customers self-select their best match.
-const SUITED_FOR: Record<string, string> = {
-  starter: 'Best for trying it on your first campaign',
-  growth: 'Best for freelancers running steady outreach',
-  scale: 'Best for agencies reaching out at volume',
+// Leads a pack works, as an honest RANGE (both floored so we never over-promise):
+// fewer sends per lead => more leads, so low-lead-count uses the HIGH per-lead cost.
+const leadsForPack = (credits: number) => ({
+  low: Math.floor(credits / CREDITS_PER_LEAD_HIGH),
+  high: Math.floor(credits / CREDITS_PER_LEAD_LOW),
+});
+
+// Anchor the worked example on the popular "Growth" pack when present, else the first.
+const examplePack = CREDIT_PACKS.find((p) => p.popular) ?? CREDIT_PACKS[0];
+const exampleLeads = leadsForPack(examplePack.credits);
+
+// Three justification layers per card (self-selection): who it's designed for +
+// concrete "best for" signals. The outcome range is computed per pack below.
+const DESIGNED_FOR: Record<string, string> = {
+  starter: 'Trying it on your first real campaign.',
+  growth: 'Freelancers running steady, weekly outreach.',
+  scale: 'Agencies reaching out at volume.',
+};
+const BEST_FOR: Record<string, string[]> = {
+  starter: ['Your first outreach test', 'A single niche or city', 'Seeing replies before you commit'],
+  growth: ['Consistent weekly campaigns', 'One or two niches at a time', 'Solo consultants & freelancers'],
+  scale: ['Always-on, high-volume outreach', 'Multiple clients & inboxes', 'Lowest price per credit'],
 };
 
 export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
@@ -97,11 +115,17 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
             ))}
           </ul>
           <p className="mt-4 text-body-sm text-muted">
-            So one lead taken all the way - found, researched, written, and sent - is about{' '}
-            <span className="font-medium text-ink">{CREDITS_PER_LEAD} credits</span>. The{' '}
-            {usd(examplePack.priceUsdCents)} {examplePack.label} pack (
-            {examplePack.credits.toLocaleString('en-US')} credits) works roughly{' '}
-            <span className="font-medium text-ink">{EXAMPLE_LEADS} leads</span> end to end.
+            So a lead taken all the way - found, researched, written, and its full 3-email
+            sequence sent - runs about{' '}
+            <span className="font-medium text-ink">
+              {CREDITS_PER_LEAD_LOW}&ndash;{CREDITS_PER_LEAD_HIGH} credits
+            </span>{' '}
+            (fewer if they reply early). The {usd(examplePack.priceUsdCents)} {examplePack.label}{' '}
+            pack ({examplePack.credits.toLocaleString('en-US')} credits) works roughly{' '}
+            <span className="font-medium text-ink">
+              {exampleLeads.low}&ndash;{exampleLeads.high} leads
+            </span>{' '}
+            end to end.
           </p>
         </div>
       </Reveal>
@@ -130,7 +154,36 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
                 <p className="mt-1 text-body-sm text-muted">
                   {pack.credits.toLocaleString('en-US')} credits
                 </p>
-                <p className="mt-3 text-body-sm text-ink/80">{SUITED_FOR[pack.id]}</p>
+
+                {/* Outcome: what the credits actually buy, as an honest range. */}
+                {(() => {
+                  const l = leadsForPack(pack.credits);
+                  return (
+                    <p className="mt-3 rounded-md bg-accent-soft px-3 py-2 text-body-sm font-medium text-accent">
+                      ≈ {l.low}&ndash;{l.high} leads, end to end
+                    </p>
+                  );
+                })()}
+
+                {/* Designed for. */}
+                <p className="mt-4 text-[0.72rem] font-medium uppercase tracking-wide text-muted">
+                  Designed for
+                </p>
+                <p className="mt-1 text-body-sm text-ink/80">{DESIGNED_FOR[pack.id]}</p>
+
+                {/* Best for - concrete self-selection signals. */}
+                <p className="mt-4 text-[0.72rem] font-medium uppercase tracking-wide text-muted">
+                  Best for
+                </p>
+                <ul className="mt-1 space-y-1.5 text-body-sm text-ink/80">
+                  {BEST_FOR[pack.id].map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <span aria-hidden className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+
                 <div className="mt-6 flex flex-1 flex-col justify-end">
                   <CtaButton
                     href={SIGNUP_URL}
