@@ -53,7 +53,7 @@ export function SiteHeader() {
         // `bg-canvas/xx` alpha modifier renders transparent on this token. Over a
         // .on-dark section we stay fully transparent and flip the nav to light.
         scrolled && !onDark
-          ? 'border-line bg-[rgba(250,250,248,0.72)] backdrop-blur-md'
+          ? 'border-line bg-[rgba(250,250,248,0.55)] backdrop-blur-lg'
           : 'border-transparent bg-transparent',
       ].join(' ')}
     >
