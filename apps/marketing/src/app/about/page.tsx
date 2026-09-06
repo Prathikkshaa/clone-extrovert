@@ -278,27 +278,15 @@ export default function AboutPage() {
             A simpler way to get meetings with local businesses.
           </h2>
           <p className="mt-5 text-body-lg text-muted">
-            {APP_NAME} is a cold-email and local-business lead-generation tool that finds local
-            businesses worth reaching, writes personalized outreach in your voice, and sends it
-            from your own inbox.
+            {APP_NAME} finds the right local businesses, writes outreach in your voice, and sends
+            it from your own inbox.
           </p>
           <p className="mt-4 text-body-lg text-muted">
-            It exists for one reason: a solo founder or a small agency shouldn&rsquo;t need a full
-            sales team to get meetings. Point it at a market - it does the finding, the writing,
-            and the sending; you show up to the calls.
+            No sales team required - point it at a market, and show up to the calls.
           </p>
         </Reveal>
 
-        <Reveal className="mt-12 flex flex-col items-center gap-8 lg:flex-row lg:items-center lg:justify-center">
-          <img
-            src="/milo/milo-hero.webp"
-            width={414}
-            height={486}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            className="h-auto w-full max-w-[130px] shrink-0"
-          />
+        <Reveal className="mt-12">
           <div className="flex w-full flex-col gap-4 md:flex-row md:items-stretch md:gap-2">
             {STEPS.map((s, i) => (
               <div key={s.title} className="flex flex-col md:flex-1 md:flex-row md:items-center md:gap-2">
@@ -347,9 +335,8 @@ export default function AboutPage() {
             <p className="text-eyebrow uppercase text-accent">The problem &amp; the bet</p>
             <h2 className="mt-3 text-display-md text-ink">Existing tools all miss the mark.</h2>
             <p className="mt-4 text-body-lg text-muted">
-              Lead databases are overpriced and stale. &ldquo;AI&rdquo; writers send generic spam.
-              Cold-email platforms are complex and slow. Stitching five tools together is a project
-              on its own.
+              Lead databases go stale. &ldquo;AI&rdquo; writers spit out spam. Cold-email tools are a
+              slog - and stitching five together is a project of its own.
             </p>
             <p className="mt-6 text-heading-md font-medium text-ink">So the bet is one honest tool.</p>
             <p className="mt-4 text-body-lg text-muted">
@@ -369,7 +356,7 @@ export default function AboutPage() {
           </Reveal>
 
           <Reveal delay={0.05}>
-            <div className="rounded-2xl bg-canvas p-6">
+            <div className="rounded-2xl border border-line bg-surface/60 p-6">
               <div className="relative flex flex-col gap-6 md:flex-row md:items-center">
                 <div className="flex flex-col gap-3 md:flex-1">
                   {TOOLS.map((t) => (
@@ -410,17 +397,6 @@ export default function AboutPage() {
                   <span className="text-body font-medium text-ink">{APP_NAME}</span>
                 </div>
               </div>
-              <div className="mt-4 flex justify-end">
-                <img
-                  src="/milo/milo-celebrating.webp"
-                  width={523}
-                  height={612}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  className="h-auto w-full max-w-[130px]"
-                />
-              </div>
             </div>
           </Reveal>
         </div>
@@ -456,23 +432,6 @@ export default function AboutPage() {
       </section>
 
       <FounderNote />
-
-      <section className="shell max-w-prose py-section-y">
-        <Reveal>
-          <p className="text-eyebrow uppercase text-accent">Where we are</p>
-          <h2 className="mt-3 text-heading-lg text-ink">Early, and building in the open.</h2>
-          <div className="mt-4 space-y-4 text-body-lg text-muted">
-            <p>
-              We&rsquo;d rather say that plainly than fake a wall of logos. What you see is
-              what&rsquo;s built - no more, no less.
-            </p>
-            <p>
-              The roadmap is shaped by what real users ask for. That&rsquo;s the upside of being
-              early: try it now, and your feedback genuinely moves what gets built next.
-            </p>
-          </div>
-        </Reveal>
-      </section>
 
       <FinalCta />
     </>
