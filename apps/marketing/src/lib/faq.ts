@@ -36,6 +36,6 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: 'What does it cost?',
-    a: 'Start free with 100 credits, no card. After that you pay only for what you use - about 5-7 credits per lead end to end, so $45 (550 credits) ≈ 80-110 leads. Billed in USD; cards from any country.',
+    a: 'Start free with 100 credits, no card. After that you pay only for what you use - about 5-7 credits per lead end to end - roughly $0.40-0.58 each - so $45 (550 credits) ≈ 78-110 leads. Billed in USD; cards from any country.',
   },
 ];

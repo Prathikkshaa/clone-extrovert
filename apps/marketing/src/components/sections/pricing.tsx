@@ -10,35 +10,24 @@ import { CtaButton } from '@/components/cta-button';
 import { SIGNUP_URL } from '@/lib/site';
 import { CtaMicrocopy } from '@/components/cta-microcopy';
 import { CREDIT_PACKS, CREDIT_COSTS, FREE_SIGNUP_CREDITS } from '@extrovertai/shared';
+import {
+  usd,
+  bestPack,
+  LOWEST_PER_CREDIT_USD,
+  CREDITS_PER_LEAD_LOW,
+  CREDITS_PER_LEAD_HIGH,
+  leadsForCredits as leadsForPack,
+  costPerLeadUsd as costPerLeadRaw,
+  fmtUsd2,
+} from '@/lib/pricing-math';
 
-const usd = (cents: number) => `$${(cents / 100).toLocaleString('en-US')}`;
-
-// Best-value pack = lowest price per credit (a computed fact, honest highlight).
-const bestPack = [...CREDIT_PACKS].sort(
-  (a, b) => a.priceUsdCents / a.credits - b.priceUsdCents / b.credits,
-)[0];
 const bestPackId = bestPack.id;
 
-// Lowest per-credit price across all packs, derived (not hardcoded). We advertise
-// "from $X/credit" instead of a single "1 credit ≈ $0.10" anchor, because the packs
-// are NOT all $0.10 — they get cheaper with volume, and the old "≈" hid that.
-const LOWEST_PER_CREDIT_USD = `$${(bestPack.priceUsdCents / bestPack.credits / 100).toFixed(3)}`;
-
-// Honest per-lead credit math, computed from the real per-action costs so it can
-// never drift. A lead is found (search), researched (enrichment), and its 3-email
-// sequence written once (draft). SENDS vary: follow-ups stop the moment a lead
-// replies, so at best 1 email sends, at worst all 3 do.
-const CREDITS_PER_LEAD_BASE =
-  CREDIT_COSTS.search + CREDIT_COSTS.enrichment + CREDIT_COSTS.draft;
-const CREDITS_PER_LEAD_LOW = CREDITS_PER_LEAD_BASE + CREDIT_COSTS.send; // reply came early
-const CREDITS_PER_LEAD_HIGH = CREDITS_PER_LEAD_BASE + 3 * CREDIT_COSTS.send; // full sequence
-
-// Leads a pack works, as an honest RANGE (both floored so we never over-promise):
-// fewer sends per lead => more leads, so low-lead-count uses the HIGH per-lead cost.
-const leadsForPack = (credits: number) => ({
-  low: Math.floor(credits / CREDITS_PER_LEAD_HIGH),
-  high: Math.floor(credits / CREDITS_PER_LEAD_LOW),
-});
+// Cost per lead as formatted USD strings for a given pack (derived, never drifts).
+const costPerLeadUsd = (priceUsdCents: number, credits: number) => {
+  const c = costPerLeadRaw(priceUsdCents, credits);
+  return { lo: fmtUsd2(c.lo), hi: fmtUsd2(c.hi) };
+};
 
 // Anchor the worked example on the popular "Growth" pack when present, else the first.
 const examplePack = CREDIT_PACKS.find((p) => p.popular) ?? CREDIT_PACKS[0];
@@ -157,10 +146,16 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
                 {/* Outcome: what the credits actually buy, as an honest range. */}
                 {(() => {
                   const l = leadsForPack(pack.credits);
+                  const cpl = costPerLeadUsd(pack.priceUsdCents, pack.credits);
                   return (
-                    <p className="mt-3 rounded-md bg-accent-soft px-3 py-2 text-body-sm font-medium text-accent">
-                      ≈ {l.low}&ndash;{l.high} leads, end to end
-                    </p>
+                    <div className="mt-3 rounded-md bg-accent-soft px-3 py-2">
+                      <p className="text-body-sm font-medium text-accent">
+                        ≈ {l.low}&ndash;{l.high} leads, end to end
+                      </p>
+                      <p className="mt-0.5 text-[0.78rem] text-accent/80">
+                        about {cpl.lo}&ndash;{cpl.hi} per lead
+                      </p>
+                    </div>
                   );
                 })()}
 
