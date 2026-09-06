@@ -18,7 +18,7 @@ type Row = {
 // real screenshots - M00 §13).
 function EmailDraftVisual() {
   return (
-    <div className="rounded-xl border border-line bg-surface p-5 shadow-[0_20px_50px_-30px_rgba(26,26,24,0.3)]">
+    <div className="rounded-xl border border-line bg-surface p-5 shadow-float">
       <p className="text-body-sm text-muted">To: owner@lonestarroofing.com</p>
       <p className="mt-1 text-body font-medium text-ink">Quick idea for Lone Star Roofing</p>
       <div className="mt-4 space-y-2 text-body-sm text-ink/80">
@@ -39,7 +39,7 @@ function EmailDraftVisual() {
 
 function ComplianceVisual() {
   return (
-    <div className="rounded-xl border border-line bg-surface p-5 shadow-[0_20px_50px_-30px_rgba(26,26,24,0.3)]">
+    <div className="rounded-xl border border-line bg-surface p-5 shadow-float">
       <div className="flex items-center justify-between">
         <span className="text-body-sm text-ink">Sending from you@yourinbox.com</span>
         <span className="rounded-full bg-positive-soft px-2.5 py-1 text-[0.78rem] font-medium text-positive">
@@ -62,7 +62,7 @@ function ComplianceVisual() {
 
 function ComplianceToolsVisual() {
   return (
-    <div className="rounded-xl border border-line bg-surface p-5 shadow-[0_20px_50px_-30px_rgba(26,26,24,0.3)]">
+    <div className="rounded-xl border border-line bg-surface p-5 shadow-float">
       <p className="text-body-sm text-muted">Footer added to every email</p>
       <div className="mt-3 space-y-2 text-body-sm text-ink/80">
         <p>
@@ -83,7 +83,7 @@ function ComplianceToolsVisual() {
 function OneToolVisual() {
   const replaced = ['Lead lists', 'Email finder', 'Copywriter', 'Cold-email tool', 'Scheduler'];
   return (
-    <div className="rounded-xl border border-line bg-surface p-5 shadow-[0_20px_50px_-30px_rgba(26,26,24,0.3)]">
+    <div className="rounded-xl border border-line bg-surface p-5 shadow-float">
       <p className="text-body-sm text-muted">Instead of five subscriptions</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {replaced.map((t) => (

@@ -235,7 +235,7 @@ function LeadsPanel() {
   return (
     <div className="relative" aria-hidden="true">
       {/* Floating trend chip - hidden on small screens to avoid overflow. */}
-      <div className="absolute -right-3 -top-4 z-10 hidden items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2 shadow-lg md:flex">
+      <div className="absolute -right-3 -top-4 z-10 hidden items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2 shadow-card md:flex">
         <TrendUpIcon className="h-5 w-5 shrink-0 text-accent" />
         <div className="text-body-sm leading-tight text-ink">
           <div>More meetings.</div>
@@ -243,7 +243,7 @@ function LeadsPanel() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-xl">
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
         {/* Window bar */}
         <div className="flex items-center gap-3 border-b border-line px-4 py-3">
           <div className="flex items-center gap-1.5">

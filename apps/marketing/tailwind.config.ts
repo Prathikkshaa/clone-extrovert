@@ -23,20 +23,20 @@ const config: Config = {
     },
     extend: {
       colors: {
-        ink: 'var(--color-ink)',
-        canvas: 'var(--color-canvas)',
-        surface: 'var(--color-surface)',
-        muted: 'var(--color-muted)',
-        line: 'var(--color-line)',
-        accent: 'var(--color-accent)',
-        'accent-strong': 'var(--color-accent-strong)',
-        'accent-soft': 'var(--color-accent-soft)',
-        positive: 'var(--color-positive)',
-        'positive-soft': 'var(--color-positive-soft)',
-        warning: 'var(--color-warning)',
-        'warning-soft': 'var(--color-warning-soft)',
-        danger: 'var(--color-danger)',
-        'danger-soft': 'var(--color-danger-soft)',
+        ink: 'rgb(var(--color-ink) / <alpha-value>)',
+        canvas: 'rgb(var(--color-canvas) / <alpha-value>)',
+        surface: 'rgb(var(--color-surface) / <alpha-value>)',
+        muted: 'rgb(var(--color-muted) / <alpha-value>)',
+        line: 'rgb(var(--color-line) / <alpha-value>)',
+        accent: 'rgb(var(--color-accent) / <alpha-value>)',
+        'accent-strong': 'rgb(var(--color-accent-strong) / <alpha-value>)',
+        'accent-soft': 'rgb(var(--color-accent-soft) / <alpha-value>)',
+        positive: 'rgb(var(--color-positive) / <alpha-value>)',
+        'positive-soft': 'rgb(var(--color-positive-soft) / <alpha-value>)',
+        warning: 'rgb(var(--color-warning) / <alpha-value>)',
+        'warning-soft': 'rgb(var(--color-warning-soft) / <alpha-value>)',
+        danger: 'rgb(var(--color-danger) / <alpha-value>)',
+        'danger-soft': 'rgb(var(--color-danger-soft) / <alpha-value>)',
       },
       borderRadius: {
         md: 'var(--radius-md)',
@@ -68,6 +68,12 @@ const config: Config = {
       spacing: {
         // Generous section rhythm — deliberate density variation (M00 §5).
         'section-y': 'clamp(4rem, 2.5rem + 7vw, 8rem)',
+      },
+      boxShadow: {
+        // Unified elevation scale: panels/cards use `card`, editorial floating
+        // mock visuals use `float`.
+        card: '0 1px 2px rgb(26 26 24 / 0.04), 0 12px 32px -16px rgb(26 26 24 / 0.16)',
+        float: '0 20px 50px -30px rgb(26 26 24 / 0.28)',
       },
       transitionTimingFunction: {
         // One considered easing used across micro-interactions (calm, human).
