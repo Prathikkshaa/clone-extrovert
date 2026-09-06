@@ -28,7 +28,7 @@ export default function BlogIndexPage() {
             <Reveal as="li" key={post.slug} delay={i * 0.05}>
               <Link
                 href={`/blog/${post.slug}`}
-                className="group block h-full rounded-lg border border-line bg-surface p-6 transition-colors hover:border-accent"
+                className="group block h-full rounded-xl border border-line bg-surface p-6 shadow-card transition-all hover:border-accent/40 hover:shadow-float"
               >
                 <p className="text-eyebrow uppercase text-accent">{post.category}</p>
                 <h2 className="mt-2 text-heading-md text-ink group-hover:text-accent">
