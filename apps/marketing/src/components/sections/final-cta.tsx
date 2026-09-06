@@ -5,7 +5,8 @@
 // globals.css neutralises its animation (so it's reduced-motion-safe by default).
 import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
-import { SIGNUP_URL, CTA_MICROCOPY } from '@/lib/site';
+import { SIGNUP_URL } from '@/lib/site';
+import { CtaMicrocopy } from '@/components/cta-microcopy';
 
 export function FinalCta() {
   return (
@@ -28,7 +29,7 @@ export function FinalCta() {
             <CtaButton href={SIGNUP_URL} size="lg">
               Start free
             </CtaButton>
-            <p className="text-body-sm text-muted">{CTA_MICROCOPY}</p>
+            <CtaMicrocopy />
           </div>
         </Reveal>
       </div>

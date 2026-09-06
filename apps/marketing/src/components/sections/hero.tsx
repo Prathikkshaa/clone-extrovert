@@ -1,56 +1,385 @@
-// SERVER component - the hero. Asymmetric, left-aligned (M00 §5): copy + CTAs on
-// the left, the product visual (with the one parallax island) on the right;
-// stacks on mobile (headline → visual → CTAs handled by source order + grid).
+// SERVER component - the hero. Two-column layout (M00 §5): copy + CTAs on the
+// left, a realistic product "leads panel" card on the right; below the two
+// columns a full-width 3-up feature strip. Stacks on mobile.
 //
 // Copy is DIRECTION per M02 - specific, transformation-led, no hype words. The
-// user refines final words.
+// user refines final words. The leads panel is illustrative/decorative
+// (aria-hidden) - the numbers are a sample list, not real metrics.
+import type { ReactElement } from 'react';
 import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
-import { HeroVisual } from '@/components/hero-visual';
-import { ProductPanel } from '@/components/product-panel';
-import { SIGNUP_URL, CTA_MICROCOPY } from '@/lib/site';
+import { SIGNUP_URL } from '@/lib/site';
+
+// --- inline thin-line icons (generic, no brand marks) ---
+type IconProps = { className?: string };
+
+function CheckIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+
+function StoreIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M3 9 4.5 4h15L21 9" />
+      <path d="M4 9v11h16V9" />
+      <path d="M9 20v-6h6v6" />
+    </svg>
+  );
+}
+
+function WrenchIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M14.7 6.3a4 4 0 0 0-5.4 5l-6 6 2.4 2.4 6-6a4 4 0 0 0 5-5.4l-2.6 2.6-2-2 2.6-2.6Z" />
+    </svg>
+  );
+}
+
+function BoltIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" />
+    </svg>
+  );
+}
+
+function ChevronIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="m9 6 6 6-6 6" />
+    </svg>
+  );
+}
+
+function TrendUpIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M3 17l6-6 4 4 8-8" />
+      <path d="M17 7h4v4" />
+    </svg>
+  );
+}
+
+function MagnifierIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+    </svg>
+  );
+}
+
+function EnvelopeIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m3 7 9 6 9-6" />
+    </svg>
+  );
+}
+
+function CalendarIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="3" y="4" width="18" height="17" rx="2" />
+      <path d="M3 9h18M8 2v4M16 2v4" />
+    </svg>
+  );
+}
+
+// --- sample lead list (illustrative only) ---
+type Lead = {
+  name: string;
+  meta: string;
+  badge: string;
+  badgeActive: boolean;
+  Icon: (p: IconProps) => ReactElement;
+};
+
+const LEADS: Lead[] = [
+  {
+    name: 'Lone Star Roofing & Exteriors',
+    meta: 'Roofing · ★ 4.8 (126)',
+    badge: 'No website',
+    badgeActive: true,
+    Icon: StoreIcon,
+  },
+  {
+    name: 'Hill Country Concrete Co.',
+    meta: 'Concrete · ★ 4.6 (58)',
+    badge: 'No website',
+    badgeActive: true,
+    Icon: WrenchIcon,
+  },
+  {
+    name: 'Delgado Custom Carpentry',
+    meta: 'Carpentry · ★ 4.9 (41)',
+    badge: 'Has site',
+    badgeActive: false,
+    Icon: StoreIcon,
+  },
+  {
+    name: 'Brazos Valley Plumbing',
+    meta: 'Plumbing · ★ 4.7 (203)',
+    badge: 'No website',
+    badgeActive: true,
+    Icon: WrenchIcon,
+  },
+  {
+    name: 'Third Coast Electric',
+    meta: 'Electrical · ★ 4.5 (89)',
+    badge: 'Has site',
+    badgeActive: false,
+    Icon: BoltIcon,
+  },
+];
+
+const BENEFITS = ['No card needed', 'Free to start', 'Works worldwide'];
+
+const FEATURES: { Icon: (p: IconProps) => ReactElement; label: string; copy: string }[] = [
+  { Icon: MagnifierIcon, label: 'Local businesses', copy: 'Find high-fit leads in any city.' },
+  {
+    Icon: EnvelopeIcon,
+    label: 'Personalized outreach',
+    copy: 'Written in your voice, not AI spam.',
+  },
+  { Icon: CalendarIcon, label: 'More meetings', copy: 'You focus on the calls.' },
+];
+
+function LeadsPanel() {
+  return (
+    <div className="relative" aria-hidden="true">
+      {/* Floating trend chip - hidden on small screens to avoid overflow. */}
+      <div className="absolute -right-3 -top-4 z-10 hidden items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2 shadow-lg md:flex">
+        <TrendUpIcon className="h-5 w-5 shrink-0 text-accent" />
+        <div className="text-body-sm leading-tight text-ink">
+          <div>More meetings.</div>
+          <div>Less work.</div>
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-xl">
+        {/* Window bar */}
+        <div className="flex items-center gap-3 border-b border-line px-4 py-3">
+          <div className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#f87171]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#fbbf24]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#34d399]" />
+          </div>
+          <p className="text-body-sm text-ink">Leads · Austin, TX</p>
+          <p className="ml-auto text-body-sm text-muted">20 results</p>
+        </div>
+
+        {/* Filter chips */}
+        <div className="flex flex-wrap items-center gap-2 px-4 py-3">
+          <span className="rounded-full border border-line px-3 py-1 text-body-sm text-ink">
+            Construction
+          </span>
+          <span className="rounded-full border border-line px-3 py-1 text-body-sm text-ink">
+            Austin, TX
+          </span>
+          <span className="rounded-full bg-accent-soft px-3 py-1 text-body-sm text-accent">
+            No website ✓
+          </span>
+        </div>
+
+        {/* Lead rows */}
+        <ul className="divide-y divide-line border-t border-line">
+          {LEADS.map((lead) => {
+            const { Icon } = lead;
+            return (
+              <li key={lead.name} className="flex items-center gap-3 px-4 py-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
+                  <Icon className="h-[18px] w-[18px]" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-body-sm font-medium text-ink">{lead.name}</p>
+                  <p className="truncate text-[0.8rem] text-muted">{lead.meta}</p>
+                </div>
+                <span
+                  className={
+                    lead.badgeActive
+                      ? 'shrink-0 rounded-full bg-accent-soft px-2.5 py-1 text-[0.75rem] text-accent'
+                      : 'shrink-0 rounded-full border border-line px-2.5 py-1 text-[0.75rem] text-muted'
+                  }
+                >
+                  {lead.badge}
+                </span>
+                <ChevronIcon className="h-4 w-4 shrink-0 text-muted" />
+              </li>
+            );
+          })}
+        </ul>
+
+        {/* Footer */}
+        <div className="flex items-center gap-3 border-t border-line px-4 py-3">
+          <p className="text-body-sm text-muted">5 of 20 leads · 3 with no website</p>
+          <span className="ml-auto rounded-md bg-accent px-3 py-1.5 text-body-sm text-white">
+            Save to list
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function Hero() {
   return (
-    <section className="shell grid items-center gap-12 pb-10 pt-14 md:grid-cols-[1.1fr_0.9fr] md:gap-16 md:pb-16 md:pt-24">
-      <div>
-        <Reveal>
-          <p className="text-eyebrow uppercase text-accent">Outreach that books meetings</p>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <h1 className="mt-4 text-display-lg text-ink">
-            Find the right businesses, email them like a pro, and book meetings.
-          </h1>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <p className="mt-6 max-w-prose text-body-lg text-muted">
-            For founders and agencies who need clients - not another tool to learn. Find local
-            businesses worth reaching, send emails that sound like your best salesperson wrote
-            each one, and stay out of spam. One tool, pay for what you use.
-          </p>
-        </Reveal>
-        <Reveal delay={0.15}>
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <CtaButton href={SIGNUP_URL} size="lg">
-              Start free
-            </CtaButton>
-            <CtaButton href="#demo" variant="secondary" size="lg">
-              See how it works
-            </CtaButton>
-          </div>
-          <p className="mt-3 text-body-sm text-muted">{CTA_MICROCOPY}</p>
-          <p className="mt-2 text-body-sm text-muted">
-            Connect your inbox once - no code, nothing to install. Works in any country and city.
-          </p>
-        </Reveal>
-      </div>
+    <>
+      <section className="shell grid items-center gap-12 pb-10 pt-14 md:grid-cols-[1.1fr_0.9fr] md:gap-16 md:pb-16 md:pt-24">
+        <div>
+          <Reveal>
+            <p className="text-eyebrow uppercase text-accent">Outreach that books meetings</p>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <h1 className="mt-4 text-display-lg text-ink">
+              Find the right businesses, email them like a pro, and book meetings.
+            </h1>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <p className="mt-6 max-w-prose text-body-lg text-muted">
+              For founders and agencies who need clients - not another tool to learn. Find local
+              businesses worth reaching, send emails that sound like your best salesperson wrote
+              each one, and stay out of spam. One tool, pay for what you use.
+            </p>
+          </Reveal>
+          <Reveal delay={0.15}>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <CtaButton href={SIGNUP_URL} size="lg">
+                Start free
+              </CtaButton>
+              <CtaButton href="#demo" variant="secondary" size="lg">
+                See how it works
+              </CtaButton>
+            </div>
+            <ul className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 sm:divide-x sm:divide-line">
+              {BENEFITS.map((benefit, i) => (
+                <li
+                  key={benefit}
+                  className={
+                    'flex items-center gap-2 text-body-sm text-ink/80' +
+                    (i > 0 ? ' sm:pl-4' : '')
+                  }
+                >
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent">
+                    <CheckIcon className="h-3 w-3" />
+                  </span>
+                  {benefit}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
 
-      {/* Product visual + the one constrained parallax island. */}
-      <Reveal delay={0.12} y={24}>
-        <HeroVisual>
-          <ProductPanel />
-        </HeroVisual>
+        {/* Product leads panel (illustrative). */}
+        <Reveal delay={0.12} y={24}>
+          <LeadsPanel />
+        </Reveal>
+      </section>
+
+      {/* Full-width 3-up feature strip. */}
+      <Reveal delay={0.1}>
+        <div className="shell border-t border-line py-8">
+          <div className="grid gap-6 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-line">
+            {FEATURES.map(({ Icon, label, copy }, i) => (
+              <div key={label} className={'flex items-start gap-3' + (i > 0 ? ' sm:pl-6' : '')}>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="font-medium text-ink">{label}</p>
+                  <p className="mt-1 text-body-sm text-muted">{copy}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </Reveal>
-    </section>
+    </>
   );
 }
