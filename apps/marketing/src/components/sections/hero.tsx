@@ -8,7 +8,8 @@ import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
 import { HeroVisual } from '@/components/hero-visual';
 import { ProductPanel } from '@/components/product-panel';
-import { SIGNUP_URL, CTA_MICROCOPY } from '@/lib/site';
+import { SIGNUP_URL } from '@/lib/site';
+import { CtaMicrocopy } from '@/components/cta-microcopy';
 
 export function Hero() {
   return (
@@ -38,7 +39,7 @@ export function Hero() {
               See how it works
             </CtaButton>
           </div>
-          <p className="mt-3 text-body-sm text-muted">{CTA_MICROCOPY}</p>
+          <CtaMicrocopy className="mt-3" />
           <p className="mt-2 text-body-sm text-muted">
             Connect your inbox once - no code, nothing to install. Works in any country and city.
           </p>

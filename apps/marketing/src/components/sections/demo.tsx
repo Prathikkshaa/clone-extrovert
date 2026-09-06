@@ -8,7 +8,8 @@
 import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
 import { DemoLoop } from './demo-loop';
-import { SIGNUP_URL, CTA_MICROCOPY } from '@/lib/site';
+import { SIGNUP_URL } from '@/lib/site';
+import { CtaMicrocopy } from '@/components/cta-microcopy';
 
 export function Demo() {
   return (
@@ -34,7 +35,7 @@ export function Demo() {
           <CtaButton href={SIGNUP_URL} size="lg">
             Start free
           </CtaButton>
-          <p className="text-body-sm text-muted">{CTA_MICROCOPY}</p>
+          <CtaMicrocopy />
         </Reveal>
       </div>
     </section>

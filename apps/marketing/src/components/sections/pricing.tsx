@@ -7,7 +7,8 @@
 // Reused on the landing page and the /pricing page. Copy is DIRECTION.
 import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
-import { SIGNUP_URL, CTA_MICROCOPY } from '@/lib/site';
+import { SIGNUP_URL } from '@/lib/site';
+import { CtaMicrocopy } from '@/components/cta-microcopy';
 import { CREDIT_PACKS, CREDIT_COSTS, FREE_SIGNUP_CREDITS } from '@extrovertai/shared';
 
 const usd = (cents: number) => `$${(cents / 100).toLocaleString('en-US')}`;
@@ -84,7 +85,7 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
             <CtaButton href={SIGNUP_URL} size="lg">
               Start free
             </CtaButton>
-            <p className="mt-2 text-body-sm text-muted">{CTA_MICROCOPY}</p>
+            <CtaMicrocopy className="mt-2" />
           </div>
         </div>
       </Reveal>
