@@ -23,7 +23,7 @@ export function DemoLoop() {
   }, []);
 
   return (
-    <div className="overflow-hidden rounded-xl border border-line bg-surface shadow-[0_30px_80px_-40px_rgba(0,0,0,0.6)]">
+    <div className="overflow-hidden rounded-xl border border-line bg-surface shadow-float">
       {/* Window chrome */}
       <div className="flex items-center gap-2 border-b border-line px-4 py-3">
         <span className="h-2.5 w-2.5 rounded-full bg-line" />

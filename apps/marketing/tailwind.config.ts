@@ -69,6 +69,12 @@ const config: Config = {
         // Generous section rhythm — deliberate density variation (M00 §5).
         'section-y': 'clamp(4rem, 2.5rem + 7vw, 8rem)',
       },
+      boxShadow: {
+        // Unified elevation scale: panels/cards use `card`, editorial floating
+        // mock visuals use `float`.
+        card: '0 1px 2px rgb(26 26 24 / 0.04), 0 12px 32px -16px rgb(26 26 24 / 0.16)',
+        float: '0 20px 50px -30px rgb(26 26 24 / 0.28)',
+      },
       transitionTimingFunction: {
         // One considered easing used across micro-interactions (calm, human).
         soft: 'cubic-bezier(0.22, 1, 0.36, 1)',

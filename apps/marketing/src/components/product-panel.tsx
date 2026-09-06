@@ -22,7 +22,7 @@ export function ProductPanel({ className }: { className?: string }) {
       role="img"
       aria-label="Representative product screenshot: a lead list for construction firms in Austin, several flagged as having no website"
       className={[
-        'w-full overflow-hidden rounded-xl border border-line bg-surface shadow-[0_24px_60px_-30px_rgba(26,26,24,0.35)]',
+        'w-full overflow-hidden rounded-xl border border-line bg-surface shadow-float',
         className,
       ]
         .filter(Boolean)
