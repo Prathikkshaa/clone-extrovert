@@ -107,31 +107,31 @@ const ROWS: Row[] = [
   {
     eyebrow: 'Personalized, not spam',
     title: 'Every email is written from the lead’s own site and reviews.',
-    copy: 'No mail-merge tokens, no “Hi {{first_name}}” tells. Each message references what that business actually does - in your voice - so it reads like you sat down and wrote it. Because, essentially, you did.',
+    copy: 'It references what the business actually does, in your voice - no mail-merge tokens, no “Hi {{first_name}}.”',
     visual: <EmailDraftVisual />,
   },
   {
     eyebrow: 'Buying-signal targeting',
     title: 'Find the businesses that actually need you - like the ones with no website.',
-    copy: 'Search any industry and city, then filter for signals that mean “ready to buy”: no website, thin online presence, low review counts. You reach people with an obvious gap, not a random list.',
+    copy: 'Filter for ready-to-buy signals like no website or a thin online presence. You reach real gaps, not a random list.',
     visual: <ProductPanel />,
   },
   {
     eyebrow: 'Built for deliverability',
     title: 'Sends the way a careful human does - so you stay out of spam.',
-    copy: 'Every email goes from your own Gmail or Outlook, not a shared blast server, so you keep your own reputation. New inboxes start around 30 sends a day and ramp as they warm; messages go out one at a time with randomized spacing, not in a burst; and bounces are watched so a bad address can’t drag you down.',
+    copy: 'From your own Gmail or Outlook. Slow warm-up, one email at a time, natural spacing, bounces watched.',
     visual: <ComplianceVisual />,
   },
   {
     eyebrow: 'Compliance tools built in',
     title: 'One-click unsubscribe and your address on every email - region-aware.',
-    copy: 'Each send carries a working one-click unsubscribe and a physical mailing address, and opt-outs are suppressed automatically. That covers CAN-SPAM in the US; for the UK/EU, outreach to businesses falls under PECR and GDPR, where a relevant offer to a business address can rest on legitimate interest. We give you the tools - you choose the regions and offers you send to.',
+    copy: 'One-click unsubscribe and your address on every email, opt-outs auto-suppressed. CAN-SPAM in the US, PECR/GDPR-aware in the UK/EU.',
     visual: <ComplianceToolsVisual />,
   },
   {
     eyebrow: 'One tool, not five',
     title: 'Search, write, send, follow up, and book - in one place.',
-    copy: 'Stop stitching together a lead-list tool, an email finder, a copywriter, a sending platform, and a scheduler. It’s one workflow, and you only pay for what you use.',
+    copy: 'No lead list, email finder, copywriter, sender, and scheduler to stitch together. One workflow, pay as you go.',
     visual: <OneToolVisual />,
   },
 ];

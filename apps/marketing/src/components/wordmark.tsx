@@ -4,14 +4,19 @@
 import Link from 'next/link';
 import { APP_NAME } from '@/lib/site';
 
-export function Wordmark({ className }: { className?: string }) {
+export function Wordmark({ className, onDark = false }: { className?: string; onDark?: boolean }) {
   return (
     <Link
       href="/"
       aria-label={`${APP_NAME} home`}
       className={['group inline-flex items-baseline gap-0.5', className].filter(Boolean).join(' ')}
     >
-      <span className="font-heading text-[1.15rem] font-medium tracking-tight text-ink">
+      <span
+        className={[
+          'font-heading text-[1.15rem] font-medium tracking-tight transition-colors duration-300',
+          onDark ? 'text-white' : 'text-ink',
+        ].join(' ')}
+      >
         {APP_NAME}
       </span>
       <span

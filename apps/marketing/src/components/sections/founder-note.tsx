@@ -15,15 +15,13 @@ export function FounderNote() {
           <p className="text-eyebrow uppercase text-accent">Why I built this</p>
           <div className="mt-4 space-y-4 text-body-lg text-ink/90">
             <p>
-              I had this exact problem: an empty pipeline and no time to do outreach the right
-              way. The tools I tried were either overpriced, spat out obvious spam, or needed
-              five subscriptions and a weekend to wire together.
+              I had this exact problem - an empty pipeline and no time - and every tool I tried
+              was overpriced, spammy, or five subscriptions wired together. So I built the one I
+              wanted: find the right businesses, write like me, send without landing in spam.
             </p>
             <p>
-              So I built the thing I wanted - one place to find the right businesses, write
-              outreach that actually sounds like me, and send it without landing in spam. It&rsquo;s
-              early, and I&rsquo;m building it in the open. If you try it and something&rsquo;s off, tell
-              me - I read every message.
+              It&rsquo;s early, and I&rsquo;m building it in the open. If something&rsquo;s off, tell me - I
+              read every message.
             </p>
           </div>
           <p className="mt-5 text-body font-medium text-ink">- {FOUNDER_NAME}</p>

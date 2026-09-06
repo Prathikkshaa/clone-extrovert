@@ -12,15 +12,32 @@ import { NAV_LINKS, SIGNUP_URL } from '@/lib/site';
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
+  const [onDark, setOnDark] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    // Track scroll (for the hairline border) and whether the header currently
+    // overlaps a `.on-dark` section - if so, the nav flips to light so it stays
+    // readable, without ever painting a solid bar.
+    const probe = 28; // ~vertical center of the header row
+    const update = () => {
+      setScrolled(window.scrollY > 8);
+      let dark = false;
+      document.querySelectorAll('.on-dark').forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.top <= probe && r.bottom >= probe) dark = true;
+      });
+      setOnDark(dark);
+    };
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, [pathname]);
 
   // Close the mobile menu whenever the route changes.
   useEffect(() => {
@@ -31,13 +48,17 @@ export function SiteHeader() {
     <header
       className={[
         'sticky top-0 z-50 border-b transition-colors duration-300 ease-soft',
-        scrolled
-          ? 'border-line bg-canvas/80 backdrop-blur-sm'
-          : 'border-transparent bg-canvas/0',
+        // Over light content: a frosted, translucent canvas + hairline border once
+        // scrolled (enterprise gloss). An explicit rgba is used because the
+        // `bg-canvas/xx` alpha modifier renders transparent on this token. Over a
+        // .on-dark section we stay fully transparent and flip the nav to light.
+        scrolled && !onDark
+          ? 'border-line bg-[rgba(250,250,248,0.72)] backdrop-blur-md'
+          : 'border-transparent bg-transparent',
       ].join(' ')}
     >
       <div className="shell flex items-center justify-between py-4">
-        <Wordmark />
+        <Wordmark onDark={onDark} />
 
         {/* Right group: primary nav + CTA clustered on the right */}
         <div className="hidden items-center gap-8 md:flex">
@@ -51,7 +72,13 @@ export function SiteHeader() {
                   href={link.href}
                   className={[
                     'text-body-sm transition-colors duration-200',
-                    active ? 'text-accent' : 'text-muted hover:text-ink',
+                    onDark
+                      ? active
+                        ? 'text-white'
+                        : 'text-white/70 hover:text-white'
+                      : active
+                        ? 'text-accent'
+                        : 'text-muted hover:text-ink',
                   ].join(' ')}
                 >
                   {link.label}
@@ -61,7 +88,10 @@ export function SiteHeader() {
           </nav>
 
           {/* Subtle divider between wayfinding links and the action */}
-          <span className="h-5 w-px bg-line" aria-hidden />
+          <span
+            className={['h-5 w-px transition-colors duration-300', onDark ? 'bg-white/25' : 'bg-line'].join(' ')}
+            aria-hidden
+          />
 
           <CtaButton href={SIGNUP_URL}>Start free</CtaButton>
         </div>
@@ -69,7 +99,10 @@ export function SiteHeader() {
         {/* Mobile menu toggle */}
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md text-ink md:hidden"
+          className={[
+            'inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors duration-300 md:hidden',
+            onDark ? 'text-white' : 'text-ink',
+          ].join(' ')}
           aria-expanded={menuOpen}
           aria-controls="mobile-menu"
           aria-label={menuOpen ? 'Close menu' : 'Open menu'}
