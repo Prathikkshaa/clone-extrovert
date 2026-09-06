@@ -32,7 +32,7 @@ export function SiteHeader() {
       className={[
         'sticky top-0 z-50 border-b transition-colors duration-300 ease-soft',
         scrolled
-          ? 'border-line bg-canvas/80 backdrop-blur-sm'
+          ? 'border-line bg-canvas/95 backdrop-blur-sm'
           : 'border-transparent bg-canvas/0',
       ].join(' ')}
     >
