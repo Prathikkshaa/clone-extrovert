@@ -323,9 +323,9 @@ export function Hero() {
           </Reveal>
           <Reveal delay={0.1}>
             <p className="mt-6 max-w-prose text-body-lg text-muted">
-              For founders and agencies who need clients - not another tool to learn. Find local
-              businesses worth reaching, send emails that sound like your best salesperson wrote
-              each one, and stay out of spam. One tool, pay for what you use.
+              For founders, agencies, and owners who need clients - no sales skills, no tools to
+              learn. Find local businesses worth reaching, send emails that sound like your best
+              salesperson wrote them, and stay out of spam. One tool, pay only for what you use.
             </p>
           </Reveal>
           <Reveal delay={0.15}>

@@ -60,44 +60,30 @@ function ComplianceVisual() {
   );
 }
 
-function ComplianceToolsVisual() {
+function AgencyVisual() {
+  const clients = [
+    { name: 'Acme Roofing', inbox: 'you@acmeroofing.com', list: 'Austin · 42 leads' },
+    { name: 'BrightSmile Dental', inbox: 'you@brightsmile.com', list: 'Dallas · 28 leads' },
+    { name: 'Peak Fitness', inbox: 'you@peakfit.co', list: 'Houston · 35 leads' },
+  ];
   return (
     <div className="rounded-xl border border-line bg-surface p-5 shadow-float">
-      <p className="text-body-sm text-muted">Footer added to every email</p>
-      <div className="mt-3 space-y-2 text-body-sm text-ink/80">
-        <p>
-          <span className="text-accent underline">Unsubscribe</span> · one click, honoured
-          instantly
-        </p>
-        <p>Your business mailing address</p>
-      </div>
-      <div className="mt-4 flex items-center gap-2 border-t border-line pt-3 text-[0.78rem]">
-        <span className="rounded-full bg-positive-soft px-2.5 py-1 font-medium text-positive">
-          Opt-outs suppressed automatically
+      <div className="flex items-center justify-between">
+        <p className="text-body-sm text-muted">Your clients</p>
+        <span className="rounded-full bg-accent-soft px-2.5 py-1 text-[0.78rem] font-medium text-accent">
+          One login
         </span>
       </div>
-    </div>
-  );
-}
-
-function OneToolVisual() {
-  const replaced = ['Lead lists', 'Email finder', 'Copywriter', 'Cold-email tool', 'Scheduler'];
-  return (
-    <div className="rounded-xl border border-line bg-surface p-5 shadow-float">
-      <p className="text-body-sm text-muted">Instead of five subscriptions</p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {replaced.map((t) => (
-          <span
-            key={t}
-            className="rounded-md border border-line px-2.5 py-1 text-[0.8rem] text-muted line-through"
-          >
-            {t}
-          </span>
+      <div className="mt-3 space-y-2">
+        {clients.map((c) => (
+          <div key={c.name} className="flex items-center justify-between rounded-md border border-line bg-canvas px-3 py-2">
+            <div>
+              <p className="text-body-sm font-medium text-ink">{c.name}</p>
+              <p className="text-[0.78rem] text-muted">{c.inbox}</p>
+            </div>
+            <span className="text-[0.78rem] text-muted">{c.list}</span>
+          </div>
         ))}
-      </div>
-      <div className="mt-4 flex items-center gap-2 border-t border-line pt-4">
-        <span className="h-2 w-2 rounded-full bg-accent" />
-        <span className="text-body font-medium text-ink">One tool · pay for what you use</span>
       </div>
     </div>
   );
@@ -117,22 +103,16 @@ const ROWS: Row[] = [
     visual: <ProductPanel />,
   },
   {
-    eyebrow: 'Built for deliverability',
+    eyebrow: 'Lands in the inbox, stays compliant',
     title: 'Sends the way a careful human does - so you stay out of spam.',
-    copy: 'From your own Gmail or Outlook. Slow warm-up, one email at a time, natural spacing, bounces watched.',
+    copy: 'From your own Gmail or Outlook: slow warm-up, one at a time, natural spacing. Every email carries one-click unsubscribe and your address - CAN-SPAM in the US, PECR/GDPR-aware in the UK/EU.',
     visual: <ComplianceVisual />,
   },
   {
-    eyebrow: 'Compliance tools built in',
-    title: 'One-click unsubscribe and your address on every email - region-aware.',
-    copy: 'One-click unsubscribe and your address on every email, opt-outs auto-suppressed. CAN-SPAM in the US, PECR/GDPR-aware in the UK/EU.',
-    visual: <ComplianceToolsVisual />,
-  },
-  {
-    eyebrow: 'One tool, not five',
-    title: 'Search, write, send, follow up, and book - in one place.',
-    copy: 'No lead list, email finder, copywriter, sender, and scheduler to stitch together. One workflow, pay as you go.',
-    visual: <OneToolVisual />,
+    eyebrow: 'Built for agencies',
+    title: 'Run every client’s outreach from one place.',
+    copy: 'Separate inboxes, separate lead lists, one login - send for each client without juggling five tools or crossing wires.',
+    visual: <AgencyVisual />,
   },
 ];
 

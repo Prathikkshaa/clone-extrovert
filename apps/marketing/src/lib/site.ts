@@ -33,6 +33,14 @@ export const SITE_DESCRIPTION =
 /** Friction-reducing microcopy shown under primary CTAs (M00 §3). */
 export const CTA_MICROCOPY = 'No card needed · Free to start';
 
+/**
+ * PLACEHOLDER - sales/enterprise contact for the "Custom" pricing tier. Swap the
+ * address (or point at a real /contact route) when it exists.
+ * TODO(wiring): confirm the real sales inbox / contact route.
+ */
+export const CONTACT_EMAIL = 'hello@extrovertai.example';
+export const CONTACT_URL = `mailto:${CONTACT_EMAIL}?subject=Volume%20pricing%20enquiry`;
+
 /** Primary nav (M00 §8 page inventory). */
 export const NAV_LINKS = [
   { href: '/how-it-works', label: 'How it works' },

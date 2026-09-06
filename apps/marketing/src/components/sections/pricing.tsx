@@ -5,40 +5,31 @@
 // computed from the real prices (a fact), never a fake "most popular" claim.
 //
 // Reused on the landing page and the /pricing page. Copy is DIRECTION.
+import { Fragment } from 'react';
 import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
 import { SIGNUP_URL } from '@/lib/site';
 import { CtaMicrocopy } from '@/components/cta-microcopy';
+import { STEP_ICONS } from '@/components/sections/pricing-enterprise';
 import { CREDIT_PACKS, CREDIT_COSTS, FREE_SIGNUP_CREDITS } from '@extrovertai/shared';
+import {
+  usd,
+  bestPack,
+  LOWEST_PER_CREDIT_USD,
+  CREDITS_PER_LEAD_LOW,
+  CREDITS_PER_LEAD_HIGH,
+  leadsForCredits as leadsForPack,
+  costPerLeadUsd as costPerLeadRaw,
+  fmtUsd2,
+} from '@/lib/pricing-math';
 
-const usd = (cents: number) => `$${(cents / 100).toLocaleString('en-US')}`;
-
-// Best-value pack = lowest price per credit (a computed fact, honest highlight).
-const bestPack = [...CREDIT_PACKS].sort(
-  (a, b) => a.priceUsdCents / a.credits - b.priceUsdCents / b.credits,
-)[0];
 const bestPackId = bestPack.id;
 
-// Lowest per-credit price across all packs, derived (not hardcoded). We advertise
-// "from $X/credit" instead of a single "1 credit ≈ $0.10" anchor, because the packs
-// are NOT all $0.10 — they get cheaper with volume, and the old "≈" hid that.
-const LOWEST_PER_CREDIT_USD = `$${(bestPack.priceUsdCents / bestPack.credits / 100).toFixed(3)}`;
-
-// Honest per-lead credit math, computed from the real per-action costs so it can
-// never drift. A lead is found (search), researched (enrichment), and its 3-email
-// sequence written once (draft). SENDS vary: follow-ups stop the moment a lead
-// replies, so at best 1 email sends, at worst all 3 do.
-const CREDITS_PER_LEAD_BASE =
-  CREDIT_COSTS.search + CREDIT_COSTS.enrichment + CREDIT_COSTS.draft;
-const CREDITS_PER_LEAD_LOW = CREDITS_PER_LEAD_BASE + CREDIT_COSTS.send; // reply came early
-const CREDITS_PER_LEAD_HIGH = CREDITS_PER_LEAD_BASE + 3 * CREDIT_COSTS.send; // full sequence
-
-// Leads a pack works, as an honest RANGE (both floored so we never over-promise):
-// fewer sends per lead => more leads, so low-lead-count uses the HIGH per-lead cost.
-const leadsForPack = (credits: number) => ({
-  low: Math.floor(credits / CREDITS_PER_LEAD_HIGH),
-  high: Math.floor(credits / CREDITS_PER_LEAD_LOW),
-});
+// Cost per lead as formatted USD strings for a given pack (derived, never drifts).
+const costPerLeadUsd = (priceUsdCents: number, credits: number) => {
+  const c = costPerLeadRaw(priceUsdCents, credits);
+  return { lo: fmtUsd2(c.lo), hi: fmtUsd2(c.hi) };
+};
 
 // Anchor the worked example on the popular "Growth" pack when present, else the first.
 const examplePack = CREDIT_PACKS.find((p) => p.popular) ?? CREDIT_PACKS[0];
@@ -57,9 +48,17 @@ const BEST_FOR: Record<string, string[]> = {
   scale: ['Always-on, high-volume outreach', 'Multiple clients & inboxes', 'Lowest price per credit'],
 };
 
-export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
+export function Pricing({
+  withHeading = true,
+  withPacks = true,
+  withFreeTier = true,
+}: {
+  withHeading?: boolean;
+  withPacks?: boolean;
+  withFreeTier?: boolean;
+}) {
   return (
-    <section className="shell py-section-y">
+    <section className={`shell pb-12 ${withHeading ? 'pt-section-y' : 'pt-10'}`}>
       {withHeading ? (
         <Reveal className="max-w-prose">
           <p className="text-eyebrow uppercase text-accent">Pricing</p>
@@ -71,52 +70,80 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
         </Reveal>
       ) : null}
 
-      {/* Free tier - lead with it (M00 §3). */}
-      <Reveal delay={0.05} className="mt-10">
-        <div className="flex flex-col items-start justify-between gap-6 rounded-xl border border-accent/40 bg-accent-soft/50 p-6 md:flex-row md:items-center md:p-8">
-          <div>
-            <p className="text-heading-md text-ink">Free to start</p>
-            <p className="mt-2 max-w-prose text-body text-muted">
-              Create an account and get {FREE_SIGNUP_CREDITS} free credits - enough to find real
-              leads, research them, write your first emails, and send them. No card needed.
-            </p>
+      {/* Free tier - lead with it (M00 §3). Shown on the homepage; on /pricing the
+          hero already carries free-to-start, so it is hidden there and folded into
+          the "How credits work" card footer instead (no flow-breaking band). */}
+      {withFreeTier ? (
+        <Reveal delay={0.05} className="mt-10">
+          <div className="flex flex-col items-start justify-between gap-6 rounded-xl border border-accent/40 bg-accent-soft/50 p-6 md:flex-row md:items-center md:p-8">
+            <div>
+              <p className="text-heading-md text-ink">Free to start</p>
+              <p className="mt-2 max-w-prose text-body text-muted">
+                Create an account and get {FREE_SIGNUP_CREDITS} free credits - enough to find real
+                leads, research them, write your first emails, and send them. No card needed.
+              </p>
+            </div>
+            <div className="shrink-0">
+              <CtaButton href={SIGNUP_URL} size="lg">
+                Start free
+              </CtaButton>
+              <CtaMicrocopy className="mt-2" />
+            </div>
           </div>
-          <div className="shrink-0">
-            <CtaButton href={SIGNUP_URL} size="lg">
-              Start free
-            </CtaButton>
-            <CtaMicrocopy className="mt-2" />
-          </div>
-        </div>
-      </Reveal>
+        </Reveal>
+      ) : null}
 
-      {/* Credit model - explained simply. */}
+      {/* How credits work - the whole loop, priced (matches the approved comp):
+          value copy on the left, the Find -> Research -> Write -> Send flow with
+          per-action credit chips on the right. Icons shared with the hero. */}
       <Reveal delay={0.1} className="mt-8">
-        <div className="rounded-xl border border-line bg-surface p-6 md:p-8">
-          <p className="text-heading-sm text-ink">
-            One simple unit: credits. From {LOWEST_PER_CREDIT_USD}/credit - cheaper by the pack.
-          </p>
-          <p className="mt-2 text-body text-muted">Credits cover the whole loop, pay as you go:</p>
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { label: 'Find a lead', cost: CREDIT_COSTS.search },
-              { label: 'Research it', cost: CREDIT_COSTS.enrichment },
-              { label: 'Write a full sequence', cost: CREDIT_COSTS.draft },
-              { label: 'Send an email', cost: CREDIT_COSTS.send },
-            ].map((row) => (
-              <li
-                key={row.label}
-                className="flex items-center justify-between gap-3 rounded-md border border-line bg-canvas px-3 py-2.5"
-              >
-                <span className="text-body-sm text-ink">{row.label}</span>
-                <span className="shrink-0 rounded-full bg-accent-soft px-2.5 py-1 text-[0.78rem] font-medium text-accent">
-                  {row.cost} {row.cost === 1 ? 'credit' : 'credits'}
-                </span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 text-body-sm text-muted">
-            A full lead - found, researched, written, sent - runs about{' '}
+        <div className="rounded-2xl border border-line bg-surface p-6 md:p-8">
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.7fr] lg:items-center lg:gap-10">
+            {/* Left: heading */}
+            <div>
+              <p className="text-eyebrow uppercase text-accent">How credits work</p>
+              <h3 className="mt-3 text-heading-lg text-ink">One simple unit: credits.</h3>
+              <p className="mt-3 text-body text-muted">
+                Credits cover the whole loop, pay as you go. From {LOWEST_PER_CREDIT_USD}/credit,
+                cheaper by the pack.
+              </p>
+            </div>
+
+            {/* Right: the priced loop */}
+            <ol className="flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-1.5">
+              {[
+                { icon: 'search' as const, label: 'Find a lead', cost: CREDIT_COSTS.search },
+                { icon: 'research' as const, label: 'Research it', cost: CREDIT_COSTS.enrichment },
+                { icon: 'write' as const, label: 'Write a full sequence', cost: CREDIT_COSTS.draft },
+                { icon: 'send' as const, label: 'Send an email', cost: CREDIT_COSTS.send },
+              ].map((row, i, arr) => {
+                const Icon = STEP_ICONS[row.icon];
+                return (
+                  <Fragment key={row.label}>
+                    <li className="flex flex-1 flex-col items-center rounded-xl border border-line bg-canvas px-3 py-4 text-center">
+                      <span className="grid h-10 w-10 place-items-center rounded-full bg-accent-soft text-accent">
+                        <Icon />
+                      </span>
+                      <span className="mt-3 text-body-sm font-medium leading-tight text-ink">
+                        {row.label}
+                      </span>
+                      <span className="mt-2 rounded-full bg-accent-soft px-2.5 py-0.5 text-[0.72rem] font-medium text-accent">
+                        {row.cost} {row.cost === 1 ? 'credit' : 'credits'}
+                      </span>
+                    </li>
+                    {i < arr.length - 1 ? (
+                      <li aria-hidden className="hidden items-center justify-center text-muted/50 sm:flex">
+                        <span className="px-0.5 text-lg">→</span>
+                      </li>
+                    ) : null}
+                  </Fragment>
+                );
+              })}
+            </ol>
+          </div>
+
+          <p className="mt-6 border-t border-line pt-5 text-center text-body-sm text-muted">
+            A full lead, found, researched, written and sent, runs about{' '}
             <span className="font-medium text-ink">
               {CREDITS_PER_LEAD_LOW}&ndash;{CREDITS_PER_LEAD_HIGH} credits
             </span>
@@ -126,10 +153,27 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
             </span>
             .
           </p>
+
+          {/* Compact free-start nudge (only when the standalone band is hidden, i.e.
+              on /pricing where the hero already carries free-to-start). */}
+          {!withFreeTier ? (
+            <div className="mt-5 flex flex-col items-center justify-center gap-3 border-t border-line pt-5 text-center sm:flex-row sm:gap-4">
+              <p className="text-body-sm text-ink">
+                <span className="font-medium">Start free with {FREE_SIGNUP_CREDITS} credits</span>. No
+                card, no commitment.
+              </p>
+              <CtaButton href={SIGNUP_URL} size="sm">
+                Start free
+              </CtaButton>
+            </div>
+          ) : null}
         </div>
       </Reveal>
 
-      {/* Top-up packs - real prices from shared; each shows who it suits. */}
+      {/* Top-up packs - shown on the homepage; hidden on /pricing where the
+          comparison matrix is the single pack view (no duplication). */}
+      {withPacks ? (
+        <>
       <div className="mt-8 grid gap-5 md:grid-cols-3">
         {CREDIT_PACKS.map((pack, i) => {
           const best = pack.id === bestPackId;
@@ -157,10 +201,16 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
                 {/* Outcome: what the credits actually buy, as an honest range. */}
                 {(() => {
                   const l = leadsForPack(pack.credits);
+                  const cpl = costPerLeadUsd(pack.priceUsdCents, pack.credits);
                   return (
-                    <p className="mt-3 rounded-md bg-accent-soft px-3 py-2 text-body-sm font-medium text-accent">
-                      ≈ {l.low}&ndash;{l.high} leads, end to end
-                    </p>
+                    <div className="mt-3 rounded-md bg-accent-soft px-3 py-2">
+                      <p className="text-body-sm font-medium text-accent">
+                        ≈ {l.low}&ndash;{l.high} leads, end to end
+                      </p>
+                      <p className="mt-0.5 text-[0.78rem] text-accent/80">
+                        about {cpl.lo}&ndash;{cpl.hi} per lead
+                      </p>
+                    </div>
                   );
                 })()}
 
@@ -204,6 +254,8 @@ export function Pricing({ withHeading = true }: { withHeading?: boolean }) {
           any country.
         </p>
       </Reveal>
+        </>
+      ) : null}
     </section>
   );
 }

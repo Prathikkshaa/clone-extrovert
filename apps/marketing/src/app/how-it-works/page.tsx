@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 // page stays consistent and there's one source per section.
 export default function HowItWorksPage() {
   return (
-    <div className="pt-16 md:pt-24">
+    <>
       <HowItWorks
         as="h1"
         subtitle={'No new skill to learn. Here’s exactly what happens between “pick a market” and “a meeting on your calendar.”'}
@@ -26,6 +26,6 @@ export default function HowItWorksPage() {
       <Demo />
       <ByTheNumbers />
       <FinalCta />
-    </div>
+    </>
   );
 }
