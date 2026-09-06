@@ -30,35 +30,39 @@ export function SiteHeader() {
   return (
     <header
       className={[
-        'sticky top-0 z-50 border-b transition-[background-color,border-color,padding] duration-300 ease-soft',
+        'sticky top-0 z-50 border-b transition-colors duration-300 ease-soft',
         scrolled
-          ? 'border-line bg-canvas/85 backdrop-blur-md'
+          ? 'border-line bg-canvas/80 backdrop-blur-sm'
           : 'border-transparent bg-canvas/0',
       ].join(' ')}
     >
-      <div className={['shell flex items-center justify-between', scrolled ? 'py-3' : 'py-4'].join(' ')}>
+      <div className="shell flex items-center justify-between py-4">
         <Wordmark />
 
-        {/* Desktop nav */}
-        <nav aria-label="Primary" className="hidden items-center gap-8 md:flex">
-          {NAV_LINKS.map((link) => {
-            const active = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={[
-                  'text-body-sm transition-colors duration-200',
-                  active ? 'text-accent' : 'text-muted hover:text-ink',
-                ].join(' ')}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
+        {/* Right group: primary nav + CTA clustered on the right */}
+        <div className="hidden items-center gap-8 md:flex">
+          {/* Desktop nav */}
+          <nav aria-label="Primary" className="flex items-center gap-8">
+            {NAV_LINKS.map((link) => {
+              const active = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={[
+                    'text-body-sm transition-colors duration-200',
+                    active ? 'text-accent' : 'text-muted hover:text-ink',
+                  ].join(' ')}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
 
-        <div className="hidden md:block">
+          {/* Subtle divider between wayfinding links and the action */}
+          <span className="h-5 w-px bg-line" aria-hidden />
+
           <CtaButton href={SIGNUP_URL}>Start free</CtaButton>
         </div>
 
