@@ -41,25 +41,61 @@ export function Reveal({ children, as, delay = 0, y = 16, className }: RevealPro
       return;
     }
 
-    const ctx = gsap.context(() => {
-      gsap.to(el, {
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        delay,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 88%',
-          once: true,
-        },
-        onStart: () => el.classList.remove('reveal-init'),
-      });
-      // Seed the from-state to match .reveal-init so GSAP animates cleanly.
-      gsap.set(el, { y });
-    });
+    // Fail-visible: never leave content stuck at opacity 0 if GSAP/ScrollTrigger
+    // errors, is slow, or a trigger misfires.
+    const show = () => {
+      el.classList.remove('reveal-init');
+      try {
+        gsap.set(el, { opacity: 1, y: 0 });
+      } catch {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      }
+    };
 
-    return () => ctx.revert();
+    // Safety net: if still hidden after ~1.2s, force it visible.
+    let safety: ReturnType<typeof setTimeout> | undefined = setTimeout(() => {
+      if (el.classList.contains('reveal-init')) show();
+    }, 1200);
+    const clearSafety = () => {
+      if (safety !== undefined) {
+        clearTimeout(safety);
+        safety = undefined;
+      }
+    };
+
+    let ctx: gsap.Context | undefined;
+    try {
+      ctx = gsap.context(() => {
+        gsap.to(el, {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          delay,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 88%',
+            once: true,
+          },
+          onStart: () => {
+            clearSafety();
+            el.classList.remove('reveal-init');
+          },
+        });
+        // Seed the from-state to match .reveal-init so GSAP animates cleanly.
+        gsap.set(el, { y });
+      });
+    } catch {
+      // GSAP setup failed - show immediately rather than leave content hidden.
+      clearSafety();
+      show();
+    }
+
+    return () => {
+      clearSafety();
+      ctx?.revert();
+    };
   }, [delay, y]);
 
   return (
