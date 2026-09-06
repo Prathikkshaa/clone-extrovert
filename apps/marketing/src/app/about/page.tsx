@@ -275,14 +275,11 @@ export default function AboutPage() {
         <Reveal className="mx-auto max-w-2xl text-center">
           <p className="text-eyebrow uppercase text-accent">What we&rsquo;re building</p>
           <h2 className="mt-3 text-display-md text-ink">
-            A simpler way to get meetings with local businesses.
+            More booked meetings - without building a sales team.
           </h2>
-          <p className="mt-5 text-body-lg text-muted">
-            {APP_NAME} finds the right local businesses, writes outreach in your voice, and sends
-            it from your own inbox.
-          </p>
-          <p className="mt-4 text-body-lg text-muted">
-            No sales team required - point it at a market, and show up to the calls.
+          <p className="mx-auto mt-5 max-w-2xl text-body-lg text-muted">
+            Point {APP_NAME} at a market. It finds the right businesses, writes in your voice, and
+            sends from your own inbox - you show up to the calls.
           </p>
         </Reveal>
 
