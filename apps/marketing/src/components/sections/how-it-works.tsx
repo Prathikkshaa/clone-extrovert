@@ -119,7 +119,16 @@ function FocalPanel({ index }: { index: number }) {
   );
 }
 
-export function HowItWorks() {
+const DEFAULT_SUBTITLE =
+  'Four steps from search to booked. You point it at a market; it does the finding, writing, and sending - you show up to the meetings. No new skill to learn.';
+
+export function HowItWorks({
+  as: Heading = 'h2',
+  subtitle = DEFAULT_SUBTITLE,
+}: {
+  as?: 'h1' | 'h2';
+  subtitle?: string;
+} = {}) {
   const [active, setActive] = useState(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -149,11 +158,8 @@ export function HowItWorks() {
     <section className="shell py-section-y">
       <Reveal className="max-w-prose">
         <p className="text-eyebrow uppercase text-accent">How it works</p>
-        <h2 className="mt-3 text-display-md text-ink">How does it work?</h2>
-        <p className="mt-4 text-body-lg text-muted">
-          Four steps from search to booked. You point it at a market; it does the finding,
-          writing, and sending - you show up to the meetings. No new skill to learn.
-        </p>
+        <Heading className="mt-3 text-display-md text-ink">How does it work?</Heading>
+        <p className="mt-4 text-body-lg text-muted">{subtitle}</p>
       </Reveal>
 
       <Reveal delay={0.05} className="mt-12 grid gap-6 md:grid-cols-[0.85fr_1.15fr] md:gap-10">

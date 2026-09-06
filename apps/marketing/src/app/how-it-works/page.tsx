@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { PageHero } from '@/components/page-hero';
 import { HowItWorks } from '@/components/sections/how-it-works';
 import { Differentiators } from '@/components/sections/differentiators';
 import { Demo } from '@/components/sections/demo';
@@ -18,16 +17,15 @@ export const metadata: Metadata = {
 // page stays consistent and there's one source per section.
 export default function HowItWorksPage() {
   return (
-    <>
-      <PageHero eyebrow="How it works" title="Find, personalize, send, and book - one loop.">
-        No new skill to learn. Here&rsquo;s exactly what happens between &ldquo;pick a market&rdquo; and
-        &ldquo;a meeting on your calendar.&rdquo;
-      </PageHero>
-      <HowItWorks />
+    <div className="pt-16 md:pt-24">
+      <HowItWorks
+        as="h1"
+        subtitle={'No new skill to learn. Here’s exactly what happens between “pick a market” and “a meeting on your calendar.”'}
+      />
       <Differentiators />
       <Demo />
       <ByTheNumbers />
       <FinalCta />
-    </>
+    </div>
   );
 }
