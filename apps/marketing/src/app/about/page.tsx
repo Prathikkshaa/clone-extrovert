@@ -18,40 +18,102 @@ export const metadata: Metadata = {
 // wrapping text-* class). Decorative motifs are aria-hidden. Thin strokes, rounded
 // caps, minimal - matching the site's quiet editorial house style. ---
 
-// A) Hero motif: an abstract "outreach signal" - a small network of nodes with one
-// accent node reaching outward (a ping/arc), evoking reaching the right people.
-function OutreachSignal() {
+// Small generic line icons for the business "chips" (no real brand logos).
+function IconCafe() {
   return (
-    <svg
-      viewBox="0 0 320 260"
-      className="h-auto w-full"
-      fill="none"
-      aria-hidden="true"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      {/* connective lines between the quiet nodes */}
-      <g className="text-line" stroke="currentColor" strokeWidth={1.5}>
-        <line x1="86" y1="176" x2="150" y2="96" />
-        <line x1="86" y1="176" x2="120" y2="210" />
-        <line x1="150" y1="96" x2="120" y2="210" />
-        <line x1="150" y1="96" x2="214" y2="150" />
-      </g>
-      {/* quiet nodes */}
-      <g className="text-muted" fill="var(--color-surface)" stroke="currentColor" strokeWidth={1.5}>
-        <circle cx="86" cy="176" r="9" />
-        <circle cx="150" cy="96" r="9" />
-        <circle cx="120" cy="210" r="9" />
-        <circle cx="214" cy="150" r="9" />
-      </g>
-      {/* the accent node sending a subtle ping outward */}
-      <g className="text-accent" stroke="currentColor">
-        <circle cx="150" cy="96" r="9" fill="currentColor" strokeWidth={0} />
-        <path d="M168 78 a26 26 0 0 1 0 36" strokeWidth={1.5} opacity={0.9} />
-        <path d="M180 66 a44 44 0 0 1 0 60" strokeWidth={1.5} opacity={0.5} />
-        <path d="M192 54 a62 62 0 0 1 0 84" strokeWidth={1.5} opacity={0.25} />
-      </g>
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 9h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V9Z" />
+      <path d="M16 10h2a2 2 0 0 1 0 4h-2" />
+      <path d="M8 3v2M11 3v2" />
     </svg>
+  );
+}
+
+function IconClinic() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="4" width="14" height="16" rx="2" />
+      <path d="M12 8v6M9 11h6" />
+    </svg>
+  );
+}
+
+function IconGym() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10" />
+    </svg>
+  );
+}
+
+function IconStore() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 9 5 4h14l1 5a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-3 0Z" />
+      <path d="M5 11v8h14v-8" />
+    </svg>
+  );
+}
+
+type Chip = { label: string; Icon: ComponentType };
+
+const HERO_CHIPS: Chip[] = [
+  { label: 'Cafe', Icon: IconCafe },
+  { label: 'Clinic', Icon: IconClinic },
+  { label: 'Gym', Icon: IconGym },
+  { label: 'Store', Icon: IconStore },
+];
+
+// A) Hero composition: Milo "calling out" to local businesses. Milo is the focal
+// image; thin dashed accent connectors reach out (behind the chips) to a column of
+// generic business chips.
+function HeroMilo() {
+  return (
+    <div className="relative rounded-xl border border-line bg-surface p-8">
+      <div className="grid grid-cols-[auto_1fr] items-center gap-6">
+        {/* Focal Milo, calling out */}
+        <img
+          src="/milo/milo-speaking.webp"
+          width={336}
+          height={498}
+          alt="Milo, the ExtrovertAI mascot"
+          loading="eager"
+          fetchPriority="high"
+          className="h-auto w-full max-w-[180px]"
+        />
+        {/* Chips, with dashed connectors layered behind */}
+        <div className="relative">
+          {/* dashed accent connectors, hidden on mobile to avoid mess */}
+          <svg
+            viewBox="0 0 120 220"
+            className="pointer-events-none absolute inset-0 hidden h-full w-full text-accent md:block"
+            fill="none"
+            aria-hidden="true"
+            preserveAspectRatio="none"
+          >
+            <g stroke="currentColor" strokeWidth={1.25} strokeDasharray="4 4" strokeLinecap="round">
+              <path d="M0 110 C 30 30, 60 28, 108 28" />
+              <path d="M0 110 C 30 90, 60 82, 108 82" />
+              <path d="M0 110 C 30 130, 60 138, 108 138" />
+              <path d="M0 110 C 30 190, 60 192, 108 192" />
+            </g>
+          </svg>
+          <ul className="relative flex flex-col gap-3">
+            {HERO_CHIPS.map((c) => (
+              <li
+                key={c.label}
+                className="inline-flex w-fit items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2 text-body-sm text-ink"
+              >
+                <span className="text-muted">
+                  <c.Icon />
+                </span>
+                {c.label}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -254,10 +316,8 @@ export default function AboutPage() {
             </p>
           </Reveal>
         </div>
-        <Reveal delay={0.12} y={24} className="hidden md:block">
-          <div className="rounded-xl border border-line bg-surface p-8">
-            <OutreachSignal />
-          </div>
+        <Reveal delay={0.12} y={24}>
+          <HeroMilo />
         </Reveal>
       </section>
 
@@ -279,8 +339,19 @@ export default function AboutPage() {
               up to the calls.
             </p>
           </div>
-          <div className="mt-8 overflow-x-auto rounded-xl border border-line bg-surface p-6">
-            <LoopDiagram />
+          <div className="mt-8 flex flex-col items-center gap-6 rounded-xl border border-line bg-surface p-6 md:flex-row">
+            <img
+              src="/milo/milo-hero.webp"
+              width={414}
+              height={486}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="h-auto w-full max-w-[140px] shrink-0"
+            />
+            <div className="w-full overflow-x-auto">
+              <LoopDiagram />
+            </div>
           </div>
         </Reveal>
       </section>
@@ -303,7 +374,20 @@ export default function AboutPage() {
               workflow, pay as you go - nothing to stitch together.
             </p>
             <div className="mt-6 rounded-xl border border-line bg-surface p-6">
-              <FiveToOne />
+              <div className="flex flex-col items-center gap-4 sm:flex-row">
+                <div className="w-full overflow-x-auto">
+                  <FiveToOne />
+                </div>
+                <img
+                  src="/milo/milo-celebrating.webp"
+                  width={534}
+                  height={601}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className="h-auto w-full max-w-[150px] shrink-0"
+                />
+              </div>
               <p className="mt-2 text-body-sm text-muted">Five subscriptions, or one tool.</p>
             </div>
           </div>
