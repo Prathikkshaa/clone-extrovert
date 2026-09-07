@@ -187,8 +187,8 @@ export function HowItWorks({
                 onClick={() => setActive(i)}
                 onKeyDown={onKeyDown}
                 className={[
-                  'flex items-center gap-3 rounded-lg border px-4 py-3 text-left transition-colors duration-200 ease-soft focus-visible:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
-                  isActive ? 'border-accent bg-accent-soft/50' : 'border-line bg-surface hover:border-accent/50',
+                  'flex items-center gap-3 rounded-lg border px-4 py-3 text-left shadow-card transition-all duration-200 ease-soft focus-visible:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+                  isActive ? 'border-accent bg-accent-soft/50' : 'border-line bg-surface hover:border-accent/50 hover:shadow-float',
                 ].join(' ')}
               >
                 <span
@@ -211,7 +211,7 @@ export function HowItWorks({
           role="tabpanel"
           id="hiw-panel"
           aria-labelledby={`hiw-tab-${active}`}
-          className="rounded-xl border border-line bg-surface p-6 md:p-8"
+          className="rounded-xl border border-line bg-surface p-6 shadow-card md:p-8"
         >
           <FocalPanel key={active} index={active} />
         </div>
