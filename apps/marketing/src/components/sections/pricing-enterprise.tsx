@@ -413,7 +413,7 @@ export function ComparisonMatrix() {
         </Reveal>
 
         {/* Trust strip */}
-        <Reveal className="mt-8 flex flex-col gap-6 rounded-2xl border border-line bg-surface p-5 md:flex-row md:items-center md:gap-4 md:p-6">
+        <Reveal className="mt-8 flex flex-col gap-6 rounded-2xl border border-line bg-surface p-5 shadow-card md:flex-row md:items-center md:gap-4 md:p-6">
           <div className="flex items-center gap-3 md:pr-4" aria-hidden>
             <img src="/milo/milo-typing.webp" alt="" width={70} height={54} className="h-12 w-auto" />
             <div className="relative rounded-xl bg-accent-soft px-3 py-1.5 text-[0.72rem] font-medium leading-tight text-accent">
