@@ -298,7 +298,7 @@ export default function AboutPage() {
           </Reveal>
 
           <Reveal delay={0.05}>
-            <div className="rounded-2xl border border-line bg-surface/60 p-6">
+            <div className="rounded-2xl border border-line bg-surface/60 p-6 shadow-card">
               <div className="relative flex flex-col gap-6 md:flex-row md:items-center">
                 <div className="flex flex-col gap-3 md:flex-1">
                   {TOOLS.map((t) => (
@@ -332,7 +332,7 @@ export default function AboutPage() {
                     <path d="M0 90 C 55 90, 45 50, 100 50" />
                   </g>
                 </svg>
-                <div className="flex shrink-0 flex-col items-center gap-2 self-center rounded-xl border border-line bg-surface px-5 py-4">
+                <div className="flex shrink-0 flex-col items-center gap-2 self-center rounded-xl border border-line bg-surface px-5 py-4 shadow-card">
                   <span className="grid h-10 w-10 place-items-center rounded-full bg-accent text-white">
                     <IconCheck className="h-5 w-5" />
                   </span>
@@ -361,7 +361,7 @@ export default function AboutPage() {
           <div className="flex w-full flex-col gap-4 md:flex-row md:items-stretch md:gap-2">
             {STEPS.map((s, i) => (
               <div key={s.title} className="flex flex-col md:flex-1 md:flex-row md:items-center md:gap-2">
-                <div className="relative flex-1 rounded-xl border border-line bg-surface p-5 pt-12">
+                <div className="relative flex-1 rounded-xl border border-line bg-surface p-5 pt-12 shadow-card">
                   <span className="absolute left-4 top-4 grid h-6 w-6 place-items-center rounded-full bg-accent-soft text-xs font-medium text-accent">
                     {s.n}
                   </span>
@@ -396,80 +396,6 @@ export default function AboutPage() {
               <span>{item.label}</span>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* SECTION B - The problem & the bet */}
-      <section className="shell py-section-y">
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
-          <Reveal>
-            <p className="text-eyebrow uppercase text-accent">The problem &amp; the bet</p>
-            <h2 className="mt-3 text-display-md text-ink">Existing tools all miss the mark.</h2>
-            <p className="mt-4 text-body-lg text-muted">
-              Lead databases go stale. &ldquo;AI&rdquo; writers spit out spam. Cold-email tools are a
-              slog - and stitching five together is a project of its own.
-            </p>
-            <p className="mt-6 text-heading-md font-medium text-ink">So the bet is one honest tool.</p>
-            <p className="mt-4 text-body-lg text-muted">
-              Find the right businesses. Write like you. Send without landing in spam. One
-              workflow, pay as you go.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3">
-              {BET_STATS.map((item) => (
-                <div key={item.label} className="flex items-center gap-2.5 text-body-sm text-ink/80">
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
-                    <item.Icon className="h-4 w-4" />
-                  </span>
-                  <span>{item.label}</span>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.05}>
-            <div className="rounded-2xl border border-line bg-surface/60 p-6">
-              <div className="relative flex flex-col gap-6 md:flex-row md:items-center">
-                <div className="flex flex-col gap-3 md:flex-1">
-                  {TOOLS.map((t) => (
-                    <div
-                      key={t.label}
-                      className="flex items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3"
-                    >
-                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent">
-                        <t.Icon className="h-5 w-5" />
-                      </span>
-                      <span className="text-body-sm text-ink">{t.label}</span>
-                      <span aria-hidden="true" className="ml-auto text-muted">
-                        &times;
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                {/* connectors converging to the ExtrovertAI node - decorative, md+ only */}
-                <svg
-                  viewBox="0 0 100 100"
-                  preserveAspectRatio="none"
-                  className="hidden h-40 w-14 shrink-0 self-center text-line md:block"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <g stroke="currentColor" strokeWidth={0.6}>
-                    <path d="M0 10 C 55 10, 45 50, 100 50" />
-                    <path d="M0 30 C 55 30, 45 50, 100 50" />
-                    <path d="M0 50 H 100" />
-                    <path d="M0 70 C 55 70, 45 50, 100 50" />
-                    <path d="M0 90 C 55 90, 45 50, 100 50" />
-                  </g>
-                </svg>
-                <div className="flex shrink-0 flex-col items-center gap-2 self-center rounded-xl border border-line bg-surface px-5 py-4">
-                  <span className="grid h-10 w-10 place-items-center rounded-full bg-accent text-white">
-                    <IconCheck className="h-5 w-5" />
-                  </span>
-                  <span className="text-body font-medium text-ink">{APP_NAME}</span>
-                </div>
-              </div>
-            </div>
-          </Reveal>
         </div>
       </section>
 

@@ -97,7 +97,7 @@ export function Pricing({
           value copy on the left, the Find -> Research -> Write -> Send flow with
           per-action credit chips on the right. Icons shared with the hero. */}
       <Reveal delay={0.1} className="mt-8">
-        <div className="rounded-2xl border border-line bg-surface p-6 md:p-8">
+        <div className="rounded-2xl border border-line bg-surface p-6 shadow-card md:p-8">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.7fr] lg:items-center lg:gap-10">
             {/* Left: heading */}
             <div>

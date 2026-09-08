@@ -49,12 +49,15 @@ export function SiteHeader() {
     <header
       className={[
         'sticky top-0 z-50 border-b transition-colors duration-300 ease-soft',
-        // Over light content: a frosted, translucent canvas + hairline border once
-        // scrolled (enterprise gloss). An explicit rgba is used because the
-        // `bg-canvas/xx` alpha modifier renders transparent on this token. Over a
-        // .on-dark section we stay fully transparent and flip the nav to light.
-        scrolled && !onDark
-          ? 'border-line bg-[rgba(250,250,248,0.55)] backdrop-blur-lg'
+        // Once scrolled, the header takes a frosted background so content scrolling
+        // underneath is masked (no messy overlap). The tint matches whichever
+        // surface it sits over: light frosted on light, dark frosted on a
+        // `.on-dark` section. At the very top it stays transparent (nav on the
+        // hero). Explicit rgba because the token alpha modifier renders transparent.
+        scrolled
+          ? onDark
+            ? 'border-white/10 bg-[rgba(20,28,26,0.72)] backdrop-blur-lg'
+            : 'border-line bg-[rgba(245,245,241,0.72)] backdrop-blur-lg'
           : 'border-transparent bg-transparent',
       ].join(' ')}
     >
