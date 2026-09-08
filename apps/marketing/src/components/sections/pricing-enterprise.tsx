@@ -304,8 +304,9 @@ export function ComparisonMatrix() {
           </p>
         </div>
 
-        {/* the grid */}
-        <Reveal className="mt-10 overflow-x-auto pb-2">
+        {/* Desktop/tablet: the full side-by-side grid (md+). On mobile it is
+            replaced by stacked per-plan cards below (no cramped horizontal scroll). */}
+        <Reveal className="mt-10 hidden overflow-x-auto pb-2 md:block">
           <div className="grid min-w-[720px] grid-cols-[minmax(150px,0.85fr)_repeat(4,minmax(0,1fr))] items-stretch">
             {/* Row 0: mascots + bubbles */}
             <div />
@@ -411,6 +412,70 @@ export function ComparisonMatrix() {
             ))}
           </div>
         </Reveal>
+
+        {/* Mobile: stacked per-plan cards (same data, no horizontal scroll) */}
+        <div className="mt-8 grid gap-5 md:hidden">
+          {columns.map((c) => (
+            <article
+              key={c.id}
+              className={[
+                'relative rounded-2xl border bg-surface p-5',
+                c.best ? 'border-accent shadow-float' : 'border-line shadow-card',
+              ].join(' ')}
+            >
+              {c.best ? (
+                <span className="absolute right-5 top-5 rounded-full bg-accent px-2.5 py-0.5 text-[0.66rem] font-medium text-white">
+                  Best value
+                </span>
+              ) : null}
+              <p className={`text-heading-md ${c.best ? 'text-accent' : 'text-ink'}`}>{c.name}</p>
+              <p className="mt-0.5 text-body-sm text-muted">{c.tagline}</p>
+              <p className="mt-3 text-display-md font-medium tracking-tight text-ink">
+                {c.pack ? usd(c.pack.priceUsdCents) : 'Let’s talk'}
+              </p>
+              <p className="mt-0.5 text-body-sm text-muted">
+                {c.pack ? `${c.pack.credits.toLocaleString('en-US')} credits` : 'Volume pricing'}
+              </p>
+
+              <dl className="mt-4 space-y-2 border-t border-line pt-4">
+                {rows.slice(2).map((r) => {
+                  const Icon = ROW_ICONS[r.icon];
+                  return (
+                    <div key={r.label} className="flex items-center justify-between gap-4 text-body-sm">
+                      <dt className="flex items-center gap-2 text-muted">
+                        <Icon />
+                        {r.label}
+                      </dt>
+                      <dd className={c.best ? 'font-medium text-ink' : 'text-ink/80'}>{r.value(c)}</dd>
+                    </div>
+                  );
+                })}
+              </dl>
+
+              <p className="mt-4 text-[0.72rem] font-medium uppercase tracking-wide text-muted">Best for</p>
+              <ul className="mt-1.5 space-y-1.5 text-body-sm text-ink/80">
+                {c.bestFor.map((b) => (
+                  <li key={b} className="flex gap-2">
+                    <span aria-hidden className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent" />
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-5">
+                {c.custom ? (
+                  <CtaButton href={CONTACT_URL} variant="secondary" className="w-full">
+                    Talk to us
+                  </CtaButton>
+                ) : (
+                  <CtaButton href={SIGNUP_URL} variant={c.best ? 'primary' : 'secondary'} className="w-full">
+                    Get {c.name}
+                  </CtaButton>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
 
         {/* Trust strip */}
         <Reveal className="mt-8 flex flex-col gap-6 rounded-2xl border border-line bg-surface p-5 shadow-card md:flex-row md:items-center md:gap-4 md:p-6">
