@@ -72,16 +72,18 @@ export function LandingPricing() {
       <Reveal
         delay={0.05}
         as="ol"
-        className="mt-10 flex flex-wrap items-start justify-center gap-x-2 gap-y-6"
+        className="mt-10 flex items-start justify-between gap-1 sm:flex-wrap sm:justify-center sm:gap-x-2 sm:gap-y-6"
       >
         {WORKFLOW.map((s, i) => (
           <Fragment key={s.label}>
-            <li className="flex w-24 flex-col items-center text-center">
-              <span className="grid h-12 w-12 place-items-center rounded-xl bg-accent-soft text-accent">
-                <s.Icon />
+            <li className="flex min-w-0 flex-1 flex-col items-center text-center sm:w-24 sm:flex-none">
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-accent-soft text-accent sm:h-12 sm:w-12">
+                <s.Icon className="h-[1.1rem] w-[1.1rem] sm:h-5 sm:w-5" />
               </span>
-              <span className="mt-2.5 text-body-sm font-medium text-ink">{s.label}</span>
-              <span className="mt-1 text-[0.75rem] text-muted">{s.chip}</span>
+              <span className="mt-2 text-[0.72rem] font-medium leading-tight text-ink sm:mt-2.5 sm:text-body-sm">
+                {s.label}
+              </span>
+              <span className="mt-1 text-[0.62rem] text-muted sm:text-[0.75rem]">{s.chip}</span>
             </li>
             {i < WORKFLOW.length - 1 ? (
               <li aria-hidden className="hidden h-12 items-center px-1 text-muted/40 sm:flex">
@@ -157,7 +159,10 @@ export function LandingPricing() {
         className="mx-auto mt-10 grid max-w-5xl gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-line"
       >
         {REASSURE.map((r) => (
-          <div key={r.title} className="flex items-start gap-3 lg:px-6 lg:first:pl-0">
+          <div
+            key={r.title}
+            className="flex flex-col items-center gap-2 text-center sm:flex-row sm:items-start sm:gap-3 sm:text-left lg:px-6 lg:first:pl-0"
+          >
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
               <r.Icon className="h-[1.1rem] w-[1.1rem]" />
             </span>
