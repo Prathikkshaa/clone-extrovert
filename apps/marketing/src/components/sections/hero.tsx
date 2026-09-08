@@ -357,7 +357,7 @@ export function Hero() {
         </div>
 
         {/* Product leads panel (illustrative). */}
-        <Reveal delay={0.12} y={24}>
+        <Reveal delay={0.12} y={24} className="min-w-0">
           <LeadsPanel />
         </Reveal>
       </section>

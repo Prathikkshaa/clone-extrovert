@@ -358,10 +358,10 @@ export default function AboutPage() {
         </Reveal>
 
         <Reveal className="mt-12">
-          <div className="flex w-full flex-col gap-4 md:flex-row md:items-stretch md:gap-2">
+          <div className="grid grid-cols-2 auto-rows-fr gap-3 md:flex md:w-full md:flex-row md:items-stretch md:gap-2">
             {STEPS.map((s, i) => (
               <div key={s.title} className="flex flex-col md:flex-1 md:flex-row md:items-center md:gap-2">
-                <div className="relative flex-1 rounded-xl border border-line bg-surface p-5 pt-12 shadow-card">
+                <div className="relative flex-1 rounded-xl border border-line bg-surface p-4 pt-11 shadow-card md:p-5 md:pt-12">
                   <span className="absolute left-4 top-4 grid h-6 w-6 place-items-center rounded-full bg-accent-soft text-xs font-medium text-accent">
                     {s.n}
                   </span>

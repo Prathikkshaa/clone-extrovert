@@ -202,14 +202,18 @@ export function PricingRoiBand() {
         <p className="mx-auto mt-8 max-w-4xl text-center text-body-sm text-white/60">
           Do the math: one client you win usually covers hundreds of leads. You set the offer; we keep the cost per lead in cents.
         </p>
-        {/* Key positioning: one tool replaces the whole stack. */}
-        <div className="mx-auto mt-5 flex max-w-2xl flex-wrap items-center justify-center gap-x-3 gap-y-2 text-body-sm">
-          {['Lead lists', 'Email finder', 'Copywriter', 'Cold-email tool', 'Scheduler'].map((t) => (
-            <span key={t} className="text-white/40 line-through">
-              {t}
-            </span>
-          ))}
-          <span className="rounded-full bg-accent/15 px-3 py-1 font-medium text-accent-strong">
+        {/* Key positioning: one tool replaces the whole stack. The struck-out
+            list stays grouped on its own line(s); the pill always sits below it,
+            so "Scheduler" never collides with the highlighted statement. */}
+        <div className="mx-auto mt-5 max-w-2xl text-center">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[0.8rem] text-white/40 sm:text-body-sm">
+            {['Lead lists', 'Email finder', 'Copywriter', 'Cold-email tool', 'Scheduler'].map((t) => (
+              <span key={t} className="line-through">
+                {t}
+              </span>
+            ))}
+          </div>
+          <span className="mt-3 inline-block rounded-full bg-accent/15 px-3 py-1 text-body-sm font-medium text-accent-strong">
             One tool, pay for what you use
           </span>
         </div>
@@ -423,13 +427,28 @@ export function ComparisonMatrix() {
                 c.best ? 'border-accent shadow-float' : 'border-line shadow-card',
               ].join(' ')}
             >
-              {c.best ? (
-                <span className="absolute right-5 top-5 rounded-full bg-accent px-2.5 py-0.5 text-[0.66rem] font-medium text-white">
-                  Best value
-                </span>
-              ) : null}
-              <p className={`text-heading-md ${c.best ? 'text-accent' : 'text-ink'}`}>{c.name}</p>
-              <p className="mt-0.5 text-body-sm text-muted">{c.tagline}</p>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className={`text-heading-md ${c.best ? 'text-accent' : 'text-ink'}`}>{c.name}</p>
+                    {c.best ? (
+                      <span className="rounded-full bg-accent px-2.5 py-0.5 text-[0.66rem] font-medium text-white">
+                        Best value
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-0.5 text-body-sm text-muted">{c.tagline}</p>
+                </div>
+                {/* Brand mascot, mobile-only, right-aligned; decorative. */}
+                <img
+                  src={`/milo/${(
+                    { starter: 'milo-hero', growth: 'milo-typing', scale: 'milo-celebrating', custom: 'milo-listening' } as Record<string, string>
+                  )[c.id] ?? 'milo-hero'}.webp`}
+                  alt=""
+                  aria-hidden
+                  className="h-14 w-auto shrink-0 self-start"
+                />
+              </div>
               <p className="mt-3 text-display-md font-medium tracking-tight text-ink">
                 {c.pack ? usd(c.pack.priceUsdCents) : 'Let’s talk'}
               </p>

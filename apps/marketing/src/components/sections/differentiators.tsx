@@ -136,12 +136,12 @@ export function Differentiators() {
               key={row.eyebrow}
               className="grid items-center gap-8 md:grid-cols-2 md:gap-14"
             >
-              <div className={flip ? 'md:order-2' : ''}>
+              <div className={flip ? 'min-w-0 md:order-2' : 'min-w-0'}>
                 <p className="text-eyebrow uppercase text-muted">{row.eyebrow}</p>
                 <h3 className="mt-3 text-heading-lg text-ink">{row.title}</h3>
                 <p className="mt-4 max-w-prose text-body-lg text-muted">{row.copy}</p>
               </div>
-              <div className={flip ? 'md:order-1' : ''}>{row.visual}</div>
+              <div className={flip ? 'min-w-0 md:order-1' : 'min-w-0'}>{row.visual}</div>
             </Reveal>
           );
         })}
