@@ -48,17 +48,20 @@ export function SiteHeader() {
   return (
     <header
       className={[
-        'sticky top-0 z-50 border-b transition-colors duration-300 ease-soft',
-        // Once scrolled, the header takes a frosted background so content scrolling
-        // underneath is masked (no messy overlap). The tint matches whichever
-        // surface it sits over: light frosted on light, dark frosted on a
-        // `.on-dark` section. At the very top it stays transparent (nav on the
-        // hero). Explicit rgba because the token alpha modifier renders transparent.
-        scrolled
-          ? onDark
-            ? 'border-white/10 bg-[rgba(20,28,26,0.72)] backdrop-blur-lg'
-            : 'border-line bg-[rgba(245,245,241,0.72)] backdrop-blur-lg'
-          : 'border-transparent bg-transparent',
+        'sticky top-0 z-50 border-b transition-[background-color,border-color,box-shadow] duration-300 ease-soft',
+        // A thin glass layer, tuned to the surface underneath. Over a `.on-dark`
+        // section it is ALWAYS translucent glass (blur + faint white highlight +
+        // soft elevation) so the nav never dissolves into the teal hero, yet the
+        // background stays clearly perceptible (kept well below opaque). Over light
+        // it is transparent at the top (already good) and light frosted once
+        // scrolled. `supports-[backdrop-filter]` bumps opacity a touch where blur
+        // is unavailable so text stays crisp. rgba is explicit (token alpha renders
+        // transparent on this variable).
+        onDark
+          ? 'border-white/12 bg-[rgba(16,24,22,0.42)] shadow-[0_10px_30px_-22px_rgba(0,0,0,0.7)] backdrop-blur-md supports-[backdrop-filter]:bg-[rgba(16,24,22,0.34)]'
+          : scrolled
+            ? 'border-line bg-[rgba(245,245,241,0.72)] shadow-[0_10px_30px_-24px_rgba(26,26,24,0.22)] backdrop-blur-lg'
+            : 'border-transparent bg-transparent',
       ].join(' ')}
     >
       <div className="shell flex items-center justify-between py-4">
