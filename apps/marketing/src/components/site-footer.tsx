@@ -9,8 +9,8 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
   return (
     <footer className="border-t border-line bg-canvas">
-      <div className="shell grid gap-10 py-14 md:grid-cols-[1.4fr_repeat(3,1fr)]">
-        <div className="max-w-xs">
+      <div className="shell grid grid-cols-2 gap-x-6 gap-y-8 py-12 md:grid-cols-[1.4fr_repeat(3,1fr)] md:gap-10 md:py-14">
+        <div className="col-span-2 max-w-xs md:col-span-1">
           <Wordmark />
           <p className="mt-4 text-body-sm text-muted">
             Find the right local businesses, reach out like your best salesperson wrote each
