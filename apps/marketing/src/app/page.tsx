@@ -8,7 +8,7 @@ import { HowItWorks } from '@/components/sections/how-it-works';
 import { Demo } from '@/components/sections/demo';
 import { Differentiators } from '@/components/sections/differentiators';
 import { FounderNote } from '@/components/sections/founder-note';
-import { Pricing } from '@/components/sections/pricing';
+import { LandingPricing } from '@/components/sections/landing-pricing';
 import { Faq } from '@/components/sections/faq';
 import { FinalCta } from '@/components/sections/final-cta';
 import { FaqJsonLd } from '@/components/structured-data';
@@ -23,7 +23,7 @@ export default function LandingPage() {
       <Demo />
       <Differentiators />
       <FounderNote />
-      <Pricing />
+      <LandingPricing />
       <Faq />
       <FinalCta />
     </>
