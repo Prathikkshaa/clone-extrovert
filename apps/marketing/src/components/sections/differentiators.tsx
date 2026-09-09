@@ -60,31 +60,31 @@ function ComplianceVisual() {
   );
 }
 
-function AgencyVisual() {
-  const clients = [
-    { name: 'Acme Roofing', inbox: 'you@acmeroofing.com', list: 'Austin · 42 leads' },
-    { name: 'BrightSmile Dental', inbox: 'you@brightsmile.com', list: 'Dallas · 28 leads' },
-    { name: 'Peak Fitness', inbox: 'you@peakfit.co', list: 'Houston · 35 leads' },
-  ];
+function ApprovalVisual() {
   return (
     <div className="rounded-xl border border-line bg-surface p-5 shadow-float">
       <div className="flex items-center justify-between">
-        <p className="text-body-sm text-muted">Your clients</p>
+        <p className="text-body-sm text-muted">Drafts waiting for you</p>
         <span className="rounded-full bg-accent-soft px-2.5 py-1 text-[0.78rem] font-medium text-accent">
-          One login
+          3 to review
         </span>
       </div>
-      <div className="mt-3 space-y-2">
-        {clients.map((c) => (
-          <div key={c.name} className="flex items-center justify-between rounded-md border border-line bg-canvas px-3 py-2">
-            <div>
-              <p className="text-body-sm font-medium text-ink">{c.name}</p>
-              <p className="text-[0.78rem] text-muted">{c.inbox}</p>
-            </div>
-            <span className="text-[0.78rem] text-muted">{c.list}</span>
-          </div>
-        ))}
+      <div className="mt-3 rounded-md border border-line bg-canvas px-3 py-3">
+        <p className="text-body-sm font-medium text-ink">Quick idea for Lone Star Roofing</p>
+        <p className="mt-1 text-[0.78rem] text-muted">To: owner@lonestarroofing.com</p>
+        <div className="mt-3 flex items-center gap-2">
+          <span className="rounded-md bg-accent px-2.5 py-1 text-[0.78rem] font-medium text-white">
+            Approve &amp; send
+          </span>
+          <span className="rounded-md border border-line px-2.5 py-1 text-[0.78rem] text-ink">
+            Edit
+          </span>
+          <span className="rounded-md border border-line px-2.5 py-1 text-[0.78rem] text-muted">
+            Skip
+          </span>
+        </div>
       </div>
+      <p className="mt-3 text-[0.78rem] text-muted">Nothing sends until you say so.</p>
     </div>
   );
 }
@@ -109,10 +109,10 @@ const ROWS: Row[] = [
     visual: <ComplianceVisual />,
   },
   {
-    eyebrow: 'Built for agencies',
-    title: 'Run every client’s outreach from one place.',
-    copy: 'Separate inboxes, separate lead lists, one login - send for each client without juggling five tools or crossing wires.',
-    visual: <AgencyVisual />,
+    eyebrow: 'You stay in control',
+    title: 'Nothing sends until you approve it.',
+    copy: 'Milo drafts every email and queues it for you. Review, tweak, or skip - not a single message leaves your inbox on autopilot.',
+    visual: <ApprovalVisual />,
   },
 ];
 

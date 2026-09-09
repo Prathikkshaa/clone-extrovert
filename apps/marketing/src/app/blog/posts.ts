@@ -113,7 +113,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'p',
-        text: "Doing this by hand works, but it is slow: checking businesses one by one, copying details into a spreadsheet, researching each one, and writing every email from scratch. That is the exact loop ExtrovertAI automates. You search an industry and city, filter for the no-website signal, and it finds the leads, pulls the details, and drafts personalized outreach grounded in each business's own public details and reviews, then sends it from your inbox. You can try it free and run a real search for your own niche before paying anything.",
+        text: "Doing this by hand works, but it is slow: checking businesses one by one, copying details into a spreadsheet, researching each one, and writing every email from scratch. That is the exact loop Milo automates. You search an industry and city, filter for the no-website signal, and it finds the leads, pulls the details, and drafts personalized outreach grounded in each business's own public details and reviews, then sends it from your inbox. You can try it free and run a real search for your own niche before paying anything.",
       },
     ],
   },
@@ -181,7 +181,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'p',
-        text: 'Doing this by hand works, but it is slow. ExtrovertAI runs the whole loop for you - search an industry and area, filter for buying signals, and it builds the list, pulls each business’s public details, and drafts personalized outreach you review before it sends from your own inbox. You can run a real search for your niche free before paying anything.',
+        text: 'Doing this by hand works, but it is slow. Milo runs the whole loop for you - search an industry and area, filter for buying signals, and it builds the list, pulls each business’s public details, and drafts personalized outreach you review before it sends from your own inbox. You can run a real search for your niche free before paying anything.',
       },
     ],
   },
@@ -253,7 +253,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'p',
-        text: 'Keeping all of this straight by hand is fiddly. ExtrovertAI runs the loop with these habits built in - it sends from your own inbox, ramps volume with warm-up, spaces sends and monitors bounces, and drafts personalized emails you approve before they go out. You can try it free.',
+        text: 'Keeping all of this straight by hand is fiddly. Milo runs the loop with these habits built in - it sends from your own inbox, ramps volume with warm-up, spaces sends and monitors bounces, and drafts personalized emails you approve before they go out. You can try it free.',
       },
     ],
   },
@@ -326,7 +326,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'p',
-        text: 'Getting the compliance details right on every send is exactly what tooling should handle. ExtrovertAI runs the loop with a one-click unsubscribe and your physical address on every email, automatic suppression of opt-outs, and region-aware handling for the US, UK, and EU - so you can focus on the offer. You can try it free.',
+        text: 'Getting the compliance details right on every send is exactly what tooling should handle. Milo runs the loop with a one-click unsubscribe and your physical address on every email, automatic suppression of opt-outs, and region-aware handling for the US, UK, and EU - so you can focus on the offer. You can try it free.',
       },
     ],
   },

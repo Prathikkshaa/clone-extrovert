@@ -130,7 +130,18 @@ export function HowItWorks({
   subtitle?: string;
 } = {}) {
   const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Auto-advance through the steps for a lively "watch it work" feel; pauses the
+  // instant the user hovers or focuses the list so they stay in control. Skipped
+  // under prefers-reduced-motion.
+  useEffect(() => {
+    if (paused) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const id = setInterval(() => setActive((a) => (a + 1) % STEPS.length), 3200);
+    return () => clearInterval(id);
+  }, [paused]);
 
   const select = (i: number) => {
     const next = (i + STEPS.length) % STEPS.length;
@@ -168,6 +179,10 @@ export function HowItWorks({
           aria-label="How it works, step by step"
           aria-orientation="vertical"
           className="flex flex-col gap-2"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          onFocusCapture={() => setPaused(true)}
+          onBlurCapture={() => setPaused(false)}
         >
           {STEPS.map((step, i) => {
             const isActive = i === active;
@@ -211,7 +226,7 @@ export function HowItWorks({
           role="tabpanel"
           id="hiw-panel"
           aria-labelledby={`hiw-tab-${active}`}
-          className="rounded-xl border border-line bg-surface p-6 shadow-card md:p-8"
+          className="min-h-[23rem] rounded-xl border border-line bg-surface p-6 shadow-card md:min-h-[24rem] md:p-8"
         >
           <FocalPanel key={active} index={active} />
         </div>

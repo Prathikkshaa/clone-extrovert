@@ -28,10 +28,10 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://extroverta
 
 /** One-line product description reused across metadata + JSON-LD (single source). */
 export const SITE_DESCRIPTION =
-  'Find local businesses worth reaching, write outreach that sounds like your best salesperson, and stay out of spam - one tool, pay for what you use.';
+  `${APP_NAME} is AI sales prospecting: it finds the businesses that need what you sell and reaches out personally, turning prospects into conversations and booked meetings.`;
 
 /** Friction-reducing microcopy shown under primary CTAs (M00 §3). */
-export const CTA_MICROCOPY = 'No card needed · Free to start';
+export const CTA_MICROCOPY = 'No card needed';
 
 /**
  * PLACEHOLDER - sales/enterprise contact for the "Custom" pricing tier. Swap the
