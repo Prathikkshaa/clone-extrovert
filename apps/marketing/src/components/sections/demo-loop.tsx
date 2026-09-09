@@ -26,9 +26,9 @@ export function DemoLoop() {
     <div className="overflow-hidden rounded-xl border border-line bg-surface shadow-float">
       {/* Window chrome */}
       <div className="flex items-center gap-2 border-b border-line px-4 py-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-line" />
-        <span className="h-2.5 w-2.5 rounded-full bg-line" />
-        <span className="h-2.5 w-2.5 rounded-full bg-line" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#f87171]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#fbbf24]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#34d399]" />
         <span className="ml-3 text-body-sm text-muted">{APP_LABELS[active]}</span>
       </div>
 
