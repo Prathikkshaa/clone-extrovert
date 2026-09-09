@@ -4,7 +4,7 @@ import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
 import { Differentiators } from '@/components/sections/differentiators';
 import { Demo } from '@/components/sections/demo';
-import { Chapters } from '@/components/how-it-works/chapters';
+import { MechanismExplorer } from '@/components/how-it-works/mechanism-explorer';
 import { HoverFaq } from '@/components/how-it-works/hover-faq';
 import { HOW_IT_WORKS_FAQ_ITEMS } from '@/lib/faq';
 import { SIGNUP_URL } from '@/lib/site';
@@ -18,16 +18,6 @@ export const metadata: Metadata = {
   alternates: { canonical: '/how-it-works' },
 };
 
-const CONTENTS = [
-  'You define the market.',
-  'Milo discovers real local businesses.',
-  'It reads each business.',
-  'It confirms the buying signal.',
-  'It writes the outreach in your voice.',
-  'It sends the way a careful human does.',
-  'It turns a reply into a conversation.',
-];
-
 /**
  * /how-it-works. Editorial explainer, deliberately not a landing hero. Answers:
  * "If I give Milo a market, what actually happens between that decision and a
@@ -38,51 +28,27 @@ export default function HowItWorksPage() {
     <>
       <FaqJsonLd items={HOW_IT_WORKS_FAQ_ITEMS} />
 
-      {/* COVER. Stance on the left, typographic table of contents on the right. */}
-      <section className="shell pt-14 md:pt-20">
-        <div className="grid gap-10 border-b border-line pb-14 md:grid-cols-[1.05fr_1fr] md:gap-16 md:pb-20">
-          <Reveal className="max-w-xl">
-            <p className="font-mono text-eyebrow uppercase tracking-wide text-muted">
-              The mechanism
-            </p>
-            <h1 className="mt-5 text-display-lg text-ink">
-              Most prospecting starts with a list.
-              <br />
-              <span className="text-accent">Milo starts with a reason to reach out.</span>
-            </h1>
-            <p className="mt-6 max-w-md text-body-lg text-muted">
-              A short, honest look at how AI lead generation, buying-signal discovery,
-              and personalized outreach actually fit together. End to end, one example,
-              nothing hidden.
-            </p>
-            <p className="mt-5 font-mono text-body-sm text-muted">
-              Read in about three minutes.
-            </p>
-          </Reveal>
-
-          <Reveal delay={0.05} className="min-w-0 md:pl-6 md:border-l md:border-line">
-            <p className="font-mono text-eyebrow uppercase tracking-wide text-muted">
-              Contents
-            </p>
-            <ol className="mt-5 space-y-3.5">
-              {CONTENTS.map((t, i) => (
-                <li
-                  key={t}
-                  className="grid grid-cols-[auto_1fr] items-baseline gap-4 text-body text-ink"
-                >
-                  <span className="font-mono text-body-sm tracking-tight text-muted">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ol>
-          </Reveal>
-        </div>
+      {/* COVER. Editorial stance, single measure, tight. The horizontal ruler
+          in the explorer below IS the table of contents. */}
+      <section className="shell pt-14 pb-8 md:pt-20 md:pb-10">
+        <Reveal className="mx-auto max-w-3xl">
+          <p className="font-mono text-eyebrow uppercase tracking-wide text-muted">
+            The mechanism
+          </p>
+          <h1 className="mt-5 text-display-lg text-ink">
+            Most prospecting starts with a list.{' '}
+            <span className="text-accent">Milo starts with a reason to reach out.</span>
+          </h1>
+          <p className="mt-6 max-w-2xl text-body-lg text-muted">
+            A short, honest look at how AI lead generation, buying-signal discovery, and
+            personalized outreach actually fit together. Seven steps, one running example,
+            nothing hidden.
+          </p>
+        </Reveal>
       </section>
 
-      {/* THE MECHANISM. Seven chapters, one running example. */}
-      <Chapters />
+      {/* THE MECHANISM. Horizontal seven-step explorer, one running example. */}
+      <MechanismExplorer />
 
       {/* SEE IT AT WORK. The existing Demo, kept intentionally as concrete proof. */}
       <Demo />
@@ -95,62 +61,107 @@ export default function HowItWorksPage() {
         intro="Every draft is written from that specific business. That is the difference between an email a stranger deletes and a note an owner replies to."
       />
 
-      {/* TRUST AND COMPLIANCE. Condensed to a compact three-column mechanic. */}
+      {/* TRUST + DELIVERABILITY. Outcome-first 2x2 value grid. */}
       <section className="shell py-section-y">
-        <Reveal className="mx-auto max-w-2xl">
-          <p className="text-eyebrow uppercase text-accent">Trust & compliance</p>
-          <h2 className="mt-3 text-display-md text-ink">Sends the way a careful human does.</h2>
+        <Reveal className="mx-auto max-w-3xl">
+          <p className="text-eyebrow uppercase text-accent">Deliverability & trust</p>
+          <h2 className="mt-3 text-display-md text-ink">
+            Built to land in the inbox, not the spam folder.
+          </h2>
+          <p className="mt-4 text-body-lg text-muted">
+            Cold outreach fails for one boring reason: it looks like blast. Milo is engineered
+            end to end to look like you sending a real email, one at a time, from your own
+            domain, in a way inbox filters trust.
+          </p>
         </Reveal>
-        <Reveal delay={0.05} className="mx-auto mt-10 grid max-w-4xl gap-x-10 gap-y-8 md:grid-cols-3">
-          {[
-            {
-              t: 'Your inbox',
-              d: 'Connected via Gmail or Outlook OAuth. Tokens encrypted. Disconnect anytime.',
-            },
-            {
-              t: 'Warmed up, throttled',
-              d: 'Slow daily ramp, one at a time, randomized spacing. Bounces watched.',
-            },
-            {
-              t: 'Unsubscribe & address',
-              d: 'One-click unsubscribe and your physical address on every message. CAN-SPAM, PECR, GDPR-aware.',
-            },
-          ].map((c) => (
-            <div key={c.t}>
-              <p className="text-heading-sm text-ink">{c.t}</p>
-              <p className="mt-2 max-w-prose text-body-sm text-muted">{c.d}</p>
-            </div>
-          ))}
+
+        <Reveal delay={0.05} className="mx-auto mt-12 max-w-5xl">
+          <ul className="grid gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-2">
+            {[
+              {
+                stat: '0',
+                unit: 'shared blast servers',
+                title: 'Inbox, not spam folder.',
+                copy: 'Warm-up ramps you gradually from a handful a day up to your daily cap. Sends spread across the day with randomized spacing and hard rate limits. Bounces pause the campaign automatically so a bad address never poisons the rest.',
+              },
+              {
+                stat: 'You',
+                unit: 'own the send',
+                title: 'From your own inbox, on your own reputation.',
+                copy: 'Connected through Gmail or Outlook OAuth. Tokens encrypted at rest. Every message ships from you@yourinbox.com, so replies come home and your domain reputation is yours to keep.',
+              },
+              {
+                stat: '1×1',
+                unit: 'per lead, per send',
+                title: 'Behaves like a careful human.',
+                copy: 'One message at a time. Natural, varied intervals. Follow-ups auto-stop the moment someone replies. No mass send, no midnight blast, no pattern for filters to catch.',
+              },
+              {
+                stat: '100%',
+                unit: 'of sends, compliant',
+                title: 'Legal on every message.',
+                copy: 'Every email carries a working one-click unsubscribe token and your physical address, non-removable. CAN-SPAM in the US, PECR and GDPR-aware in the UK and EU. Unsubscribes suppress on the spot, forever.',
+              },
+            ].map((v) => (
+              <li key={v.title} className="flex flex-col gap-4 bg-surface p-6 md:p-8">
+                <div className="flex items-baseline gap-3">
+                  <span className="font-mono text-display-md leading-none text-accent">
+                    {v.stat}
+                  </span>
+                  <span className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">
+                    {v.unit}
+                  </span>
+                </div>
+                <p className="text-heading-sm text-ink">{v.title}</p>
+                <p className="max-w-prose text-body-sm text-muted">{v.copy}</p>
+              </li>
+            ))}
+          </ul>
         </Reveal>
       </section>
 
-      {/* PRICING + AGENCIES. One compact rule, two short lines each. */}
+      {/* PRICING + AGENCIES. Outcome-led, tighter, with a real anchor number. */}
       <section className="shell pb-section-y">
-        <div className="mx-auto grid max-w-4xl gap-8 border-y border-line py-8 md:grid-cols-2 md:gap-16 md:py-10">
-          <div>
-            <p className="font-mono text-eyebrow uppercase tracking-wide text-muted">
+        <Reveal className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
+          <div className="rounded-2xl border border-line bg-surface p-6 md:p-8">
+            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
               Pricing, plainly
             </p>
-            <p className="mt-2 text-heading-sm text-ink">
+            <p className="mt-4 text-heading-lg text-ink">
               You only pay when Milo does the work.
             </p>
-            <p className="mt-2 text-body-sm text-muted">
-              {FREE_SIGNUP_CREDITS} free credits on signup. About {CREDITS_PER_LEAD_LOW} to{' '}
-              {CREDITS_PER_LEAD_HIGH} credits per lead, end to end. Growth pack is 550 to 650
-              credits when you are ready to keep going.
+            <div className="mt-6 flex items-baseline gap-3 border-t border-line pt-6">
+              <span className="font-mono text-display-md leading-none text-ink">
+                {FREE_SIGNUP_CREDITS}
+              </span>
+              <span className="text-body-sm text-muted">free credits on signup, no card.</span>
+            </div>
+            <p className="mt-4 max-w-prose text-body-sm text-muted">
+              Roughly {CREDITS_PER_LEAD_LOW} to {CREDITS_PER_LEAD_HIGH} credits per lead, end
+              to end. Growth pack scales you to 550 to 650 credits when the mechanism proves out.
+              No seats, no monthly minimum, credits never expire.
             </p>
           </div>
-          <div>
-            <p className="font-mono text-eyebrow uppercase tracking-wide text-muted">
-              Agencies
+          <div className="rounded-2xl border border-line bg-surface p-6 md:p-8">
+            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
+              For agencies
             </p>
-            <p className="mt-2 text-heading-sm text-ink">Same mechanism, more markets.</p>
-            <p className="mt-2 text-body-sm text-muted">
-              No seats. Run one market per client from the same pool of credits. Milo keeps a
-              distinct voice per market.
+            <p className="mt-4 text-heading-lg text-ink">
+              One tool, many markets. No seats.
+            </p>
+            <div className="mt-6 flex items-baseline gap-3 border-t border-line pt-6">
+              <span className="font-mono text-display-md leading-none text-ink">1</span>
+              <span className="text-body-sm text-muted">
+                credit pool across every client market.
+              </span>
+            </div>
+            <p className="mt-4 max-w-prose text-body-sm text-muted">
+              Run a distinct voice, market, and inbox per client. Same mechanism, same
+              deliverability guardrails, one balance to top up. Bring your team without a seat
+              tax.
             </p>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* FAQ. One open, hover-to-open on desktop, tap on touch. */}
