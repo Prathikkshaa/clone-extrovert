@@ -7,7 +7,7 @@ import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
 import { SIGNUP_URL } from '@/lib/site';
 import { CREDIT_PACKS, CREDIT_COSTS, FREE_SIGNUP_CREDITS } from '@extrovertai/shared';
-import { usd, leadsForCredits, CREDITS_PER_LEAD_LOW, CREDITS_PER_LEAD_HIGH } from '@/lib/pricing-math';
+import { usd, leadsForCredits } from '@/lib/pricing-math';
 
 /* ── inline icons (currentColor so they inherit accent) ── */
 type IP = { className?: string };
@@ -79,7 +79,6 @@ const PLANS = [
 ];
 
 const REASSURE = [
-  { Icon: IcoCoins, title: 'One lead, end to end', sub: `~${CREDITS_PER_LEAD_LOW}–${CREDITS_PER_LEAD_HIGH} credits` },
   { Icon: IcoUsers, title: 'No seats', sub: 'Use it solo or with your team.' },
   { Icon: IcoCard, title: 'No monthly minimum', sub: 'Top up only when you need to.' },
   { Icon: IcoShield, title: 'Credits never expire', sub: 'Use them at your own pace.' },
@@ -87,7 +86,7 @@ const REASSURE = [
 
 export function LandingPricing() {
   return (
-    <section id="pricing" className="shell py-section-y">
+    <section id="pricing" className="shell relative overflow-x-clip py-section-y">
       {/* eyebrow + headline */}
       <Reveal className="mx-auto max-w-3xl text-center">
         <p className="text-eyebrow uppercase tracking-wide text-accent">Pricing</p>
@@ -130,14 +129,14 @@ export function LandingPricing() {
 
       {/* plans + Milo mascot — Milo lives OUTSIDE the grid so it doesn't push cards */}
       <div className="relative mx-auto mt-14 max-w-5xl">
-        {/* Milo (desktop only): sits to the right of the Scale card, speech bubble above */}
+        {/* Milo (desktop only): sits to the right of the cards, speech bubble above.
+            Positioned OUTSIDE the max-w-5xl so it never covers the plan cards. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-4 top-8 hidden w-[168px] lg:block xl:-right-16 xl:w-[188px]"
+          className="pointer-events-none absolute top-6 z-10 hidden w-[160px] lg:right-[-152px] lg:block xl:right-[-184px] xl:w-[180px]"
         >
-          <div className="relative -mb-2 ml-2 inline-block rounded-2xl border border-line bg-surface px-3.5 py-2 text-[0.78rem] leading-snug text-ink shadow-card">
+          <div className="relative mb-1 inline-block rounded-2xl border border-line bg-surface px-3.5 py-2 text-[0.78rem] leading-snug text-ink shadow-card">
             Same work.<br />Fewer subscriptions.<br />More opportunities.
-            {/* pointer */}
             <span className="absolute -bottom-[7px] left-8 h-3 w-3 rotate-45 border-b border-r border-line bg-surface" />
           </div>
           <Image
@@ -145,7 +144,7 @@ export function LandingPricing() {
             alt=""
             width={376}
             height={344}
-            className="mt-1 h-auto w-full select-none"
+            className="h-auto w-full select-none"
             priority={false}
           />
         </div>
@@ -214,7 +213,7 @@ export function LandingPricing() {
       {/* benefit row — one line per item on desktop */}
       <Reveal
         delay={0.05}
-        className="mx-auto mt-10 grid max-w-5xl gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-4"
+        className="mx-auto mt-10 grid max-w-5xl gap-x-6 gap-y-4 sm:grid-cols-3"
       >
         {REASSURE.map((r) => (
           <div key={r.title} className="flex items-center gap-3">
