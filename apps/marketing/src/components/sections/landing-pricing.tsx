@@ -2,7 +2,6 @@
 // Starter card = the FREE_SIGNUP_CREDITS grant (rendered as $0). Growth + Scale are
 // read from the shared CREDIT_PACKS source of truth so nothing drifts.
 import { Fragment } from 'react';
-import Image from 'next/image';
 import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
 import { SIGNUP_URL } from '@/lib/site';
@@ -86,7 +85,7 @@ const REASSURE = [
 
 export function LandingPricing() {
   return (
-    <section id="pricing" className="shell relative overflow-x-clip py-section-y">
+    <section id="pricing" className="shell py-section-y">
       {/* eyebrow + headline */}
       <Reveal className="mx-auto max-w-3xl text-center">
         <p className="text-eyebrow uppercase tracking-wide text-accent">Pricing</p>
@@ -127,28 +126,8 @@ export function LandingPricing() {
         ))}
       </Reveal>
 
-      {/* plans + Milo mascot — Milo lives OUTSIDE the grid so it doesn't push cards */}
-      <div className="relative mx-auto mt-14 max-w-5xl">
-        {/* Milo (desktop only): sits to the right of the cards, speech bubble above.
-            Positioned OUTSIDE the max-w-5xl so it never covers the plan cards. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-6 z-10 hidden w-[160px] lg:right-[-152px] lg:block xl:right-[-184px] xl:w-[180px]"
-        >
-          <div className="relative mb-1 inline-block rounded-2xl border border-line bg-surface px-3.5 py-2 text-[0.78rem] leading-snug text-ink shadow-card">
-            Same work.<br />Fewer subscriptions.<br />More opportunities.
-            <span className="absolute -bottom-[7px] left-8 h-3 w-3 rotate-45 border-b border-r border-line bg-surface" />
-          </div>
-          <Image
-            src="/milo/milo-pricing.png"
-            alt=""
-            width={376}
-            height={344}
-            className="h-auto w-full select-none"
-            priority={false}
-          />
-        </div>
-
+      {/* plans */}
+      <div className="mx-auto mt-14 max-w-5xl">
         <div className="grid items-stretch gap-6 md:grid-cols-3">
           {PLANS.map((p, i) => (
             <Reveal
