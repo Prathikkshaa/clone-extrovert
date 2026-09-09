@@ -3,14 +3,13 @@
 // FINALIZED shared constants - no invented figures. Comparisons are by CATEGORY,
 // never a named competitor with a quoted price, so nothing can go stale or wrong.
 import { Fragment, type ReactNode } from 'react';
-import { CREDIT_PACKS, type CreditPack } from '@extrovertai/shared';
+import { CREDIT_PACKS, FREE_SIGNUP_CREDITS, type CreditPack } from '@extrovertai/shared';
 import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
-import { CONTACT_URL, SIGNUP_URL } from '@/lib/site';
+import { CONTACT_URL, SIGNUP_URL, APP_NAME } from '@/lib/site';
 import {
   usd,
   fmtUsd2,
-  bestPack,
   leadsForCredits,
   costPerLeadUsd,
   LOWEST_COST_PER_LEAD,
@@ -101,20 +100,32 @@ export function PricingRoiBand() {
           <div className="max-w-xl">
             <p className="text-eyebrow uppercase tracking-wide text-accent">Pricing</p>
             <h1 className="mt-4 text-display-lg tracking-tight">
-              Outreach priced like a utility,{' '}
-              <span className="text-white/45">not a headcount.</span>
+              Build your pipeline{' '}
+              <span className="text-white/45">without another subscription.</span>
             </h1>
             <p className="mt-5 max-w-md text-body-lg text-white/70">
-              Start free with 100 credits. After that you only pay for what you use, from{' '}
-              {LOWEST_COST_PER_LEAD} a lead, found, researched, written and sent. No seats, no
-              subscription, nothing hidden.
+              Find businesses, uncover buying signals, research prospects, personalize outreach, and
+              start conversations. Pay for the work you use, from {LOWEST_COST_PER_LEAD} a prospect,
+              not seats, contracts, or monthly minimums.
             </p>
             <div className="mt-7">
-              <CtaButton href={SIGNUP_URL} size="lg">
-                Start free
+              <CtaButton
+                href={SIGNUP_URL}
+                size="lg"
+                className="!bg-[#0f766e] text-white hover:!bg-[#0b5d56]"
+              >
+                Start with 100 free credits
               </CtaButton>
-              <p className="mt-3 text-body-sm text-white/55">No card needed&nbsp;&nbsp;|&nbsp;&nbsp;Free to start</p>
+              <p className="mt-3 text-body-sm text-white/55">No card needed · No auto-charge</p>
             </div>
+            <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-body-sm text-white/70">
+              {['No seats', 'No subscription', 'No monthly minimum', 'Credits never expire'].map((x) => (
+                <li key={x} className="flex items-center gap-2">
+                  <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-accent" />
+                  {x}
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* Middle: Milo scene (xl only). Bubble + sparkles are baked into the
@@ -172,16 +183,19 @@ export function PricingRoiBand() {
               ))}
             </ul>
 
-            {/* Highlighted free-credits callout (light fill, like the comp) */}
-            <div className="mt-4 flex items-center gap-3 rounded-2xl bg-[#e8f4ef] p-4">
+            {/* Highlighted free-credits callout - a real button into signup. */}
+            <a
+              href={SIGNUP_URL}
+              className="mt-4 flex items-center gap-3 rounded-2xl bg-[#e8f4ef] p-4 transition-colors hover:bg-[#dcefe7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            >
               <span className="text-[#0f766e]">
                 <IconGift />
               </span>
               <div>
-                <p className="text-body-sm font-semibold text-[#12332e]">100 free credits</p>
+                <p className="text-body-sm font-semibold text-[#12332e]">Get 100 free credits</p>
                 <p className="text-[0.8rem] text-[#12332e]/70">Try it out. No card required.</p>
               </div>
-            </div>
+            </a>
           </div>
         </div>
 
@@ -251,105 +265,148 @@ function IconCard() {
 }
 
 /* ─────────────────────── side-by-side comparison ────────────────────── */
-// Matches the approved comp: a Milo-headed column per plan, the Scale column
-// highlighted, row icons on the left, and a trust strip below. Every figure is
-// derived from lib/pricing-math so it can never drift from what the API charges.
-export function ComparisonMatrix() {
-  type Col = {
-    id: string;
-    name: string;
-    tagline: string;
-    img: string;
-    bubble: string;
-    pack?: CreditPack;
-    best?: boolean;
-    custom?: boolean;
-    baked?: boolean; // artwork already includes its speech bubble
-    bestFor: string[];
-  };
-  const byId = Object.fromEntries(CREDIT_PACKS.map((p) => [p.id, p])) as Record<string, CreditPack>;
-  const columns: Col[] = [
-    { id: 'starter', name: 'Starter', tagline: 'Try it out.', img: 'milo-hero', bubble: 'A great place to start.', pack: byId['starter'], bestFor: ['Your first outreach test', 'A single niche or city', 'Replies before you commit'] },
-    { id: 'growth', name: 'Growth', tagline: 'For steady progress.', img: 'milo-typing', bubble: 'For consistent outreach.', pack: byId['growth'], bestFor: ['Weekly campaigns', 'One or two niches', 'Solo consultants & freelancers'] },
-    { id: 'scale', name: 'Scale', tagline: 'For high-volume outreach.', img: 'milo-scale-full', bubble: 'More meetings. Less cost.', pack: byId['scale'], best: true, baked: true, bestFor: ['Always-on, high volume', 'Multiple clients & inboxes', 'Lowest price per credit'] },
-    { id: 'custom', name: 'Custom', tagline: 'Built for your needs.', img: 'milo-custom-full', bubble: "Need more? Let's tailor it for you.", custom: true, baked: true, bestFor: ['Volume beyond the packs', 'Invoicing & purchase orders', 'Help to launch'] },
-  ];
-  const rows: { label: string; icon: keyof typeof ROW_ICONS; value: (c: Col) => ReactNode }[] = [
-    { label: 'Price', icon: 'tag', value: (c) => (c.pack ? usd(c.pack.priceUsdCents) : "Let's talk") },
-    { label: 'Credits', icon: 'db', value: (c) => (c.pack ? c.pack.credits.toLocaleString('en-US') : 'Volume') },
-    { label: 'Leads covered', icon: 'bars', value: (c) => {
-        if (!c.pack) return 'Unlimited scale';
-        const l = leadsForCredits(c.pack.credits);
-        return `${l.low}–${l.high}`;
-      } },
-    { label: 'Cost per lead', icon: 'users', value: (c) => {
-        if (!c.pack) return 'Best rates';
-        const x = costPerLeadUsd(c.pack.priceUsdCents, c.pack.credits);
-        return `${fmtUsd2(x.lo)}–${fmtUsd2(x.hi)}`;
-      } },
-    { label: '$ / credit', icon: 'percent', value: (c) => (c.pack ? `$${(c.pack.priceUsdCents / c.pack.credits / 100).toFixed(3)}` : `From ${LOWEST_PER_CREDIT_USD}`) },
-    { label: 'Credits expire', icon: 'clock', value: () => 'Never' },
-    { label: 'Invoicing & POs', icon: 'doc', value: (c) => (c.custom ? 'Yes' : '–') },
-  ];
+// The four plans, side by side. Starter is the FREE acquisition tier (the signup
+// grant), Growth is the highlighted value pick (it is the lowest $/credit and
+// $/lead of the paid tiers - a computed fact, not a badge), Scale is the volume
+// anchor, Custom is contact-sales. Every figure derives from lib/pricing-math so
+// it can never drift from what the API charges. No per-plan mascots here - Milo
+// lives once, in the hero CTA area, so the pricing hierarchy stays the hero.
+type Plan = {
+  id: string;
+  name: string;
+  bestFor: string;
+  credits?: number;
+  priceUsdCents?: number;
+  free?: boolean;
+  custom?: boolean;
+  best?: boolean;
+  cta: string;
+  href: string;
+};
 
-  // Per-cell highlight for the Scale column (continuous bordered box).
-  const hi = (c: Col, extra = '') => (c.best ? `bg-accent-soft/50 border-x border-accent ${extra}` : '');
+function usePlans(): Plan[] {
+  const byId = Object.fromEntries(CREDIT_PACKS.map((p) => [p.id, p])) as Record<string, CreditPack>;
+  return [
+    {
+      id: 'starter',
+      name: 'Starter',
+      bestFor: `Trying ${APP_NAME} on your first market`,
+      credits: FREE_SIGNUP_CREDITS,
+      priceUsdCents: 0,
+      free: true,
+      cta: 'Start free',
+      href: SIGNUP_URL,
+    },
+    {
+      id: 'growth',
+      name: 'Growth',
+      bestFor: 'Steady prospecting & pipeline building',
+      credits: byId['growth'].credits,
+      priceUsdCents: byId['growth'].priceUsdCents,
+      best: true,
+      cta: 'Build my pipeline',
+      href: SIGNUP_URL,
+    },
+    {
+      id: 'scale',
+      name: 'Scale',
+      bestFor: 'High-volume outreach',
+      credits: byId['scale'].credits,
+      priceUsdCents: byId['scale'].priceUsdCents,
+      cta: 'Scale prospecting',
+      href: SIGNUP_URL,
+    },
+    {
+      id: 'custom',
+      name: 'Custom',
+      bestFor: 'Teams with specialized requirements',
+      custom: true,
+      cta: 'Talk to us',
+      href: CONTACT_URL,
+    },
+  ];
+}
+
+const ROWS: { label: string; icon: keyof typeof ROW_ICONS; value: (p: Plan) => ReactNode }[] = [
+  {
+    label: 'Price',
+    icon: 'tag',
+    value: (p) => (p.custom ? "Let's talk" : p.free ? 'Free' : usd(p.priceUsdCents!)),
+  },
+  {
+    label: 'Credits',
+    icon: 'db',
+    value: (p) => (p.custom ? 'Volume' : p.credits!.toLocaleString('en-US')),
+  },
+  {
+    label: 'Prospects',
+    icon: 'bars',
+    value: (p) => {
+      if (p.custom) return 'Unlimited scale';
+      const l = leadsForCredits(p.credits!);
+      return `${l.low}–${l.high}`;
+    },
+  },
+  {
+    label: 'Cost per prospect',
+    icon: 'users',
+    value: (p) => {
+      if (p.custom) return 'Best rates';
+      if (p.free) return '$0';
+      const x = costPerLeadUsd(p.priceUsdCents!, p.credits!);
+      return `${fmtUsd2(x.lo)}–${fmtUsd2(x.hi)}`;
+    },
+  },
+  {
+    label: '$ / credit',
+    icon: 'percent',
+    value: (p) =>
+      p.custom ? `From ${LOWEST_PER_CREDIT_USD}` : p.free ? 'Free' : `$${(p.priceUsdCents! / p.credits! / 100).toFixed(3)}`,
+  },
+  { label: 'Credits expire', icon: 'clock', value: () => 'Never' },
+  { label: 'Invoicing & POs', icon: 'doc', value: (p) => (p.custom ? 'Yes' : '–') },
+];
+
+export function ComparisonMatrix() {
+  const plans = usePlans();
+  // Per-cell highlight for the Growth column (continuous bordered box).
+  const hi = (p: Plan, extra = '') => (p.best ? `bg-accent-soft/50 border-x border-accent ${extra}` : '');
 
   return (
     <section className="relative overflow-hidden bg-canvas pb-section-y pt-8">
-      {/* header */}
       <div className="shell relative">
         <div className="relative text-center">
-          <p className="text-eyebrow uppercase tracking-wide text-accent">Pricing</p>
+          <p className="text-eyebrow uppercase tracking-wide text-accent">Plans</p>
           <h2 className="mx-auto mt-3 max-w-3xl text-display-md text-ink">Every number, side by side.</h2>
           <p className="mx-auto mt-4 max-w-xl text-body-lg text-muted">
-            Nothing hidden. No estimates buried in the fine print. Every number comes from the same
-            credit cost you actually pay.
+            Nothing hidden. Every figure comes from the same credit cost you actually pay, so what
+            you compare is what you get.
           </p>
         </div>
 
-        {/* Desktop/tablet: the full side-by-side grid (md+). On mobile it is
-            replaced by stacked per-plan cards below (no cramped horizontal scroll). */}
+        {/* Desktop/tablet: full side-by-side grid (md+). Mobile uses stacked cards. */}
         <Reveal className="mt-10 hidden overflow-x-auto pb-2 md:block">
-          <div className="grid min-w-[720px] grid-cols-[minmax(150px,0.85fr)_repeat(4,minmax(0,1fr))] items-stretch">
-            {/* Row 0: mascots + bubbles */}
-            <div />
-            {columns.map((c) =>
-              c.baked ? (
-                // Artwork already carries its speech bubble - show it whole.
-                <div key={c.id} className="flex items-end justify-center px-2 pb-2">
-                  <img src={`/milo/${c.img}.webp`} alt="" className="h-auto w-full max-w-[150px]" />
-                </div>
-              ) : (
-                <div key={c.id} className="flex flex-col items-center justify-end px-3 pb-3">
-                  <div className="relative mb-1 rounded-xl bg-surface px-3 py-1.5 text-center text-[0.72rem] font-medium leading-tight text-ink shadow-card">
-                    {c.bubble}
-                    <span className="absolute -bottom-1 left-1/2 h-2.5 w-2.5 -translate-x-1/2 rotate-45 bg-surface" />
-                  </div>
-                  <img src={`/milo/${c.img}.webp`} alt="" width={100} height={100} className="h-[56px] w-auto" />
-                </div>
-              ),
-            )}
-
-            {/* Row 1: name + tagline (top of the highlighted box) */}
-            <div className="px-4 pt-2" />
-            {columns.map((c) => (
+          <div className="grid min-w-[760px] grid-cols-[minmax(150px,0.9fr)_repeat(4,minmax(0,1fr))] items-stretch">
+            {/* Header: Milo presides from the label cell; then plan names. */}
+            <div className="flex items-end justify-center pb-1" aria-hidden>
+              <img src="/milo/milo-typing.webp" alt="" className="h-[4.5rem] w-auto" />
+            </div>
+            {plans.map((p) => (
               <div
-                key={c.id}
-                className={`relative px-3 pb-3 pt-3 text-center ${hi(c, 'rounded-t-2xl border-t')}`}
+                key={p.id}
+                className={`relative flex items-end justify-center px-4 pb-4 pt-7 text-center ${hi(p, 'rounded-t-2xl border-t')}`}
               >
-                {c.best ? (
+                {p.best ? (
                   <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent px-3 py-0.5 text-[0.66rem] font-medium text-white">
                     Best value
                   </span>
                 ) : null}
-                <p className={`text-heading-md ${c.best ? 'text-accent' : 'text-ink'}`}>{c.name}</p>
-                <p className="mt-1 text-body-sm text-muted">{c.tagline}</p>
+                <p className={`text-heading-md ${p.best ? 'text-accent' : 'text-ink'}`}>{p.name}</p>
               </div>
             ))}
 
             {/* Data rows */}
-            {rows.map((r) => {
+            {ROWS.map((r) => {
               const Icon = ROW_ICONS[r.icon];
               return (
                 <Fragment key={r.label}>
@@ -357,107 +414,65 @@ export function ComparisonMatrix() {
                     <Icon />
                     {r.label}
                   </div>
-                  {columns.map((c) => (
+                  {plans.map((p) => (
                     <div
-                      key={c.id}
+                      key={p.id}
                       className={`flex items-center justify-center border-t border-line px-4 py-2.5 text-center text-body-sm ${
-                        c.best ? 'font-medium text-ink' : 'text-ink/80'
-                      } ${hi(c)}`}
+                        p.best ? 'font-medium text-ink' : 'text-ink/80'
+                      } ${hi(p)}`}
                     >
-                      {r.value(c)}
+                      {r.value(p)}
                     </div>
                   ))}
                 </Fragment>
               );
             })}
 
-            {/* Best for - self-selection copy folded in from the old pack cards */}
-            <div className="flex items-start gap-2.5 border-t border-line px-2 py-2.5 text-body-sm font-medium text-ink">
-              <span className="mt-0.5">
-                <IconGift />
-              </span>
-              Best for
-            </div>
-            {columns.map((c) => (
-              <div
-                key={c.id}
-                className={`border-t border-line px-4 py-2.5 text-body-sm text-ink/80 ${hi(c)}`}
-              >
-                <ul className="space-y-1">
-                  {c.bestFor.map((b) => (
-                    <li key={b} className="flex gap-2">
-                      <span aria-hidden className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent" />
-                      <span>{b}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-
             {/* CTA row (bottom of the highlighted box) */}
             <div className="px-2 pt-5" />
-            {columns.map((c) => (
-              <div key={c.id} className={`px-3 pb-4 pt-3 ${hi(c, 'rounded-b-2xl border-b')}`}>
-                {c.custom ? (
-                  <CtaButton href={CONTACT_URL} variant="secondary" size="sm" className="w-full">
-                    Talk to us
-                  </CtaButton>
-                ) : (
-                  <CtaButton
-                    href={SIGNUP_URL}
-                    variant={c.best ? 'primary' : 'secondary'}
-                    size="sm"
-                    className="w-full"
-                  >
-                    Get {c.name}
-                  </CtaButton>
-                )}
+            {plans.map((p) => (
+              <div key={p.id} className={`px-3 pb-4 pt-4 ${hi(p, 'rounded-b-2xl border-b')}`}>
+                <CtaButton
+                  href={p.href}
+                  variant={p.best ? 'primary' : 'secondary'}
+                  size="sm"
+                  className="w-full"
+                >
+                  {p.cta}
+                </CtaButton>
               </div>
             ))}
           </div>
         </Reveal>
 
-        {/* Mobile: stacked per-plan cards (same data, no horizontal scroll) */}
+        {/* Mobile: stacked per-plan cards (same data, no horizontal scroll, no mascots) */}
         <div className="mt-8 grid gap-5 md:hidden">
-          {columns.map((c) => (
+          {plans.map((p) => (
             <article
-              key={c.id}
+              key={p.id}
               className={[
                 'relative rounded-2xl border bg-surface p-5',
-                c.best ? 'border-accent shadow-float' : 'border-line shadow-card',
+                p.best ? 'border-accent shadow-float' : 'border-line shadow-card',
               ].join(' ')}
             >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className={`text-heading-md ${c.best ? 'text-accent' : 'text-ink'}`}>{c.name}</p>
-                    {c.best ? (
-                      <span className="rounded-full bg-accent px-2.5 py-0.5 text-[0.66rem] font-medium text-white">
-                        Best value
-                      </span>
-                    ) : null}
-                  </div>
-                  <p className="mt-0.5 text-body-sm text-muted">{c.tagline}</p>
-                </div>
-                {/* Brand mascot, mobile-only, right-aligned; decorative. */}
-                <img
-                  src={`/milo/${(
-                    { starter: 'milo-hero', growth: 'milo-typing', scale: 'milo-celebrating', custom: 'milo-listening' } as Record<string, string>
-                  )[c.id] ?? 'milo-hero'}.webp`}
-                  alt=""
-                  aria-hidden
-                  className="h-14 w-auto shrink-0 self-start"
-                />
+              <div className="flex flex-wrap items-center gap-2">
+                <p className={`text-heading-md ${p.best ? 'text-accent' : 'text-ink'}`}>{p.name}</p>
+                {p.best ? (
+                  <span className="rounded-full bg-accent px-2.5 py-0.5 text-[0.66rem] font-medium text-white">
+                    Best value
+                  </span>
+                ) : null}
               </div>
+
               <p className="mt-3 text-display-md font-medium tracking-tight text-ink">
-                {c.pack ? usd(c.pack.priceUsdCents) : 'Let’s talk'}
+                {p.custom ? 'Let’s talk' : p.free ? 'Free' : usd(p.priceUsdCents!)}
               </p>
               <p className="mt-0.5 text-body-sm text-muted">
-                {c.pack ? `${c.pack.credits.toLocaleString('en-US')} credits` : 'Volume pricing'}
+                {p.custom ? 'Volume pricing' : `${p.credits!.toLocaleString('en-US')} credits`}
               </p>
 
               <dl className="mt-4 space-y-2 border-t border-line pt-4">
-                {rows.slice(2).map((r) => {
+                {ROWS.slice(2).map((r) => {
                   const Icon = ROW_ICONS[r.icon];
                   return (
                     <div key={r.label} className="flex items-center justify-between gap-4 text-body-sm">
@@ -465,63 +480,51 @@ export function ComparisonMatrix() {
                         <Icon />
                         {r.label}
                       </dt>
-                      <dd className={c.best ? 'font-medium text-ink' : 'text-ink/80'}>{r.value(c)}</dd>
+                      <dd className={p.best ? 'font-medium text-ink' : 'text-ink/80'}>{r.value(p)}</dd>
                     </div>
                   );
                 })}
               </dl>
 
-              <p className="mt-4 text-[0.72rem] font-medium uppercase tracking-wide text-muted">Best for</p>
-              <ul className="mt-1.5 space-y-1.5 text-body-sm text-ink/80">
-                {c.bestFor.map((b) => (
-                  <li key={b} className="flex gap-2">
-                    <span aria-hidden className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent" />
-                    <span>{b}</span>
-                  </li>
-                ))}
-              </ul>
-
               <div className="mt-5">
-                {c.custom ? (
-                  <CtaButton href={CONTACT_URL} variant="secondary" className="w-full">
-                    Talk to us
-                  </CtaButton>
-                ) : (
-                  <CtaButton href={SIGNUP_URL} variant={c.best ? 'primary' : 'secondary'} className="w-full">
-                    Get {c.name}
-                  </CtaButton>
-                )}
+                <CtaButton href={p.href} variant={p.best ? 'primary' : 'secondary'} className="w-full">
+                  {p.cta}
+                </CtaButton>
               </div>
             </article>
           ))}
         </div>
 
-        {/* Trust strip */}
-        <Reveal className="mt-8 flex flex-col gap-6 rounded-2xl border border-line bg-surface p-5 shadow-card md:flex-row md:items-center md:gap-4 md:p-6">
-          <div className="flex items-center gap-3 md:pr-4" aria-hidden>
-            <img src="/milo/milo-typing.webp" alt="" width={70} height={54} className="h-12 w-auto" />
-            <div className="relative rounded-xl bg-accent-soft px-3 py-1.5 text-[0.72rem] font-medium leading-tight text-accent">
-              100 free credits to
-              <br />
-              explore. No card needed!
+        {/* Risk-reversal / no-subscription strip */}
+        <Reveal className="mt-8 rounded-2xl border border-line bg-surface p-6 shadow-card md:p-8">
+          <div className="grid gap-6 md:grid-cols-[0.9fr_1.1fr] md:items-center md:gap-10">
+            <div>
+              <p className="text-eyebrow uppercase text-accent">Try it without committing</p>
+              <h3 className="mt-2 text-heading-lg text-ink">
+                Start with 100 free credits. Decide later.
+              </h3>
+              <p className="mt-3 text-body text-muted">
+                Traditional tools ask how many seats you need. {APP_NAME} asks how much prospecting you
+                need. No seats, no subscription, no monthly minimum, and credits never expire.
+              </p>
             </div>
-          </div>
-          <div className="grid flex-1 gap-5 sm:grid-cols-3 md:border-l md:border-line md:pl-6">
-            {[
-              { Icon: IconGift, title: '100 free credits', sub: 'No card needed. Free to start.' },
-              { Icon: IconInfinity, title: 'Credits never expire', sub: 'Use them at your own pace.' },
-              { Icon: IconCard, title: 'Global payments', sub: 'Billed in USD; cards from any country.' },
-            ].map(({ Icon, title, sub }) => (
-              <div key={title} className="flex items-start gap-3">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
-                  <Icon />
-                </span>
-                <div>
-                  <p className="text-body-sm font-medium text-ink">{title}</p>
-                  <p className="text-[0.8rem] text-muted">{sub}</p>
+            <div className="grid gap-5 sm:grid-cols-3 md:border-l md:border-line md:pl-8">
+              {[
+                { Icon: IconGift, title: '100 free credits', sub: 'No card, no auto-charge.' },
+                { Icon: IconInfinity, title: 'Credits never expire', sub: 'Use them at your own pace.' },
+                { Icon: IconCard, title: 'Global payments', sub: 'Billed in USD; cards worldwide.' },
+              ].map(({ Icon, title, sub }) => (
+                <div key={title} className="flex items-start gap-3">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
+                    <Icon />
+                  </span>
+                  <div>
+                    <p className="text-body-sm font-medium text-ink">{title}</p>
+                    <p className="text-[0.8rem] text-muted">{sub}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </Reveal>
       </div>

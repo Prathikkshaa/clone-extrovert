@@ -70,8 +70,8 @@ export const CREDIT_PACKS = [
   {
     id: 'growth',
     label: 'Growth',
-    credits: 550,
-    priceUsdCents: 4500,
+    credits: 650,
+    priceUsdCents: 3900,
     audience: 'Growing your outreach',
     tagline: 'Run real campaigns every week — the best value.',
     popular: true,
@@ -79,10 +79,10 @@ export const CREDIT_PACKS = [
   {
     id: 'scale',
     label: 'Scale',
-    credits: 1200,
-    priceUsdCents: 8900,
+    credits: 1450,
+    priceUsdCents: 9900,
     audience: 'High-volume senders',
-    tagline: 'Always-on outreach at the lowest price per credit.',
+    tagline: 'Always-on outreach for high volume.',
     popular: false,
   },
 ] as const;
