@@ -282,6 +282,9 @@ type Plan = {
   best?: boolean;
   cta: string;
   href: string;
+  img: string; // Milo mascot per plan
+  bubble?: string; // speech bubble (only when the artwork does not bake one in)
+  baked?: boolean; // artwork already carries its own speech bubble
 };
 
 function usePlans(): Plan[] {
@@ -296,6 +299,8 @@ function usePlans(): Plan[] {
       free: true,
       cta: 'Start free',
       href: SIGNUP_URL,
+      img: 'milo-hero',
+      bubble: 'A great place to start.',
     },
     {
       id: 'growth',
@@ -306,6 +311,8 @@ function usePlans(): Plan[] {
       best: true,
       cta: 'Build my pipeline',
       href: SIGNUP_URL,
+      img: 'milo-typing',
+      bubble: 'For consistent outreach.',
     },
     {
       id: 'scale',
@@ -315,6 +322,8 @@ function usePlans(): Plan[] {
       priceUsdCents: byId['scale'].priceUsdCents,
       cta: 'Scale prospecting',
       href: SIGNUP_URL,
+      img: 'milo-scale-full',
+      baked: true,
     },
     {
       id: 'custom',
@@ -323,6 +332,8 @@ function usePlans(): Plan[] {
       custom: true,
       cta: 'Talk to us',
       href: CONTACT_URL,
+      img: 'milo-custom-full',
+      baked: true,
     },
   ];
 }
@@ -387,14 +398,30 @@ export function ComparisonMatrix() {
         {/* Desktop/tablet: full side-by-side grid (md+). Mobile uses stacked cards. */}
         <Reveal className="mt-10 hidden overflow-x-auto pb-2 md:block">
           <div className="grid min-w-[760px] grid-cols-[minmax(150px,0.9fr)_repeat(4,minmax(0,1fr))] items-stretch">
-            {/* Header: Milo presides from the label cell; then plan names. */}
-            <div className="flex items-end justify-center pb-1" aria-hidden>
-              <img src="/milo/milo-typing.webp" alt="" className="h-[4.5rem] w-auto" />
-            </div>
+            {/* Row 0: Milo mascot per plan (baked artwork shows whole; others get a bubble) */}
+            <div />
+            {plans.map((p) =>
+              p.baked ? (
+                <div key={p.id} className="flex items-end justify-center px-2 pb-2" aria-hidden>
+                  <img src={`/milo/${p.img}.webp`} alt="" className="h-auto w-full max-w-[150px]" />
+                </div>
+              ) : (
+                <div key={p.id} className="flex flex-col items-center justify-end px-3 pb-3" aria-hidden>
+                  <div className="relative mb-1 rounded-xl bg-surface px-3 py-1.5 text-center text-[0.72rem] font-medium leading-tight text-ink shadow-card">
+                    {p.bubble}
+                    <span className="absolute -bottom-1 left-1/2 h-2.5 w-2.5 -translate-x-1/2 rotate-45 bg-surface" />
+                  </div>
+                  <img src={`/milo/${p.img}.webp`} alt="" width={100} height={100} className="h-[56px] w-auto" />
+                </div>
+              ),
+            )}
+
+            {/* Row 1: plan name (top of the highlighted box) */}
+            <div className="px-4 pt-2" />
             {plans.map((p) => (
               <div
                 key={p.id}
-                className={`relative flex items-end justify-center px-4 pb-4 pt-7 text-center ${hi(p, 'rounded-t-2xl border-t')}`}
+                className={`relative px-4 pb-4 pt-3 text-center ${hi(p, 'rounded-t-2xl border-t')}`}
               >
                 {p.best ? (
                   <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent px-3 py-0.5 text-[0.66rem] font-medium text-white">
@@ -455,13 +482,23 @@ export function ComparisonMatrix() {
                 p.best ? 'border-accent shadow-float' : 'border-line shadow-card',
               ].join(' ')}
             >
-              <div className="flex flex-wrap items-center gap-2">
-                <p className={`text-heading-md ${p.best ? 'text-accent' : 'text-ink'}`}>{p.name}</p>
-                {p.best ? (
-                  <span className="rounded-full bg-accent px-2.5 py-0.5 text-[0.66rem] font-medium text-white">
-                    Best value
-                  </span>
-                ) : null}
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className={`text-heading-md ${p.best ? 'text-accent' : 'text-ink'}`}>{p.name}</p>
+                  {p.best ? (
+                    <span className="rounded-full bg-accent px-2.5 py-0.5 text-[0.66rem] font-medium text-white">
+                      Best value
+                    </span>
+                  ) : null}
+                </div>
+                <img
+                  src={`/milo/${(
+                    { starter: 'milo-hero', growth: 'milo-typing', scale: 'milo-celebrating', custom: 'milo-listening' } as Record<string, string>
+                  )[p.id] ?? 'milo-hero'}.webp`}
+                  alt=""
+                  aria-hidden
+                  className="h-14 w-auto shrink-0 self-start"
+                />
               </div>
 
               <p className="mt-3 text-display-md font-medium tracking-tight text-ink">
