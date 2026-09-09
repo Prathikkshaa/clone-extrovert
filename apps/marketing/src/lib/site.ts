@@ -31,7 +31,7 @@ export const SITE_DESCRIPTION =
   `${APP_NAME} is AI sales prospecting: it finds the businesses that need what you sell and reaches out personally, turning prospects into conversations and booked meetings.`;
 
 /** Friction-reducing microcopy shown under primary CTAs (M00 §3). */
-export const CTA_MICROCOPY = 'No card needed · Free to start';
+export const CTA_MICROCOPY = 'No card needed';
 
 /**
  * PLACEHOLDER - sales/enterprise contact for the "Custom" pricing tier. Swap the

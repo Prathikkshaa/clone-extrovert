@@ -34,7 +34,7 @@ export function DemoLoop() {
 
       {/* Stage - all scenes are stacked; the active one fades in. Fixed aspect so
           the frame never jumps between scenes. */}
-      <div className="relative aspect-[16/10] w-full bg-canvas">
+      <div className="relative aspect-[16/9] w-full bg-canvas">
         {SCENES.map((_, i) => (
           <div
             key={i}
@@ -83,7 +83,7 @@ function SearchScene() {
       <p className="text-body-sm text-muted">Search a market</p>
       <div className="flex flex-wrap items-center gap-2">
         <span className="rounded-md border border-line bg-surface px-3 py-2 text-body text-ink">
-          Roofers
+          Restaurants
         </span>
         <span className="flex items-center rounded-md border border-accent bg-surface px-3 py-2 text-body text-ink">
           Austin, TX
@@ -104,10 +104,10 @@ function SearchScene() {
 
 function LeadsScene() {
   const rows = [
-    { name: 'Lone Star Roofing & Exteriors', meta: 'Roofing · ★ 4.8 (126)', flag: true },
-    { name: 'Hill Country Concrete Co.', meta: 'Concrete · ★ 4.6 (58)', flag: true },
-    { name: 'Delgado Custom Carpentry', meta: 'Carpentry · ★ 4.9 (41)', flag: false },
-    { name: 'Brazos Valley Plumbing', meta: 'Plumbing · ★ 4.7 (203)', flag: true },
+    { name: 'Barton Springs Bistro', meta: 'Restaurant · ★ 4.7 (212)', flag: true },
+    { name: 'El Alma Taqueria', meta: 'Mexican · ★ 4.8 (340)', flag: true },
+    { name: 'Congress Ave Coffee', meta: 'Cafe · ★ 4.6 (95)', flag: false },
+    { name: 'Zilker Smokehouse', meta: 'BBQ · ★ 4.9 (508)', flag: true },
   ];
   return (
     <div className="flex h-full flex-col">
@@ -135,8 +135,8 @@ function DraftScene() {
   return (
     <div className="flex h-full flex-col justify-center">
       <div className="rounded-md border border-line bg-surface p-4">
-        <p className="text-[0.8rem] text-muted">To: owner@lonestarroofing.com</p>
-        <p className="mt-1 text-body font-medium text-ink">Quick idea for Lone Star Roofing</p>
+        <p className="text-[0.8rem] text-muted">To: hello@bartonspringsbistro.com</p>
+        <p className="mt-1 text-body font-medium text-ink">Quick idea for Barton Springs Bistro</p>
         <div className="mt-3 space-y-1.5">
           <div className="h-2 w-[92%] rounded bg-line" />
           <div className="h-2 w-[80%] rounded bg-line" />
@@ -144,7 +144,7 @@ function DraftScene() {
           <div className="h-2 w-[54%] rounded bg-accent-soft" />
         </div>
         <div className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-accent-soft px-2.5 py-1 text-[0.76rem] font-medium text-accent">
-          Written from their site + reviews
+          Written from their reviews + details
         </div>
       </div>
     </div>
@@ -159,7 +159,7 @@ function BookedScene() {
       </span>
       <div>
         <p className="text-heading-sm text-ink">Meeting booked</p>
-        <p className="text-body-sm text-muted">Thursday · 2:30 PM · with Lone Star Roofing</p>
+        <p className="text-body-sm text-muted">Thursday · 2:30 PM · with Barton Springs Bistro</p>
       </div>
     </div>
   );
