@@ -237,21 +237,47 @@ function reducer(s: S, a: A): S {
   }
 }
 
+const HOVER_PREVIEW_MS = 120;
+
 export function MechanismExplorer() {
   const [{ i, auto, tick }, dispatch] = useReducer(reducer, { i: 0, auto: true, tick: 0 });
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [canHover, setCanHover] = useState(false);
   const [hovering, setHovering] = useState(false);
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const rafId = useRef<number | null>(null);
   const lastTs = useRef<number>(0);
+  const dwellTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setReducedMotion(mql.matches);
-    update();
-    mql.addEventListener?.('change', update);
-    return () => mql.removeEventListener?.('change', update);
+    const rm = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const hv = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const updateRm = () => setReducedMotion(rm.matches);
+    const updateHv = () => setCanHover(hv.matches);
+    updateRm();
+    updateHv();
+    rm.addEventListener?.('change', updateRm);
+    hv.addEventListener?.('change', updateHv);
+    return () => {
+      rm.removeEventListener?.('change', updateRm);
+      hv.removeEventListener?.('change', updateHv);
+    };
   }, []);
+
+  const cancelDwell = () => {
+    if (dwellTimer.current) {
+      clearTimeout(dwellTimer.current);
+      dwellTimer.current = null;
+    }
+  };
+  const previewOnHover = (idx: number) => {
+    if (!canHover) return;
+    cancelDwell();
+    if (i === idx) return;
+    dwellTimer.current = setTimeout(() => {
+      dispatch({ type: 'set', i: idx });
+    }, HOVER_PREVIEW_MS);
+  };
 
   // Autoplay ticker (60fps rAF, throttled by AUTOPLAY_MS). Pauses on hover,
   // reduced-motion, or once the user has interacted.
@@ -292,8 +318,6 @@ export function MechanismExplorer() {
     tabRefs.current[next]?.focus();
   };
 
-  const step = STEPS[i];
-
   return (
     <section className="shell pb-section-y">
       <div
@@ -328,6 +352,9 @@ export function MechanismExplorer() {
                 tabIndex={active ? 0 : -1}
                 onClick={() => dispatch({ type: 'set', i: idx })}
                 onKeyDown={(e) => onKey(e, idx)}
+                onMouseEnter={() => previewOnHover(idx)}
+                onMouseLeave={cancelDwell}
+                onFocus={() => previewOnHover(idx)}
                 className="group relative z-10 flex cursor-pointer flex-col items-center gap-2 py-3 text-center focus:outline-none active:scale-[0.98]"
               >
                 <span
@@ -368,7 +395,11 @@ export function MechanismExplorer() {
                 id={`mech-panel-${idx}`}
                 aria-labelledby={`mech-tab-${idx}`}
                 hidden={!active}
-                className="grid gap-10 p-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-14 md:p-10"
+                className={
+                  active
+                    ? 'grid gap-10 p-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-14 md:p-10'
+                    : ''
+                }
               >
                 <div className="min-w-0">
                   <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">

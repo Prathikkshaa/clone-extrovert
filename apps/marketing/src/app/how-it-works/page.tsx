@@ -1,13 +1,12 @@
 import type { Metadata } from 'next';
 import { FaqJsonLd } from '@/components/structured-data';
 import { Reveal } from '@/components/reveal';
-import { CtaButton } from '@/components/cta-button';
 import { Differentiators } from '@/components/sections/differentiators';
 import { Demo } from '@/components/sections/demo';
+import { Faq } from '@/components/sections/faq';
+import { FinalCta } from '@/components/sections/final-cta';
 import { MechanismExplorer } from '@/components/how-it-works/mechanism-explorer';
-import { HoverFaq } from '@/components/how-it-works/hover-faq';
 import { HOW_IT_WORKS_FAQ_ITEMS } from '@/lib/faq';
-import { SIGNUP_URL } from '@/lib/site';
 import { FREE_SIGNUP_CREDITS } from '@extrovertai/shared';
 import { CREDITS_PER_LEAD_LOW, CREDITS_PER_LEAD_HIGH } from '@/lib/pricing-math';
 
@@ -164,23 +163,20 @@ export default function HowItWorksPage() {
         </Reveal>
       </section>
 
-      {/* FAQ. One open, hover-to-open on desktop, tap on touch. */}
-      <HoverFaq items={HOW_IT_WORKS_FAQ_ITEMS} />
+      {/* FAQ. Site-wide accordion, brand tone. Same pattern as landing / pricing. */}
+      <Faq
+        items={HOW_IT_WORKS_FAQ_ITEMS}
+        tone="brand"
+        title="How AI outreach actually works."
+        intro="Short answers to the questions people ask about AI lead generation, buying signals, and personalized cold email."
+      />
 
-      {/* CLOSE. Small, single CTA on a hairline. Not a dark full-width block. */}
-      <section className="shell pb-section-y">
-        <div className="mx-auto flex max-w-3xl flex-col items-start gap-4 border-t border-line pt-10 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-heading-sm text-ink">Try the mechanism on your own market.</p>
-            <p className="mt-1 text-body-sm text-muted">
-              {FREE_SIGNUP_CREDITS} free credits. No card. You only pay when the work runs.
-            </p>
-          </div>
-          <CtaButton href={SIGNUP_URL} size="md">
-            Find my first 20 leads
-          </CtaButton>
-        </div>
-      </section>
+      {/* CLOSE. Site-wide FinalCta, one primary action. */}
+      <FinalCta
+        title="Try the mechanism on your own market."
+        body={`${FREE_SIGNUP_CREDITS} free credits. No card. You only pay when Milo does the work.`}
+        cta="Find my first 20 leads"
+      />
     </>
   );
 }
