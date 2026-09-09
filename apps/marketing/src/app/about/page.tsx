@@ -310,9 +310,6 @@ export default function AboutPage() {
                         <t.Icon className="h-5 w-5" />
                       </span>
                       <span className="text-body-sm text-ink">{t.label}</span>
-                      <span aria-hidden="true" className="ml-auto text-muted">
-                        &times;
-                      </span>
                     </div>
                   ))}
                 </div>

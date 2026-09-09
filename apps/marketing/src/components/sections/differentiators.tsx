@@ -116,20 +116,37 @@ const ROWS: Row[] = [
   },
 ];
 
-export function Differentiators() {
+export function Differentiators({
+  only,
+  hideHeading = false,
+  eyebrow = 'Why it works',
+  title = 'Why does this outreach actually work?',
+  intro = 'It’s built to kill the reasons cold outreach fails - one specific objection at a time.',
+}: {
+  /** Filter and REORDER rows by their `eyebrow` key. */
+  only?: readonly string[];
+  hideHeading?: boolean;
+  eyebrow?: string;
+  title?: string;
+  intro?: string;
+} = {}) {
+  const rows = only
+    ? only
+        .map((k) => ROWS.find((r) => r.eyebrow === k))
+        .filter((r): r is Row => Boolean(r))
+    : ROWS;
   return (
     <section className="shell py-section-y">
-      <Reveal className="max-w-prose">
-        <p className="text-eyebrow uppercase text-accent">Why it works</p>
-        <h2 className="mt-3 text-display-md text-ink">Why does this outreach actually work?</h2>
-        <p className="mt-4 text-body-lg text-muted">
-          It&rsquo;s built to kill the reasons cold outreach fails - one specific objection at a
-          time.
-        </p>
-      </Reveal>
+      {hideHeading ? null : (
+        <Reveal className="max-w-prose">
+          <p className="text-eyebrow uppercase text-accent">{eyebrow}</p>
+          <h2 className="mt-3 text-display-md text-ink">{title}</h2>
+          <p className="mt-4 text-body-lg text-muted">{intro}</p>
+        </Reveal>
+      )}
 
-      <div className="mt-14 flex flex-col gap-16 md:gap-24">
-        {ROWS.map((row, i) => {
+      <div className={[hideHeading ? '' : 'mt-14', 'flex flex-col gap-16 md:gap-24'].join(' ')}>
+        {rows.map((row, i) => {
           const flip = i % 2 === 1; // alternate the visual side down the page
           return (
             <Reveal

@@ -40,6 +40,28 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
 ];
 
+// /how-it-works FAQ: search/answer-intent questions AI answer engines ask about
+// AI-driven local lead generation and personalized cold outreach. Reuses two
+// FAQ_ITEMS answers verbatim (deliverability + legality) so wording stays
+// consistent across pages.
+export const HOW_IT_WORKS_FAQ_ITEMS: FaqItem[] = [
+  {
+    q: 'How does AI lead generation work with Milo?',
+    a: 'You pick a market, an industry and a city, and Milo pulls real local businesses from public information anyone can look up. It then researches each one from its own website and reviews, drafts a personalized 3-email sequence in your voice, and sends the ones you approve from your own inbox. You only pay in credits when the work actually runs.',
+  },
+  {
+    q: 'How does AI find qualified local business leads?',
+    a: 'By starting from a buying signal, not a directory dump. You can filter for businesses that are missing something you can fix (no website, thin online presence, weak reviews) so every lead already has a reason to hear from you.',
+  },
+  {
+    q: 'How does AI personalize cold emails without sounding generic?',
+    a: 'Milo reads the lead’s own site and reviews and writes each email grounded in what that specific business actually does. No mail-merge tokens, no "Hi {{first_name}}." You review every draft before it sends, so nothing goes out that doesn’t sound like you.',
+  },
+  FAQ_ITEMS[0], // deliverability
+  FAQ_ITEMS[1], // where do leads come from + legality
+  FAQ_ITEMS[3], // review-before-send
+];
+
 // Pricing-page FAQ: the money questions people ask before buying. Numbers match
 // lib/pricing-math (kept in words here; if packs change, update both).
 export const PRICING_FAQ_ITEMS: FaqItem[] = [
