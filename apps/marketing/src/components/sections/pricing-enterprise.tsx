@@ -151,7 +151,7 @@ export function PricingRoiBand() {
           </div>
 
           {/* Right: "What you pay" summary card */}
-          <div className="self-start rounded-3xl border border-white/12 bg-white/[0.04] p-6 backdrop-blur-sm">
+          <div className="self-center rounded-3xl border border-white/12 bg-white/[0.04] p-6 backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <p className="text-heading-sm text-white">What you pay</p>
               <span className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-[0.72rem] font-medium text-accent-strong">
