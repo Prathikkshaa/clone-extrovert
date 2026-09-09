@@ -39,11 +39,11 @@ export function Demo() {
                 </li>
               ))}
             </ul>
-            <div className="mt-8">
+            <div className="mt-8 flex flex-col items-center text-center">
               <CtaButton href={SIGNUP_URL} size="lg">
                 Start free
               </CtaButton>
-              <CtaMicrocopy className="mt-3" />
+              <CtaMicrocopy className="mt-3 text-center" />
             </div>
           </Reveal>
 

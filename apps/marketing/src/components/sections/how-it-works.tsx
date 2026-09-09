@@ -226,7 +226,7 @@ export function HowItWorks({
           role="tabpanel"
           id="hiw-panel"
           aria-labelledby={`hiw-tab-${active}`}
-          className="rounded-xl border border-line bg-surface p-6 shadow-card md:p-8"
+          className="min-h-[23rem] rounded-xl border border-line bg-surface p-6 shadow-card md:min-h-[24rem] md:p-8"
         >
           <FocalPanel key={active} index={active} />
         </div>
