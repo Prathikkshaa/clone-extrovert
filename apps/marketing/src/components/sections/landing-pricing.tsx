@@ -156,12 +156,12 @@ export function LandingPricing() {
       {/* reassurance - the top objections, one calm row */}
       <Reveal
         delay={0.05}
-        className="mx-auto mt-10 grid max-w-5xl gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-line"
+        className="mx-auto mt-8 grid max-w-4xl gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-line"
       >
         {REASSURE.map((r) => (
           <div
             key={r.title}
-            className="flex flex-col items-center gap-2 text-center sm:flex-row sm:items-start sm:gap-3 sm:text-left lg:px-6 lg:first:pl-0"
+            className="flex flex-col items-center gap-2 text-center sm:flex-row sm:items-start sm:gap-2.5 sm:text-left lg:px-5 lg:first:pl-0"
           >
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
               <r.Icon className="h-[1.1rem] w-[1.1rem]" />
