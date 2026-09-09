@@ -1,15 +1,15 @@
-// SERVER component - the LANDING-PAGE pricing section (short, premium, calm).
-// Distinct from the full /pricing page: one glance = one tool replaces the
-// five-tool stack, pay for what you use, pick a pack, start free. Every number is
-// derived from lib/pricing-math (shared credit constants) so nothing can drift.
+// SERVER component - the LANDING-PAGE pricing section.
+// Starter card = the FREE_SIGNUP_CREDITS grant (rendered as $0). Growth + Scale are
+// read from the shared CREDIT_PACKS source of truth so nothing drifts.
 import { Fragment } from 'react';
+import Image from 'next/image';
 import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
 import { SIGNUP_URL } from '@/lib/site';
 import { CREDIT_PACKS, CREDIT_COSTS, FREE_SIGNUP_CREDITS } from '@extrovertai/shared';
 import { usd, leadsForCredits, CREDITS_PER_LEAD_LOW, CREDITS_PER_LEAD_HIGH } from '@/lib/pricing-math';
 
-/* ── inline icons (one weight/size, currentColor so they inherit accent) ── */
+/* ── inline icons (currentColor so they inherit accent) ── */
 type IP = { className?: string };
 const sp = (c = 'h-5 w-5') => ({
   viewBox: '0 0 24 24',
@@ -30,49 +30,81 @@ const IcoCoins = (p: IP) => (<svg {...sp(p.className)}><ellipse cx="12" cy="6" r
 const IcoUsers = (p: IP) => (<svg {...sp(p.className)}><circle cx="9" cy="8" r="3" /><path d="M3.5 20a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.8M20.5 20a5.5 5.5 0 0 0-4-5.3" /></svg>);
 const IcoCard = (p: IP) => (<svg {...sp(p.className)}><rect x="2.5" y="5" width="19" height="14" rx="2.5" /><path d="M2.5 10h19M6 15h4" /></svg>);
 const IcoShield = (p: IP) => (<svg {...sp(p.className)}><path d="M12 3 5 6v5c0 4.4 3 7.6 7 9 4-1.4 7-4.6 7-9V6z" /><path d="m9 12 2 2 4-4" /></svg>);
+const IcoCheck = (p: IP) => (<svg {...sp(p.className)}><path d="m5 12 4 4 10-10" /></svg>);
 
-// The five jobs. Only paid actions carry a credit; tracking replies is included
-// (honest: you pay for work done, not for watching your inbox).
 const WORKFLOW = [
   { label: 'Find leads', chip: `${CREDIT_COSTS.search} credit`, Icon: IcoSearch },
   { label: 'Research', chip: `${CREDIT_COSTS.enrichment} credits`, Icon: IcoDoc },
   { label: 'Write', chip: `${CREDIT_COSTS.draft} credit`, Icon: IcoPen },
   { label: 'Send', chip: `${CREDIT_COSTS.send} credit`, Icon: IcoSend },
-  { label: 'Track', chip: 'included', Icon: IcoChart },
+  { label: 'Track', chip: 'Included', Icon: IcoChart },
 ];
 
-const TAGLINE: Record<string, string> = {
-  starter: 'Try it out',
-  growth: 'For steady outreach',
-  scale: 'For high-volume outreach',
-};
+// Plan cards — Starter is the free-signup grant (rendered $0), Growth + Scale from
+// CREDIT_PACKS. No pricing hardcoded that could contradict shared/Stripe.
+const growthPack = CREDIT_PACKS.find((p) => p.id === 'growth')!;
+const scalePack = CREDIT_PACKS.find((p) => p.id === 'scale')!;
+
+const PLANS = [
+  {
+    id: 'starter',
+    label: 'Starter',
+    tagline: 'Try it out',
+    priceLabel: '$0',
+    credits: FREE_SIGNUP_CREDITS,
+    features: ['Full workflow access', 'No credit card required', 'Credits never expire'],
+    cta: 'Start free',
+    highlight: false,
+  },
+  {
+    id: 'growth',
+    label: growthPack.label,
+    tagline: 'For steady outreach',
+    priceLabel: usd(growthPack.priceUsdCents),
+    credits: growthPack.credits,
+    features: ['Full workflow access', 'Best value for consistent use', 'Credits never expire'],
+    cta: 'Build my pipeline',
+    highlight: true,
+  },
+  {
+    id: 'scale',
+    label: scalePack.label,
+    tagline: 'For high-volume outreach',
+    priceLabel: usd(scalePack.priceUsdCents),
+    credits: scalePack.credits,
+    features: ['Full workflow access', 'For larger prospecting needs', 'Credits never expire'],
+    cta: 'Scale prospecting',
+    highlight: false,
+  },
+];
 
 const REASSURE = [
   { Icon: IcoCoins, title: 'One lead, end to end', sub: `~${CREDITS_PER_LEAD_LOW}–${CREDITS_PER_LEAD_HIGH} credits` },
   { Icon: IcoUsers, title: 'No seats', sub: 'Use it solo or with your team.' },
   { Icon: IcoCard, title: 'No monthly minimum', sub: 'Top up only when you need to.' },
-  { Icon: IcoShield, title: 'Credits never expire', sub: 'While your account is active.' },
+  { Icon: IcoShield, title: 'Credits never expire', sub: 'Use them at your own pace.' },
 ];
 
 export function LandingPricing() {
   return (
-    <section className="shell py-section-y">
-      {/* eyebrow + headline + supporting copy - optically centered */}
+    <section id="pricing" className="shell py-section-y">
+      {/* eyebrow + headline */}
       <Reveal className="mx-auto max-w-3xl text-center">
         <p className="text-eyebrow uppercase tracking-wide text-accent">Pricing</p>
         <h2 className="mt-3 text-display-md text-ink">
           One tool. <span className="text-accent">Five jobs.</span> One simple price.
         </h2>
-        <p className="mx-auto mt-4 max-w-4xl text-body-lg text-muted">
-          The whole outreach stack in one tool. Pay for the work you do, not five subscriptions.
+        <p className="mx-auto mt-4 max-w-3xl text-body-lg text-muted">
+          Find businesses, research them, write personalized emails, send outreach and track results.
+          Pay for the work you do, not five different subscriptions.
         </p>
       </Reveal>
 
-      {/* workflow - lightweight; arrows centered on the icon band */}
+      {/* five-step workflow */}
       <Reveal
         delay={0.05}
         as="ol"
-        className="mt-10 flex items-start justify-between gap-1 sm:flex-wrap sm:justify-center sm:gap-x-2 sm:gap-y-6"
+        className="mx-auto mt-10 flex max-w-4xl items-start justify-between gap-1 sm:flex-wrap sm:justify-center sm:gap-x-2 sm:gap-y-6"
       >
         {WORKFLOW.map((s, i) => (
           <Fragment key={s.label}>
@@ -96,96 +128,119 @@ export function LandingPricing() {
         ))}
       </Reveal>
 
-      {/* three plans - equal widths/gaps/heights; Growth emphasized */}
-      <div className="mx-auto mt-14 grid max-w-5xl items-stretch gap-6 md:grid-cols-3">
-        {CREDIT_PACKS.map((pack, i) => {
-          const best = pack.popular; // Growth
-          const l = leadsForCredits(pack.credits);
-          return (
+      {/* plans + Milo mascot — Milo lives OUTSIDE the grid so it doesn't push cards */}
+      <div className="relative mx-auto mt-14 max-w-5xl">
+        {/* Milo (desktop only): sits to the right of the Scale card, speech bubble above */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-4 top-8 hidden w-[168px] lg:block xl:-right-16 xl:w-[188px]"
+        >
+          <div className="relative -mb-2 ml-2 inline-block rounded-2xl border border-line bg-surface px-3.5 py-2 text-[0.78rem] leading-snug text-ink shadow-card">
+            Same work.<br />Fewer subscriptions.<br />More opportunities.
+            {/* pointer */}
+            <span className="absolute -bottom-[7px] left-8 h-3 w-3 rotate-45 border-b border-r border-line bg-surface" />
+          </div>
+          <Image
+            src="/milo/milo-pricing.png"
+            alt=""
+            width={376}
+            height={344}
+            className="mt-1 h-auto w-full select-none"
+            priority={false}
+          />
+        </div>
+
+        <div className="grid items-stretch gap-6 md:grid-cols-3">
+          {PLANS.map((p, i) => (
             <Reveal
-              key={pack.id}
+              key={p.id}
               as="article"
               delay={0.05 * i}
               className={[
-                'relative flex h-full flex-col rounded-2xl border bg-surface p-6 transition-shadow duration-200',
-                best
-                  ? 'border-accent shadow-float'
-                  : 'border-line shadow-card hover:shadow-float',
+                'relative flex h-full flex-col rounded-2xl border p-6 transition-shadow duration-200',
+                p.highlight
+                  ? 'border-accent bg-accent-soft/40 shadow-float'
+                  : 'border-line bg-surface shadow-card hover:shadow-float',
               ].join(' ')}
             >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-heading-md text-ink">{pack.label}</p>
-                  <p className="mt-1 text-body-sm text-muted">{TAGLINE[pack.id]}</p>
-                </div>
-                {best ? (
-                  <span className="shrink-0 rounded-full bg-accent px-3 py-1 text-[0.7rem] font-medium text-white">
-                    Most popular
-                  </span>
-                ) : null}
+              {p.highlight ? (
+                <span className="absolute right-5 top-5 rounded-full bg-accent px-2.5 py-1 text-[0.68rem] font-medium tracking-wide text-white">
+                  Most popular
+                </span>
+              ) : null}
+
+              <div>
+                <p className="text-heading-md text-ink">{p.label}</p>
+                <p className="mt-1 text-body-sm text-muted">{p.tagline}</p>
               </div>
 
-              <p className="mt-5 text-display-md font-medium tracking-tight text-ink">
-                {usd(pack.priceUsdCents)}
+              <p className="mt-5 text-[2.5rem] font-medium leading-none tracking-tight text-ink">
+                {p.priceLabel}
               </p>
-              <p className="mt-1 text-body-sm text-muted">
-                {pack.credits.toLocaleString('en-US')} credits
+              <p className="mt-2 text-body-sm text-muted">
+                {p.credits.toLocaleString('en-US')} credits
               </p>
 
               <div className="mt-5 rounded-lg bg-accent-soft px-4 py-3">
                 <p className="text-body-sm font-medium text-accent">
-                  &asymp; {l.low}&ndash;{l.high} leads
+                  &asymp; {leadsForCredits(p.credits).low}&ndash;{leadsForCredits(p.credits).high} leads
                 </p>
                 <p className="mt-0.5 text-[0.78rem] text-accent/80">end to end</p>
               </div>
 
+              <ul className="mt-5 space-y-2.5">
+                {p.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-body-sm text-ink">
+                    <IcoCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+
               <div className="mt-6 flex flex-1 flex-col justify-end">
                 <CtaButton
                   href={SIGNUP_URL}
-                  variant={best ? 'primary' : 'secondary'}
+                  variant={p.highlight ? 'primary' : 'secondary'}
                   className="w-full"
                 >
-                  Get Started
+                  {p.cta}
                 </CtaButton>
               </div>
             </Reveal>
-          );
-        })}
+          ))}
+        </div>
       </div>
 
-      {/* reassurance - the top objections, one calm row */}
+      {/* benefit row — one line per item on desktop */}
       <Reveal
         delay={0.05}
-        className="mx-auto mt-8 grid max-w-4xl gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-line"
+        className="mx-auto mt-10 grid max-w-5xl gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-4"
       >
         {REASSURE.map((r) => (
-          <div
-            key={r.title}
-            className="flex flex-col items-center gap-2 text-center sm:flex-row sm:items-start sm:gap-2.5 sm:text-left lg:px-5 lg:first:pl-0"
-          >
+          <div key={r.title} className="flex items-center gap-3">
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
               <r.Icon className="h-[1.1rem] w-[1.1rem]" />
             </span>
-            <div>
-              <p className="text-body-sm font-medium text-ink">{r.title}</p>
-              <p className="text-[0.8rem] text-muted">{r.sub}</p>
-            </div>
+            <p className="min-w-0 text-body-sm leading-snug">
+              <span className="font-medium text-ink">{r.title}</span>{' '}
+              <span className="text-muted">{r.sub}</span>
+            </p>
           </div>
         ))}
       </Reveal>
 
-      {/* CTA group - primary dominates; secondary routes to the full page */}
-      <Reveal delay={0.05} className="mt-14 flex flex-col items-center">
+      {/* CTA group */}
+      <Reveal delay={0.05} className="mt-12 flex flex-col items-center">
         <div className="flex flex-col items-center gap-3 sm:flex-row">
           <CtaButton href={SIGNUP_URL} size="lg">
-            Start free
+            Start with {FREE_SIGNUP_CREDITS} free credits
           </CtaButton>
           <CtaButton href="/pricing" variant="secondary" size="lg">
             See full pricing
           </CtaButton>
         </div>
         <p className="mt-3 text-body-sm text-muted">
-          {FREE_SIGNUP_CREDITS} credits &middot; No card required
+          No card required &middot; No auto-charge &middot; Decide later
         </p>
       </Reveal>
     </section>
