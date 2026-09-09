@@ -28,7 +28,7 @@ function HeroMilo() {
       src="/milo/milo-hero-scene.webp"
       width={912}
       height={750}
-      alt="Milo, the ExtrovertAI mascot, reaching out to local businesses across a city"
+      alt="Milo reaching out to local businesses across a city"
       loading="eager"
       fetchPriority="high"
       className="h-auto w-full rounded-2xl"
@@ -316,7 +316,7 @@ export default function AboutPage() {
                     </div>
                   ))}
                 </div>
-                {/* connectors converging to the ExtrovertAI node - decorative, md+ only */}
+                {/* connectors converging to the Milo node - decorative, md+ only */}
                 <svg
                   viewBox="0 0 100 100"
                   preserveAspectRatio="none"
