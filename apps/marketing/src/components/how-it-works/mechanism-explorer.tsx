@@ -310,7 +310,7 @@ export function MechanismExplorer() {
           {/* base connecting hairline (behind the dots) */}
           <span
             aria-hidden
-            className="pointer-events-none absolute left-[calc(50%/7)] right-[calc(50%/7)] top-[13px] h-px bg-line"
+            className="pointer-events-none absolute left-[calc(50%/7)] right-[calc(50%/7)] top-[28px] h-px bg-line sm:top-[30px]"
           />
           {STEPS.map((s, idx) => {
             const active = idx === i;
@@ -328,16 +328,16 @@ export function MechanismExplorer() {
                 tabIndex={active ? 0 : -1}
                 onClick={() => dispatch({ type: 'set', i: idx })}
                 onKeyDown={(e) => onKey(e, idx)}
-                className="group relative flex flex-col items-center gap-2 py-2 text-center focus:outline-none"
+                className="group relative z-10 flex cursor-pointer flex-col items-center gap-2 py-3 text-center focus:outline-none active:scale-[0.98]"
               >
                 <span
                   className={[
-                    'grid h-7 w-7 place-items-center rounded-full font-mono text-[0.72rem] transition-all duration-200',
+                    'grid h-8 w-8 place-items-center rounded-full font-mono text-[0.72rem] transition-all duration-200 sm:h-9 sm:w-9 sm:text-[0.78rem]',
                     active
-                      ? 'bg-accent text-white shadow-card'
+                      ? 'scale-110 bg-accent text-white shadow-float ring-4 ring-accent/15'
                       : s.pivot
-                        ? 'border border-accent bg-accent-soft text-accent group-hover:border-accent group-hover:bg-accent group-hover:text-white'
-                        : 'border border-line bg-surface text-muted group-hover:border-accent group-hover:text-accent group-focus-visible:border-accent group-focus-visible:text-accent',
+                        ? 'border border-accent bg-accent-soft text-accent group-hover:scale-105 group-hover:border-accent group-hover:bg-accent group-hover:text-white'
+                        : 'border border-line bg-surface text-muted group-hover:scale-105 group-hover:border-accent group-hover:text-accent group-focus-visible:border-accent group-focus-visible:text-accent',
                   ].join(' ')}
                 >
                   {String(idx + 1).padStart(2, '0')}
