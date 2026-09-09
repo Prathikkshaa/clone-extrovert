@@ -9,7 +9,7 @@ import { PRICING_FAQ_ITEMS } from '@/lib/faq';
 export const metadata: Metadata = {
   title: 'Pricing',
   description:
-    'Start free, then pay only for what you use. Simple credit pricing that covers finding, researching, writing, and sending - from ~$0.37 a lead, no seats, no subscription.',
+    'AI prospecting pricing that is pay-as-you-go, not per seat. Start free with 100 credits, then pay only for the work you use - finding, researching, writing, and sending, from about $0.30 a prospect. No seats, no subscription, no monthly minimum, credits never expire.',
   alternates: { canonical: '/pricing' },
 };
 
@@ -31,7 +31,11 @@ export default function PricingPage() {
         title="Pricing, answered."
         intro="The money questions people ask before they start."
       />
-      <FinalCta />
+      <FinalCta
+        title="Find your first opportunities."
+        body="Start with 100 free credits. No card. No subscription."
+        cta="Find my first leads"
+      />
     </>
   );
 }
