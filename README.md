@@ -1,8 +1,67 @@
 # ExtrovertAI
 
-ExtrovertAI is a global, email-first B2B sales-outreach platform for solo founders, freelancers, small SaaS companies, digital marketing agencies, and IT solution providers. A user connects their own Gmail/Outlook mailbox, and the platform finds leads, enriches them, drafts personalized emails in the user's own voice, sends them through the user's mailbox in a throttled, compliant sequence with follow-ups, ingests replies into a threaded inbox, drafts AI replies (approval-by-default), books meetings via Cal.com, and tracks everything on a dashboard. The platform owns all third-party API keys; users pay via a credit system metered per action. "ExtrovertAI" is a placeholder name surfaced through a single `APP_NAME` constant so it can be renamed later.
+ExtrovertAI is a global, email-first B2B sales-outreach platform for solo founders, freelancers, small SaaS companies, digital marketing agencies, and IT solution providers. A user connects their own Gmail/Outlook mailbox, and the platform finds leads, enriches them, drafts personalized emails in the user's own voice, sends them through the user's mailbox in a throttled, compliant sequence with follow-ups, ingests replies into a threaded inbox, drafts AI replies (approval-by-default), books meetings via Cal.com, and tracks everything on a dashboard. The platform owns all third-party API keys; users pay via a credit system metered per action. The product name is surfaced through a single `APP_NAME` constant so it can be renamed at any time; it is **currently set to "Milo"** (see the AI-agent section below).
 
 > **For contributors / AI agents:** read [`/docs/00-master-context.md`](docs/00-master-context.md) first (every session), then [`/docs/PROGRESS.md`](docs/PROGRESS.md) and [`/docs/CODE-MAP.md`](docs/CODE-MAP.md). External account/key setup is documented in [`/docs/setup-credentials-md.md`](docs/setup-credentials-md.md).
+
+---
+
+## For AI agents (start here)
+
+**This is a single [npm workspaces](https://docs.npmjs.com/cli/using-npm/workspaces) monorepo** containing BOTH the marketing/landing website AND the full product application. Read this section before running anything.
+
+### What lives where
+
+| Path | Workspace name | What it is |
+| --- | --- | --- |
+| `apps/marketing` | `marketing` | **The public marketing/landing website** (Next.js 15 App Router). Routes: `/` (landing), `/pricing`, `/about`, `/how-it-works`, `/blog`. **This is the currently active workstream.** |
+| `apps/web` | `web` | The product application itself — the app users log into (Angular + Tailwind). |
+| `apps/api` | `api` | NestJS HTTP API (auth, endpoints, webhooks). |
+| `apps/worker` | `worker` | NestJS BullMQ worker (enrichment, drafting, sending, reply polling). |
+| `packages/shared` | `@extrovertai/shared` | Browser-safe shared types/enums/constants — **including the product name** (`APP_NAME`). No secrets. |
+| `packages/server` | `@extrovertai/server` | Backend-only shared providers (may hold secrets; never imported by `web`/`marketing`). |
+| `docs/`, `supabase/` | — | Build spine + SQL migrations. |
+
+The marketing site and the product app are independent to run: **you do not need the database, Redis, API, or any secret keys to run and view the landing site.**
+
+### Run the landing site (the usual task)
+
+```bash
+npm install            # once, at the repo root — resolves all workspaces
+npm run dev:marketing  # Next.js dev server → http://localhost:4321
+```
+
+Then open **http://localhost:4321** — that is the landing page. Navigate from there to `/pricing`, `/about`, `/how-it-works`, `/blog`. All marketing source is under `apps/marketing/src/` (`app/` = routes, `components/sections/` = page sections, `components/` = shared UI, `lib/` = config/data).
+
+### Product name is "Milo" — single source of truth
+
+The product is currently named **Milo**. It is set in ONE place and read everywhere else — never hardcode it:
+
+- `packages/shared/src/app.ts` → `DEFAULT_APP_NAME` (overridable via the `APP_NAME` env var). Everything imports `APP_NAME`.
+- `@extrovertai/shared` is consumed as its **built `dist/`**, so after changing the name (or anything in `packages/shared`) you must rebuild it for the marketing/app to pick it up:
+
+```bash
+npm run build:shared   # rebuilds packages/shared/dist so APP_NAME propagates
+```
+
+### Marketing app: conventions & gotchas (must-know)
+
+- **Stack:** Next.js 15.5 (App Router, RSC-first — client components only where interaction is needed, e.g. `hero-leads-panel`, `faq`, `how-it-works`). **Tailwind v3** with design tokens as RGB-channel CSS variables in `apps/marketing/src/app/globals.css`. Dev port is **4321**.
+- **Design tokens:** semantic utilities `ink / canvas / surface / muted / line / accent / accent-strong / accent-soft`. The **primary brand teal is `rgb(15 118 110)`** (the nav "Start free" button = `bg-accent`). Dark "island" sections use the `.on-dark` class (which remaps tokens + paints a dark bg) — **never use `bg-ink` inside `.on-dark`**.
+- **Copy rule: NO em dashes anywhere** in user-facing copy — use commas, colons, or a spaced hyphen.
+- **Type-check instead of building during dev:** run `npx tsc --noEmit` inside `apps/marketing`. **Do NOT run `next build` while the dev server is running** (it can corrupt `.next`); the real production build runs on Vercel on push.
+- **Deploy:** the marketing site auto-deploys via **Vercel** on push (see `vercel.json`).
+- **Responsive:** all mobile-only changes must be behind `md:`/`sm:` breakpoints so desktop is unaffected; verify no horizontal overflow at 320/375/390/430px.
+
+### Git workflow (required)
+
+- **Never commit directly to `main`.** Create a branch, open a PR against `main`, and merge from there. Keep commit messages clear; end them with the required `Co-Authored-By` trailer if configured.
+
+### Running the full product app (only if asked)
+
+The product app needs more setup (Supabase, Redis, OAuth, etc.) and most keys are optional for local boot (missing keys are reported, not fatal). See **Prerequisites**, **Database**, and **Run** below, and [`docs/setup-credentials-md.md`](docs/setup-credentials-md.md).
+
+---
 
 ## What it does (the loop)
 
@@ -23,6 +82,7 @@ This is an [npm workspaces](https://docs.npmjs.com/cli/using-npm/workspaces) mon
 ```
 extrovertai/
   apps/
+    marketing/  Next.js 15 marketing/landing website (public site; the active workstream) — port 4321
     web/        Angular + Tailwind frontend (lazy-loaded screens)
     api/        NestJS HTTP API (auth, feature endpoints, public webhooks)
     worker/     NestJS standalone BullMQ worker (enrichment, drafting, sending, reply polling)
@@ -57,9 +117,10 @@ SQL migrations live in [`supabase/migrations/`](supabase/migrations). Apply them
 ## Run
 
 ```bash
-npm run dev:api     # NestJS API on API_PORT (default 3000); GET /health, GET /health/db
-npm run dev:worker  # NestJS standalone worker (BullMQ; warns if REDIS_URL is unset)
-npm run dev:web     # Angular dev server on port 4200
+npm run dev:marketing  # Next.js marketing/landing site → http://localhost:4321 (no DB/keys needed)
+npm run dev:api        # NestJS API on API_PORT (default 3000); GET /health, GET /health/db
+npm run dev:worker     # NestJS standalone worker (BullMQ; warns if REDIS_URL is unset)
+npm run dev:web        # Angular dev server on port 4200
 ```
 
 ## Build, lint & tests

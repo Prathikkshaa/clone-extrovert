@@ -8,7 +8,15 @@ import { CtaButton } from '@/components/cta-button';
 import { SIGNUP_URL } from '@/lib/site';
 import { CtaMicrocopy } from '@/components/cta-microcopy';
 
-export function FinalCta() {
+export function FinalCta({
+  title = 'Stop staring at an empty calendar.',
+  body = 'Find the right businesses, reach out like a pro, and let the meetings come to you. Start free - see real leads in minutes.',
+  cta = 'Start free',
+}: {
+  title?: string;
+  body?: string;
+  cta?: string;
+} = {}) {
   return (
     <section className="on-dark relative overflow-hidden">
       {/* Subtle accent glow - not a blob; low-opacity, blurred, slow drift. */}
@@ -18,16 +26,11 @@ export function FinalCta() {
       />
       <div className="shell relative py-section-y text-center">
         <Reveal className="mx-auto max-w-2xl">
-          <h2 className="text-display-lg text-ink">
-            Stop staring at an empty calendar.
-          </h2>
-          <p className="mx-auto mt-5 max-w-prose text-body-lg text-muted">
-            Find the right businesses, reach out like a pro, and let the meetings come to you.
-            Start free - see real leads in minutes.
-          </p>
+          <h2 className="text-display-lg text-ink">{title}</h2>
+          <p className="mx-auto mt-5 max-w-prose text-body-lg text-muted">{body}</p>
           <div className="mt-9 flex flex-col items-center gap-3">
             <CtaButton href={SIGNUP_URL} size="lg">
-              Start free
+              {cta}
             </CtaButton>
             <CtaMicrocopy />
           </div>
