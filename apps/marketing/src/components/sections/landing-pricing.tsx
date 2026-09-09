@@ -178,10 +178,10 @@ export function LandingPricing() {
       <Reveal delay={0.05} className="mt-14 flex flex-col items-center">
         <div className="flex flex-col items-center gap-3 sm:flex-row">
           <CtaButton href={SIGNUP_URL} size="lg">
-            Start free <span aria-hidden>&rarr;</span>
+            Start free
           </CtaButton>
           <CtaButton href="/pricing" variant="secondary" size="lg">
-            See full pricing <span aria-hidden>&rarr;</span>
+            See full pricing
           </CtaButton>
         </div>
         <p className="mt-3 text-body-sm text-muted">

@@ -13,12 +13,26 @@ export function Faq({
   items = FAQ_ITEMS,
   title = 'The honest answers.',
   intro = 'The things people actually worry about before trying a cold-outreach tool.',
+  tone = 'plain',
 }: {
   withHeading?: boolean;
   items?: FaqItem[];
   title?: string;
   intro?: string;
+  /** 'brand' paints the section in the primary teal for an intentional brand moment. */
+  tone?: 'plain' | 'brand';
 }) {
+  const brand = tone === 'brand';
+  const c = {
+    section: brand ? 'bg-accent text-white' : '',
+    eyebrow: brand ? 'text-white/70' : 'text-accent',
+    title: brand ? 'text-white' : 'text-ink',
+    intro: brand ? 'text-white/80' : 'text-muted',
+    list: brand ? 'divide-white/20 border-white/20' : 'divide-line border-line',
+    q: brand ? 'text-white' : 'text-ink',
+    icon: brand ? 'text-white' : 'text-accent',
+    a: brand ? 'text-white/80' : 'text-muted',
+  };
   // The questions people worry about most (deliverability, lead source + legality,
   // and "do I need to be technical?") open by default so the answers - and the named
   // data source - are visible without a click. The rest stay collapsed.
@@ -32,20 +46,20 @@ export function Faq({
     });
 
   return (
-    <section className="shell py-section-y">
-      <div className="grid gap-10 md:grid-cols-[0.8fr_1.2fr] md:gap-14">
+    <section className={['py-section-y', c.section].join(' ')}>
+      <div className="shell grid gap-10 md:grid-cols-[0.8fr_1.2fr] md:gap-14">
         {withHeading ? (
           <Reveal>
-            <p className="text-eyebrow uppercase text-accent">Questions</p>
-            <h2 className="mt-3 text-display-md text-ink">{title}</h2>
-            <p className="mt-4 max-w-prose text-body-lg text-muted">{intro}</p>
+            <p className={['text-eyebrow uppercase', c.eyebrow].join(' ')}>Questions</p>
+            <h2 className={['mt-3 text-display-md', c.title].join(' ')}>{title}</h2>
+            <p className={['mt-4 max-w-prose text-body-lg', c.intro].join(' ')}>{intro}</p>
           </Reveal>
         ) : (
           <div />
         )}
 
         <Reveal delay={0.05}>
-          <ul className="divide-y divide-line border-y border-line">
+          <ul className={['divide-y border-y', c.list].join(' ')}>
             {items.map((item, i) => {
               const isOpen = open.has(i);
               const btnId = `faq-q-${i}`;
@@ -61,11 +75,12 @@ export function Faq({
                       onClick={() => toggle(i)}
                       className="flex w-full items-center justify-between gap-4 py-5 text-left"
                     >
-                      <span className="text-heading-sm text-ink">{item.q}</span>
+                      <span className={['text-heading-sm', c.q].join(' ')}>{item.q}</span>
                       <span
                         aria-hidden
                         className={[
-                          'relative mt-1 h-4 w-4 shrink-0 text-accent transition-transform duration-300 ease-soft',
+                          'relative mt-1 h-4 w-4 shrink-0 transition-transform duration-300 ease-soft',
+                          c.icon,
                           isOpen ? 'rotate-45' : '',
                         ].join(' ')}
                       >
@@ -82,7 +97,7 @@ export function Faq({
                     hidden={!isOpen}
                     className="pb-5 pr-8"
                   >
-                    <p className="max-w-prose text-body text-muted">{item.a}</p>
+                    <p className={['max-w-prose text-body', c.a].join(' ')}>{item.a}</p>
                   </div>
                 </li>
               );

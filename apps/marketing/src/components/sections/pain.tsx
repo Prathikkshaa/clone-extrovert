@@ -3,11 +3,12 @@
 // nothing) + three scannable hits + a bridge kicker into "how it works". Its
 // whole job is the "that's exactly me" moment (M00 §2). Reveal on scroll.
 import { Reveal } from '@/components/reveal';
+import { APP_NAME } from '@/lib/site';
 
 const HITS = [
-  'Finding leads eats the hours you meant to spend selling.',
-  'Every email you write sounds like everyone else’s.',
-  'Half of them bounce or die in spam, so the calendar stays empty.',
+  'Finding businesses that actually fit eats the hours you meant to spend selling.',
+  'Generic lead lists and copy-paste emails get ignored.',
+  'Researching and personalizing every prospect by hand never ends.',
 ];
 
 export function Pain() {
@@ -31,7 +32,8 @@ export function Pain() {
             ))}
           </ul>
           <p className="mt-8 text-heading-sm text-ink">
-            The fix isn’t five more tools. It’s one that does the work, from find to booked.
+            The fix isn’t five more tools. It’s {APP_NAME}: one that finds the right businesses,
+            reaches out personally, and turns replies into meetings.
           </p>
         </Reveal>
       </div>

@@ -4,7 +4,7 @@
 // Reads APP_NAME from the environment when available (Node apps), and falls back
 // to the default in browser bundles where `process` is undefined.
 
-const DEFAULT_APP_NAME = 'ExtrovertAI';
+const DEFAULT_APP_NAME = 'Milo';
 
 function resolveAppName(): string {
   if (typeof process !== 'undefined' && process.env && process.env['APP_NAME']) {

@@ -24,7 +24,7 @@ export default function LandingPage() {
       <Differentiators />
       <FounderNote />
       <LandingPricing />
-      <Faq />
+      <Faq tone="brand" />
       <FinalCta />
     </>
   );

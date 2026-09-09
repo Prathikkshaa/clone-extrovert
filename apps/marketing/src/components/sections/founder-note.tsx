@@ -9,11 +9,11 @@ import { APP_NAME, FOUNDER_NAME } from '@/lib/site';
 
 export function FounderNote() {
   return (
-    <section className="border-y border-line bg-surface/40">
+    <section className="bg-accent text-white">
       <div className="shell py-section-y">
         <Reveal className="max-w-prose">
-          <p className="text-eyebrow uppercase text-accent">Why I built this</p>
-          <div className="mt-4 space-y-4 text-body-lg text-ink/90">
+          <p className="text-eyebrow uppercase text-white/70">Why I built this</p>
+          <div className="mt-4 space-y-4 text-body-lg text-white/90">
             <p>
               I built {APP_NAME} for my own problem: an empty pipeline and no time to fix it. Every
               tool I tried was overpriced, spammy, or five subscriptions taped together.
@@ -24,7 +24,7 @@ export function FounderNote() {
               message.
             </p>
           </div>
-          <p className="mt-5 text-body font-medium text-ink">- {FOUNDER_NAME}</p>
+          <p className="mt-5 text-body font-medium text-white">- {FOUNDER_NAME}</p>
 
           {/* Real-proof slot - intentionally EMPTY + labeled. Fill when it exists. */}
           {/* SWAP-SLOT(M00 §7): testimonials / results / logos go here once real.

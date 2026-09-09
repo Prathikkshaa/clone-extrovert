@@ -1,5 +1,5 @@
 /*
- * Global styles + design tokens - ExtrovertAI marketing site.
+ * Global styles + design tokens - Milo marketing site.
  *
  * WHY: tokens are CSS custom properties (mirroring apps/web/src/styles.css so the
  * two apps stay visually one product). Tailwind maps semantic utility names to
