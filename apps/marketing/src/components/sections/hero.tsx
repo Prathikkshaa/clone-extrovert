@@ -8,7 +8,7 @@
 import type { ReactElement } from 'react';
 import { Reveal } from '@/components/reveal';
 import { CtaButton } from '@/components/cta-button';
-import { SIGNUP_URL } from '@/lib/site';
+import { SIGNUP_URL, APP_NAME } from '@/lib/site';
 
 // --- inline thin-line icons (generic, no brand marks) ---
 type IconProps = { className?: string };
@@ -136,7 +136,7 @@ function MagnifierIcon({ className }: IconProps) {
   );
 }
 
-function EnvelopeIcon({ className }: IconProps) {
+function PenIcon({ className }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -148,8 +148,25 @@ function EnvelopeIcon({ className }: IconProps) {
       className={className}
       aria-hidden="true"
     >
-      <rect x="3" y="5" width="18" height="14" rx="2" />
-      <path d="m3 7 9 6 9-6" />
+      <path d="M12 20h8" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
+    </svg>
+  );
+}
+
+function SendIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M21 3 10.5 13.5M21 3l-6.5 18-4-8-8-4z" />
     </svg>
   );
 }
@@ -219,16 +236,14 @@ const LEADS: Lead[] = [
   },
 ];
 
-const BENEFITS = ['No card needed', 'Free to start', 'Works worldwide'];
+const BENEFITS = ['100 free credits', 'No card needed', 'See real leads in minutes'];
 
-const FEATURES: { Icon: (p: IconProps) => ReactElement; label: string; copy: string }[] = [
-  { Icon: MagnifierIcon, label: 'Local businesses', copy: 'Find high-fit leads in any city.' },
-  {
-    Icon: EnvelopeIcon,
-    label: 'Personalized outreach',
-    copy: 'Written in your voice, not AI spam.',
-  },
-  { Icon: CalendarIcon, label: 'More meetings', copy: 'You focus on the calls.' },
+// The product narrative in four beats - the lightweight hero "how it works".
+const STEPS: { Icon: (p: IconProps) => ReactElement; label: string; copy: string }[] = [
+  { Icon: MagnifierIcon, label: 'Find', copy: 'Businesses that fit your market.' },
+  { Icon: PenIcon, label: 'Personalize', copy: 'Researched, written like you.' },
+  { Icon: SendIcon, label: 'Send', copy: 'From your own inbox.' },
+  { Icon: CalendarIcon, label: 'Book', copy: 'Replies become meetings.' },
 ];
 
 function LeadsPanel() {
@@ -314,18 +329,21 @@ export function Hero() {
       <section className="shell grid items-center gap-12 pb-10 pt-14 md:grid-cols-[1.1fr_0.9fr] md:gap-16 md:pb-16 md:pt-24">
         <div>
           <Reveal>
-            <p className="text-eyebrow uppercase text-accent">Outreach that books meetings</p>
+            <p className="text-eyebrow uppercase text-accent">AI prospecting that books meetings</p>
           </Reveal>
           <Reveal delay={0.05}>
             <h1 className="mt-4 text-display-lg text-ink">
-              Find the right businesses, email them like a pro, and book meetings.
+              Tell {APP_NAME} what you sell. It finds the businesses that need you and books you
+              meetings.
             </h1>
           </Reveal>
           <Reveal delay={0.1}>
             <p className="mt-6 max-w-prose text-body-lg text-muted">
-              For founders, agencies, and owners who need clients - no sales skills, no tools to
-              learn. Find local businesses worth reaching, send emails that sound like your best
-              salesperson wrote them, and stay out of spam. One tool, pay only for what you use.
+              {APP_NAME} is AI sales prospecting for founders, owners, and agencies who need
+              clients. Tell it what you sell and the market you want, and it finds relevant local
+              businesses, researches why each one might need you, and writes personalized outreach
+              that sounds like you, not a spam blast, so more of it turns into real conversations
+              and booked meetings. No seats, no monthly minimum, pay only for what you use.
             </p>
           </Reveal>
           <Reveal delay={0.15}>
@@ -362,22 +380,29 @@ export function Hero() {
         </Reveal>
       </section>
 
-      {/* Full-width 3-up feature strip. */}
+      {/* Full-width product narrative: Find -> Personalize -> Send -> Book. A
+          lightweight, static "how it works" glance - no animation, no layout shift. */}
       <Reveal delay={0.1}>
         <div className="shell border-t border-line py-8">
-          <div className="grid gap-6 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-line">
-            {FEATURES.map(({ Icon, label, copy }, i) => (
-              <div key={label} className={'flex items-start gap-3' + (i > 0 ? ' sm:pl-6' : '')}>
+          <ol className="grid grid-cols-2 gap-x-4 gap-y-6 sm:flex sm:items-start sm:justify-between sm:gap-4">
+            {STEPS.map(({ Icon, label, copy }, i) => (
+              <li
+                key={label}
+                className="flex items-start gap-3 sm:flex-1"
+              >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent">
                   <Icon className="h-5 w-5" />
                 </span>
-                <div>
-                  <p className="font-medium text-ink">{label}</p>
+                <div className="min-w-0">
+                  <p className="flex items-center gap-1.5 font-medium text-ink">
+                    <span className="text-body-sm text-accent">{i + 1}</span>
+                    {label}
+                  </p>
                   <p className="mt-1 text-body-sm text-muted">{copy}</p>
                 </div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </Reveal>
     </>
