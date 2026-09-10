@@ -63,16 +63,16 @@ function PlanCard({ card, delayMs }: { card: PricingCard; delayMs: number }) {
         </span>
       ) : null}
 
-      {/* Plan identity */}
-      <div>
+      {/* Plan identity. Fixed height so every card's audience row lands at the same Y. */}
+      <div className="min-h-[5.25rem]">
         <p className="text-heading-md text-ink">{card.label}</p>
-        <p className="mt-2 min-h-[3rem] max-w-[22ch] text-body-sm leading-snug text-muted">
+        <p className="mt-2 max-w-[22ch] text-body-sm leading-snug text-muted">
           {card.audience}
         </p>
       </div>
 
-      {/* Price */}
-      <div className="mt-7 flex items-baseline gap-2">
+      {/* Price. Single-line, so height is naturally uniform. */}
+      <div className="mt-7 flex h-10 items-baseline gap-2">
         <span className="text-[2.5rem] font-medium leading-none tracking-tight text-ink">
           {card.price}
         </span>
@@ -81,10 +81,10 @@ function PlanCard({ card, delayMs }: { card: PricingCard; delayMs: number }) {
         ) : null}
       </div>
 
-      {/* Outcome + value note */}
+      {/* Outcome + value note. Fixed height (fits 1-line outcome + 2-line note). */}
       <div
         className={[
-          'mt-5 rounded-lg px-4 py-3',
+          'mt-5 flex min-h-[5rem] flex-col justify-center rounded-lg px-4 py-3',
           highlighted ? 'bg-accent text-white' : 'bg-accent-soft text-accent',
         ].join(' ')}
       >
@@ -99,8 +99,8 @@ function PlanCard({ card, delayMs }: { card: PricingCard; delayMs: number }) {
         </p>
       </div>
 
-      {/* Features */}
-      <ul className="mt-6 space-y-3">
+      {/* Features. Fixed min-height so the CTA row lands at the same Y across cards. */}
+      <ul className="mt-6 min-h-[8.5rem] space-y-3">
         {card.features.map((f) => (
           <li key={f} className="flex items-start gap-2.5 text-body-sm text-ink/90">
             <IcoCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
