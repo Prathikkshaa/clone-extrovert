@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Reveal } from '@/components/reveal';
-import { APP_NAME, CONTACT_EMAIL, SITE_URL } from '@/lib/site';
+import { APP_NAME, SITE_URL } from '@/lib/site';
 import { BLOG_POSTS, getPost, postDescription, readMinutes, type Block } from '../posts';
 import { relatedFor, clusterIdFor, clusterLabel } from '../clusters';
 import { authorFor } from '../authors';
@@ -41,12 +41,21 @@ function slugify(t: string) {
   return t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
-/* ── Block renderer ── */
+/**
+ * Block renderer. Editorial-first:
+ * - Text blocks use a comfortable 44rem measure at the article body level.
+ * - Diagram / table blocks BREAK OUT to a wider bleed via `.article-bleed`,
+ *   so heavy data sits at ~64rem while prose sits at ~44rem.
+ * - No rounded card frames unless the content earns them (FAQ, CTA).
+ */
 function BlockView({ block }: { block: Block }) {
   if (block.type === 'h2') {
     const id = block.id ?? slugify(block.text);
     return (
-      <h2 id={id} className="scroll-mt-24 mt-12 text-heading-lg text-ink">
+      <h2
+        id={id}
+        className="scroll-mt-24 mt-16 text-[1.75rem] font-medium leading-[1.2] tracking-tight text-ink md:text-[2rem]"
+      >
         {block.text}
       </h2>
     );
@@ -54,14 +63,17 @@ function BlockView({ block }: { block: Block }) {
   if (block.type === 'h3') {
     const id = block.id ?? slugify(block.text);
     return (
-      <h3 id={id} className="scroll-mt-24 mt-8 text-heading-md text-ink">
+      <h3
+        id={id}
+        className="scroll-mt-24 mt-10 text-[1.25rem] font-medium leading-[1.3] tracking-tight text-ink md:text-[1.375rem]"
+      >
         {block.text}
       </h3>
     );
   }
   if (block.type === 'ul') {
     return (
-      <ul className="ml-5 list-disc space-y-2 text-body-lg text-ink/90 marker:text-accent">
+      <ul className="list-disc space-y-2.5 pl-5 text-[1.0625rem] leading-[1.75] text-ink/85 marker:text-accent md:text-[1.125rem]">
         {block.items.map((item, i) => (
           <li key={i}>{item}</li>
         ))}
@@ -70,7 +82,7 @@ function BlockView({ block }: { block: Block }) {
   }
   if (block.type === 'ol') {
     return (
-      <ol className="ml-5 list-decimal space-y-2 text-body-lg text-ink/90 marker:text-accent">
+      <ol className="list-decimal space-y-2.5 pl-5 text-[1.0625rem] leading-[1.75] text-ink/85 marker:text-accent md:text-[1.125rem]">
         {block.items.map((item, i) => (
           <li key={i}>{item}</li>
         ))}
@@ -78,62 +90,82 @@ function BlockView({ block }: { block: Block }) {
     );
   }
   if (block.type === 'link') {
+    // Subtle inline referral. NOT a card. NOT a container. Just text.
     return (
-      <p className="rounded-md border-l-2 border-accent bg-accent-soft/40 py-3 pl-4 pr-3 text-body text-ink/85">
+      <p className="border-l-2 border-accent pl-4 text-[1rem] leading-[1.7] text-ink/85">
         {block.text}{' '}
-        <Link href={block.href} className="font-medium text-accent underline underline-offset-2 hover:text-accent-strong">
+        <Link
+          href={block.href}
+          className="font-medium text-accent underline underline-offset-4 hover:text-accent-strong"
+        >
           {block.label}
         </Link>
+        .
       </p>
     );
   }
   if (block.type === 'tldr') {
+    // NOT a card. A typographic lead: mono eyebrow + emphasized paragraph.
     return (
-      <aside className="rounded-2xl border border-line bg-canvas p-5 md:p-6">
-        <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
+      <div>
+        <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-accent">
           TL;DR
         </p>
-        <p className="mt-2 text-body-lg text-ink/90">{block.text}</p>
-      </aside>
+        <p className="mt-3 text-[1.25rem] font-normal leading-[1.55] text-ink md:text-[1.35rem]">
+          {block.text}
+        </p>
+      </div>
     );
   }
   if (block.type === 'callout') {
-    const styles = {
-      info: 'border-accent bg-accent-soft/50 text-ink',
-      warn: 'border-warning bg-warning-soft text-ink',
-      success: 'border-positive bg-positive-soft text-ink',
-    } as const;
-    const labels = { info: 'Note', warn: 'Heads up', success: 'Good to know' } as const;
+    // Editorial pull, not a UI card. Left accent stripe, no rounded box.
     return (
-      <div className={`rounded-2xl border-l-4 p-5 md:p-6 ${styles[block.tone]}`}>
-        <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">
-          {block.title ?? labels[block.tone]}
+      <aside className="border-l-2 border-accent pl-5 md:pl-6">
+        {block.title ? (
+          <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-accent">
+            {block.title}
+          </p>
+        ) : null}
+        <p className="mt-2 text-[1.0625rem] leading-[1.7] text-ink/90 md:text-[1.125rem]">
+          {block.text}
         </p>
-        <p className="mt-2 text-body-lg text-ink/90">{block.text}</p>
-      </div>
+      </aside>
     );
   }
   if (block.type === 'quote') {
     return (
-      <blockquote className="border-l-2 border-accent pl-5 text-body-lg italic text-ink/85">
-        <p>{block.text}</p>
+      <blockquote className="relative pl-8 md:pl-10">
+        <span
+          aria-hidden
+          className="absolute -left-1 -top-2 font-serif text-[3.5rem] leading-none text-accent/40 md:text-[4.5rem]"
+        >
+          &ldquo;
+        </span>
+        <p className="text-[1.375rem] italic leading-[1.5] text-ink md:text-[1.625rem]">
+          {block.text}
+        </p>
         {block.cite ? (
-          <cite className="mt-2 block text-body-sm not-italic text-muted">— {block.cite}</cite>
+          <cite className="mt-3 block text-body-sm not-italic text-muted">— {block.cite}</cite>
         ) : null}
       </blockquote>
     );
   }
   if (block.type === 'steps') {
+    // Editorial list. Big mono digit, heading, body. No card frame.
     return (
-      <ol className="space-y-4">
+      <ol className="space-y-8">
         {block.items.map((it, i) => (
-          <li key={i} className="grid grid-cols-[auto_1fr] gap-4 rounded-xl border border-line bg-surface p-4 md:p-5">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent-soft font-mono text-body-sm text-accent">
+          <li key={i} className="grid grid-cols-[auto_1fr] gap-x-5 gap-y-1">
+            <span className="font-mono text-[1.5rem] leading-none text-accent/70">
               {String(i + 1).padStart(2, '0')}
             </span>
             <div>
-              <p className="text-heading-sm text-ink">{it.title}</p>
-              <p className="mt-1 text-body text-ink/85">{it.text}</p>
+              <p className="text-[1.125rem] font-medium leading-tight text-ink md:text-[1.25rem]">
+                {it.title}
+              </p>
+              <p className="mt-2 text-[1.0625rem] leading-[1.7] text-ink/85 md:text-[1.125rem]">
+                {it.text}
+              </p>
             </div>
           </li>
         ))}
@@ -141,79 +173,74 @@ function BlockView({ block }: { block: Block }) {
     );
   }
   if (block.type === 'table') {
+    // Full-width bleed. Data tables sit wider than the prose measure.
     return (
-      <figure className="overflow-x-auto">
-        <table className="w-full min-w-[36rem] border-collapse text-body-sm">
-          <thead>
-            <tr className="border-b border-line">
-              {block.headers.map((h, i) => (
-                <th key={i} className="py-3 pr-4 text-left font-medium text-ink">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {block.rows.map((row, i) => (
-              <tr key={i} className="border-b border-line last:border-0">
-                {row.map((cell, j) => (
-                  <td key={j} className="py-3 pr-4 align-top text-ink/85">
-                    {cell}
-                  </td>
+      <figure className="article-bleed">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[36rem] border-collapse text-body-sm">
+            <thead>
+              <tr className="border-b border-ink/20">
+                {block.headers.map((h, i) => (
+                  <th
+                    key={i}
+                    className="py-4 pr-4 text-left font-mono text-[0.72rem] font-medium uppercase tracking-[0.12em] text-muted"
+                  >
+                    {h}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {block.rows.map((row, i) => (
+                <tr key={i} className="border-b border-line last:border-0">
+                  {row.map((cell, j) => (
+                    <td key={j} className="py-4 pr-4 align-top text-[0.95rem] leading-[1.6] text-ink/90">
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         {block.caption ? (
-          <figcaption className="mt-2 text-body-sm text-muted">{block.caption}</figcaption>
+          <figcaption className="mt-3 text-body-sm text-muted">{block.caption}</figcaption>
         ) : null}
       </figure>
     );
   }
   if (block.type === 'stat') {
     return (
-      <div className="grid grid-cols-[auto_1fr] items-baseline gap-4 rounded-xl border border-line bg-surface p-5">
-        <span className="font-mono text-display-md leading-none text-accent">{block.value}</span>
-        <span className="text-body-sm text-muted">{block.label}</span>
+      <div className="flex items-baseline gap-4">
+        <span className="font-mono text-[3rem] leading-none text-accent">{block.value}</span>
+        <span className="text-body-lg text-muted">{block.label}</span>
       </div>
     );
   }
   if (block.type === 'faq') {
     return (
-      <dl className="divide-y divide-line rounded-2xl border border-line bg-surface">
+      <div className="space-y-8">
         {block.items.map((qa, i) => (
-          <div key={i} className="p-5 md:p-6">
-            <dt className="text-heading-sm text-ink">{qa.q}</dt>
-            <dd className="mt-2 text-body text-ink/85">{qa.a}</dd>
+          <div key={i}>
+            <h3 className="text-[1.125rem] font-medium leading-snug text-ink md:text-[1.25rem]">
+              {qa.q}
+            </h3>
+            <p className="mt-3 text-[1.0625rem] leading-[1.7] text-ink/85 md:text-[1.125rem]">
+              {qa.a}
+            </p>
           </div>
         ))}
-      </dl>
-    );
-  }
-  if (block.type === 'diagram') return <DiagramView block={block} />;
-  if (block.type === 'newsletter') {
-    return (
-      <div className="rounded-2xl border border-accent bg-accent-soft/40 p-6 md:p-7">
-        <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
-          Get the playbook
-        </p>
-        <p className="mt-2 text-heading-sm text-ink">
-          {block.text ?? 'One email when a new Milo playbook lands. No noise.'}
-        </p>
-        <a
-          href={`mailto:${CONTACT_EMAIL}?subject=Subscribe%20to%20the%20Milo%20playbook`}
-          className="mt-4 inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-body-sm font-medium text-white transition-colors hover:bg-accent-strong"
-        >
-          Send subscribe
-        </a>
       </div>
     );
   }
-  return <p className="text-body-lg text-ink/90">{block.text}</p>;
+  if (block.type === 'diagram') return <DiagramView block={block} />;
+  if (block.type === 'newsletter') return null;
+  return (
+    <p className="text-[1.0625rem] leading-[1.75] text-ink/90 md:text-[1.125rem]">{block.text}</p>
+  );
 }
 
-/* ── Diagram renderer. SVG, token-driven, dark-safe. ── */
+/* ── Diagram renderer. Full-bleed. SVG, token-driven, dark-safe. ── */
 type DiagramBlock = Extract<Block, { type: 'diagram' }>;
 function DiagramView({ block }: { block: DiagramBlock }) {
   const nodeMap = new Map(block.nodes.map((n, i) => [n.id, { ...n, i }]));
@@ -231,12 +258,14 @@ function DiagramView({ block }: { block: DiagramBlock }) {
     return { x: 20 + c * (nodeW + gapX), y: 20 + r * (nodeH + gapY) };
   };
   return (
-    <figure className="rounded-2xl border border-line bg-surface p-5 md:p-6">
-      <figcaption className="mb-4">
-        <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
+    <figure className="article-bleed">
+      <figcaption className="mb-5">
+        <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-accent">
           {block.kind.replace('-', ' ')}
         </p>
-        <p className="mt-1 text-heading-sm text-ink">{block.title}</p>
+        <p className="mt-1 text-[1.25rem] font-medium leading-snug text-ink md:text-[1.375rem]">
+          {block.title}
+        </p>
       </figcaption>
       <div className="overflow-x-auto">
         <svg
@@ -245,7 +274,7 @@ function DiagramView({ block }: { block: DiagramBlock }) {
           preserveAspectRatio="xMidYMid meet"
           role="img"
           aria-label={block.title}
-          className="min-w-[36rem]"
+          className="min-w-[34rem]"
         >
           <defs>
             <marker id={`${block.kind}-arrow`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
@@ -296,7 +325,7 @@ function DiagramView({ block }: { block: DiagramBlock }) {
                   y={y}
                   width={nodeW}
                   height={nodeH}
-                  rx="12"
+                  rx="10"
                   fill={isE ? 'rgb(var(--color-accent))' : 'rgb(var(--color-canvas))'}
                   stroke={isE ? 'rgb(var(--color-accent-strong))' : 'rgb(var(--color-line))'}
                   strokeWidth="1"
@@ -323,7 +352,7 @@ function DiagramView({ block }: { block: DiagramBlock }) {
         </svg>
       </div>
       {block.caption ? (
-        <p className="mt-3 text-body-sm text-muted">{block.caption}</p>
+        <figcaption className="mt-3 text-body-sm text-muted">{block.caption}</figcaption>
       ) : null}
     </figure>
   );
@@ -341,10 +370,10 @@ export default async function BlogPostPage({
 
   const clusterId = clusterIdFor(post);
   const related = relatedFor(post, 3);
+  const author = authorFor(post.slug);
 
   const faqBlocks = post.body.filter((b): b is Extract<Block, { type: 'faq' }> => b.type === 'faq');
   const stepsBlocks = post.body.filter((b): b is Extract<Block, { type: 'steps' }> => b.type === 'steps');
-  const ldAuthor = authorFor(post.slug);
 
   const blogPostingLd = {
     '@context': 'https://schema.org',
@@ -356,9 +385,9 @@ export default async function BlogPostPage({
     dateModified: post.dateModified ?? post.datePublished,
     author: {
       '@type': 'Person',
-      name: ldAuthor.name,
-      url: `${SITE_URL}/blog/authors/${ldAuthor.id}`,
-      jobTitle: ldAuthor.role,
+      name: author.name,
+      url: `${SITE_URL}/blog/authors/${author.id}`,
+      jobTitle: author.role,
     },
     publisher: { '@type': 'Organization', name: APP_NAME, url: SITE_URL },
     mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
@@ -405,186 +434,173 @@ export default async function BlogPostPage({
       }
     : null;
 
-  const author = authorFor(post.slug);
-  const toc = post.body
-    .map((b, i) => (b.type === 'h2' ? { i, text: b.text, id: b.id ?? slugify(b.text) } : null))
-    .filter((x): x is { i: number; text: string; id: string } => x !== null);
-
   return (
-    <article className="shell py-14 md:py-20">
+    <article className="article-root">
+      <style>{`
+        .article-root {
+          --article-measure: 44rem;
+          --article-bleed: 64rem;
+          padding-block: clamp(3rem, 4vw, 5rem) clamp(4rem, 6vw, 7rem);
+        }
+        .article-shell {
+          width: min(100% - 2.5rem, var(--article-bleed));
+          margin-inline: auto;
+        }
+        .article-measure {
+          width: min(100%, var(--article-measure));
+          margin-inline: auto;
+        }
+        .article-body > * {
+          width: min(100%, var(--article-measure));
+          margin-inline: auto;
+        }
+        .article-body > figure.article-bleed {
+          width: min(100%, var(--article-bleed));
+        }
+        .article-body > * + * {
+          margin-top: 1.5rem;
+        }
+        .article-body > h2 + * {
+          margin-top: 1.25rem;
+        }
+        .article-body > h3 + * {
+          margin-top: 1rem;
+        }
+        .article-body > figure.article-bleed + * {
+          margin-top: 3rem;
+        }
+      `}</style>
+
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingLd).replace(/</g, '\\u003c') }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, '\\u003c') }} />
       {faqLd ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd).replace(/</g, '\\u003c') }} /> : null}
       {howToLd ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd).replace(/</g, '\\u003c') }} /> : null}
 
-      {/* Breadcrumb + cluster tag. Full width; enterprise editorial anchor. */}
-      <Reveal className="mx-auto max-w-6xl">
-        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-body-sm text-muted">
-          <Link href="/" className="hover:text-ink">Home</Link>
-          <span aria-hidden>/</span>
-          <Link href="/blog" className="hover:text-ink">Blog</Link>
-          <span aria-hidden>/</span>
-          {clusterId ? (
-            <>
-              <Link href={`/blog?cluster=${clusterId}`} className="hover:text-ink">
-                {clusterLabel(clusterId)}
-              </Link>
-              <span aria-hidden>/</span>
-            </>
-          ) : null}
-          <span className="truncate text-ink/70">{post.title}</span>
-        </nav>
-      </Reveal>
+      {/* Editorial hero. Left-aligned, generous vertical rhythm, no card. */}
+      <header className="article-shell">
+        <Reveal className="article-measure">
+          <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-body-sm text-muted">
+            <Link href="/" className="hover:text-ink">Home</Link>
+            <span aria-hidden>/</span>
+            <Link href="/blog" className="hover:text-ink">Blog</Link>
+            {clusterId ? (
+              <>
+                <span aria-hidden>/</span>
+                <Link href={`/blog?cluster=${clusterId}`} className="hover:text-ink">
+                  {clusterLabel(clusterId)}
+                </Link>
+              </>
+            ) : null}
+          </nav>
 
-      {/* Article hero: title + subline meta, comfortable full-width measure. */}
-      <Reveal className="mx-auto mt-6 max-w-6xl">
-        <p className="text-eyebrow uppercase tracking-wide text-accent">{post.category}</p>
-        <h1 className="mt-3 max-w-4xl text-display-lg text-ink">{post.title}</h1>
-        <p className="mt-5 max-w-3xl text-body-lg text-muted">{postDescription(post)}</p>
-        <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-body-sm text-muted">
-          <span className="inline-flex items-center gap-2">
-            <span className="grid h-7 w-7 place-items-center rounded-full bg-accent-soft font-mono text-[0.72rem] text-accent">
-              {author.initials}
-            </span>
-            <Link href={`/blog/authors/${author.id}`} className="text-ink hover:text-accent">
-              {author.name}
-            </Link>
-            <span className="text-muted">· {author.role}</span>
-          </span>
-          <span aria-hidden>·</span>
-          <span>{readMinutes(post)} min read</span>
-          <span aria-hidden>·</span>
-          <span>Published {dateFmt(post.datePublished)}</span>
-          {post.dateModified && post.dateModified !== post.datePublished ? (
-            <>
-              <span aria-hidden>·</span>
-              <span>Updated {dateFmt(post.dateModified)}</span>
-            </>
-          ) : null}
-        </div>
-      </Reveal>
+          <p className="mt-10 font-mono text-[0.72rem] uppercase tracking-[0.18em] text-accent">
+            {post.category}
+          </p>
 
-      {/* Three-column editorial layout. Sticky TOC left, article center, meta rail right. */}
-      <div className="mx-auto mt-14 grid max-w-6xl gap-10 lg:grid-cols-[13rem_minmax(0,1fr)_13rem] lg:gap-12">
-        {/* Left rail: TOC. Renders as a compact top block below lg. */}
-        <aside className="order-2 lg:order-1">
-          {toc.length ? (
-            <nav aria-label="On this page" className="lg:sticky lg:top-24">
-              <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">
-                On this page
-              </p>
-              <ol className="mt-3 space-y-2 border-l border-line pl-4">
-                {toc.map((t) => (
-                  <li key={t.id}>
-                    <a
-                      href={`#${t.id}`}
-                      className="block text-body-sm leading-snug text-muted transition-colors hover:text-accent"
-                    >
-                      {t.text}
-                    </a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          ) : null}
-        </aside>
+          <h1 className="mt-4 text-[2.25rem] font-medium leading-[1.1] tracking-tight text-ink sm:text-[2.75rem] md:text-[3.25rem] lg:text-[3.75rem]">
+            {post.title}
+          </h1>
 
-        {/* Article body. Comfortable measure at the center. */}
-        <div className="order-1 min-w-0 lg:order-2">
-          <div className="mx-auto flex max-w-[46rem] flex-col gap-6">
-            {post.body.map((block, i) => (
-              <BlockView key={i} block={block} />
-            ))}
-          </div>
-        </div>
+          <p className="mt-6 text-[1.25rem] leading-[1.5] text-muted md:text-[1.375rem]">
+            {postDescription(post)}
+          </p>
 
-        {/* Right rail: author + cluster hub + CTA card. */}
-        <aside className="order-3 flex flex-col gap-6 lg:sticky lg:top-24 lg:h-max">
-          <div className="rounded-2xl border border-line bg-surface p-5">
-            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">Author</p>
-            <div className="mt-3 flex items-start gap-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-soft font-mono text-body-sm text-accent">
+          <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-line pt-6 text-body-sm text-muted">
+            <Link href={`/blog/authors/${author.id}`} className="inline-flex items-center gap-2 text-ink hover:text-accent">
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-accent-soft font-mono text-[0.72rem] text-accent">
                 {author.initials}
               </span>
-              <div className="min-w-0">
-                <Link
-                  href={`/blog/authors/${author.id}`}
-                  className="text-heading-sm text-ink hover:text-accent"
-                >
-                  {author.name}
-                </Link>
-                <p className="text-body-sm text-muted">{author.role}</p>
-              </div>
-            </div>
-            <p className="mt-3 text-body-sm text-ink/85">{author.bio}</p>
+              <span className="font-medium">{author.name}</span>
+            </Link>
+            <span className="text-muted">{author.role}</span>
+            <span aria-hidden className="hidden h-3 w-px bg-line md:block" />
+            <span>{dateFmt(post.datePublished)}</span>
+            {post.dateModified && post.dateModified !== post.datePublished ? (
+              <>
+                <span aria-hidden className="hidden h-3 w-px bg-line md:block" />
+                <span>Updated {dateFmt(post.dateModified)}</span>
+              </>
+            ) : null}
+            <span aria-hidden className="hidden h-3 w-px bg-line md:block" />
+            <span>{readMinutes(post)} min read</span>
           </div>
+        </Reveal>
+      </header>
 
-          {clusterId ? (
-            <div className="rounded-2xl border border-line bg-surface p-5">
-              <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">Topic</p>
-              <Link
-                href={`/blog?cluster=${clusterId}`}
-                className="mt-2 block text-heading-sm text-ink hover:text-accent"
-              >
-                {clusterLabel(clusterId)}
-              </Link>
-              <p className="mt-2 text-body-sm text-muted">
-                Read the rest of this cluster.
-              </p>
-            </div>
-          ) : null}
+      {/* Article body. Text at 44rem measure, diagrams / tables bleed to 64rem. */}
+      <div className="article-shell mt-16">
+        <div className="article-body">
+          {post.body.map((block, i) => (
+            <BlockView key={i} block={block} />
+          ))}
+        </div>
+      </div>
 
-          <div className="rounded-2xl border border-accent bg-accent-soft/40 p-5">
-            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
-              {APP_NAME}
+      {/* Editorial footer: Milo CTA (contextual), author bio, related. */}
+      <div className="article-shell mt-24">
+        <div className="article-measure">
+          {/* Contextual product callout. Not a giant card — a thin editorial rule. */}
+          <div className="border-t border-b border-line py-8">
+            <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-accent">
+              From {APP_NAME}
             </p>
-            <p className="mt-2 text-heading-sm text-ink">Run this loop end to end.</p>
-            <p className="mt-2 text-body-sm text-muted">
-              Find the right businesses, personalize outreach, send from your own inbox.
+            <p className="mt-3 text-[1.25rem] leading-[1.45] text-ink md:text-[1.375rem]">
+              {APP_NAME} runs this loop end to end. Find the right businesses, personalize
+              the outreach, send it from your own inbox.
             </p>
-            <div className="mt-3 flex flex-wrap gap-2 text-body-sm">
-              <Link
-                href="/how-it-works"
-                className="rounded-md border border-line bg-canvas px-3 py-1.5 text-ink transition-colors hover:border-accent hover:text-accent"
-              >
-                How it works
+            <div className="mt-5 flex flex-wrap gap-4 text-body-sm">
+              <Link href="/how-it-works" className="font-medium text-accent underline underline-offset-4 hover:text-accent-strong">
+                See how it works
               </Link>
-              <Link
-                href="/pricing"
-                className="rounded-md border border-line bg-canvas px-3 py-1.5 text-ink transition-colors hover:border-accent hover:text-accent"
-              >
+              <Link href="/pricing" className="font-medium text-accent underline underline-offset-4 hover:text-accent-strong">
                 Pricing
               </Link>
             </div>
           </div>
-        </aside>
+
+          {/* Author line. Just typography. */}
+          <div className="mt-12 flex items-start gap-4">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-accent-soft font-mono text-body-sm text-accent">
+              {author.initials}
+            </span>
+            <div className="min-w-0">
+              <p className="text-body-sm text-muted">Written by</p>
+              <Link href={`/blog/authors/${author.id}`} className="text-heading-sm text-ink hover:text-accent">
+                {author.name}
+              </Link>
+              <p className="mt-1 text-body-sm text-muted">{author.role}</p>
+              <p className="mt-3 max-w-prose text-body text-ink/85">{author.bio}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Related reading. Full width. */}
+      {/* Related — minimal, no heavy borders. */}
       {related.length ? (
-        <Reveal delay={0.05} className="mx-auto mt-20 max-w-6xl">
-          <div className="flex items-baseline justify-between gap-4">
-            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">
-              Related reading
+        <Reveal delay={0.05} className="article-shell mt-20">
+          <div className="flex items-baseline justify-between gap-4 border-b border-line pb-4">
+            <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-muted">
+              Keep reading
             </p>
             <Link href="/blog" className="text-body-sm text-accent hover:text-accent-strong">
               All posts
             </Link>
           </div>
-          <ul className="mt-5 grid gap-5 md:grid-cols-3">
+          <ul className="mt-8 grid gap-x-10 gap-y-8 md:grid-cols-3">
             {related.map((r) => {
               const ra = authorFor(r.slug);
               return (
                 <li key={r.slug}>
-                  <Link
-                    href={`/blog/${r.slug}`}
-                    className="flex h-full flex-col rounded-2xl border border-line bg-surface p-5 transition-shadow hover:shadow-card"
-                  >
-                    <span className="text-body-sm text-muted">{r.category}</span>
-                    <span className="mt-2 text-heading-sm text-ink">{r.title}</span>
-                    <span className="mt-auto pt-4 text-body-sm text-muted">
+                  <Link href={`/blog/${r.slug}`} className="group block">
+                    <p className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted">
+                      {r.category}
+                    </p>
+                    <p className="mt-3 text-[1.125rem] font-medium leading-snug text-ink transition-colors group-hover:text-accent md:text-[1.25rem]">
+                      {r.title}
+                    </p>
+                    <p className="mt-3 text-body-sm text-muted">
                       {ra.name} · {readMinutes(r)} min read
-                    </span>
+                    </p>
                   </Link>
                 </li>
               );
