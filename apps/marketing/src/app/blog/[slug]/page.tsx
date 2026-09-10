@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Reveal } from '@/components/reveal';
-import { APP_NAME, FOUNDER_NAME, SITE_URL } from '@/lib/site';
-import { BLOG_POSTS, getPost, readMinutes, type Block } from '../posts';
+import { APP_NAME, CONTACT_EMAIL, FOUNDER_NAME, SITE_URL } from '@/lib/site';
+import { BLOG_POSTS, getPost, postDescription, readMinutes, type Block } from '../posts';
 import { relatedFor, clusterIdFor, clusterLabel } from '../clusters';
 
 export function generateStaticParams() {
@@ -20,12 +20,12 @@ export async function generateMetadata({
   if (!post) return {};
   return {
     title: post.title,
-    description: post.description,
+    description: postDescription(post),
     alternates: { canonical: `/blog/${post.slug}` },
     openGraph: {
       type: 'article',
       title: post.title,
-      description: post.description,
+      description: postDescription(post),
       url: `${SITE_URL}/blog/${post.slug}`,
       publishedTime: post.datePublished,
       modifiedTime: post.dateModified ?? post.datePublished,
@@ -190,7 +190,142 @@ function BlockView({ block }: { block: Block }) {
       </dl>
     );
   }
+  if (block.type === 'diagram') return <DiagramView block={block} />;
+  if (block.type === 'newsletter') {
+    return (
+      <div className="rounded-2xl border border-accent bg-accent-soft/40 p-6 md:p-7">
+        <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
+          Get the playbook
+        </p>
+        <p className="mt-2 text-heading-sm text-ink">
+          {block.text ?? 'One email when a new Milo playbook lands. No noise.'}
+        </p>
+        <a
+          href={`mailto:${CONTACT_EMAIL}?subject=Subscribe%20to%20the%20Milo%20playbook`}
+          className="mt-4 inline-flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-body-sm font-medium text-white transition-colors hover:bg-accent-strong"
+        >
+          Send subscribe
+        </a>
+      </div>
+    );
+  }
   return <p className="text-body-lg text-ink/90">{block.text}</p>;
+}
+
+/* ── Diagram renderer. SVG, token-driven, dark-safe. ── */
+type DiagramBlock = Extract<Block, { type: 'diagram' }>;
+function DiagramView({ block }: { block: DiagramBlock }) {
+  const nodeMap = new Map(block.nodes.map((n, i) => [n.id, { ...n, i }]));
+  const cols = block.kind === 'ladder' ? 1 : block.kind === 'matrix' ? 2 : Math.min(block.nodes.length, 4);
+  const rows = Math.ceil(block.nodes.length / cols);
+  const nodeW = 220;
+  const nodeH = 88;
+  const gapX = 40;
+  const gapY = 32;
+  const width = cols * nodeW + (cols - 1) * gapX + 40;
+  const height = rows * nodeH + (rows - 1) * gapY + 40;
+  const position = (i: number) => {
+    const c = i % cols;
+    const r = Math.floor(i / cols);
+    return { x: 20 + c * (nodeW + gapX), y: 20 + r * (nodeH + gapY) };
+  };
+  return (
+    <figure className="rounded-2xl border border-line bg-surface p-5 md:p-6">
+      <figcaption className="mb-4">
+        <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
+          {block.kind.replace('-', ' ')}
+        </p>
+        <p className="mt-1 text-heading-sm text-ink">{block.title}</p>
+      </figcaption>
+      <div className="overflow-x-auto">
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          width="100%"
+          preserveAspectRatio="xMidYMid meet"
+          role="img"
+          aria-label={block.title}
+          className="min-w-[36rem]"
+        >
+          <defs>
+            <marker id={`${block.kind}-arrow`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="rgb(var(--color-muted))" />
+            </marker>
+          </defs>
+          {block.edges?.map((e, i) => {
+            const a = nodeMap.get(e.from);
+            const b = nodeMap.get(e.to);
+            if (!a || !b) return null;
+            const pa = position(a.i);
+            const pb = position(b.i);
+            const x1 = pa.x + nodeW / 2;
+            const y1 = pa.y + nodeH / 2;
+            const x2 = pb.x + nodeW / 2;
+            const y2 = pb.y + nodeH / 2;
+            return (
+              <g key={i}>
+                <line
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                  stroke="rgb(var(--color-line))"
+                  strokeWidth="1.5"
+                  markerEnd={`url(#${block.kind}-arrow)`}
+                />
+                {e.label ? (
+                  <text
+                    x={(x1 + x2) / 2}
+                    y={(y1 + y2) / 2 - 6}
+                    textAnchor="middle"
+                    className="fill-[rgb(var(--color-muted))] font-mono text-[10px]"
+                  >
+                    {e.label}
+                  </text>
+                ) : null}
+              </g>
+            );
+          })}
+          {block.nodes.map((n, i) => {
+            const { x, y } = position(i);
+            const isE = n.emphasis;
+            return (
+              <g key={n.id}>
+                <rect
+                  x={x}
+                  y={y}
+                  width={nodeW}
+                  height={nodeH}
+                  rx="12"
+                  fill={isE ? 'rgb(var(--color-accent))' : 'rgb(var(--color-canvas))'}
+                  stroke={isE ? 'rgb(var(--color-accent-strong))' : 'rgb(var(--color-line))'}
+                  strokeWidth="1"
+                />
+                <text
+                  x={x + 16}
+                  y={y + 26}
+                  className={isE ? 'fill-white text-[13px] font-medium' : 'fill-[rgb(var(--color-ink))] text-[13px] font-medium'}
+                >
+                  {n.label}
+                </text>
+                {n.sub ? (
+                  <text
+                    x={x + 16}
+                    y={y + 52}
+                    className={isE ? 'fill-white/80 text-[11px]' : 'fill-[rgb(var(--color-muted))] text-[11px]'}
+                  >
+                    {n.sub.length > 32 ? n.sub.slice(0, 30) + '...' : n.sub}
+                  </text>
+                ) : null}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      {block.caption ? (
+        <p className="mt-3 text-body-sm text-muted">{block.caption}</p>
+      ) : null}
+    </figure>
+  );
 }
 
 /* ── Page ── */
@@ -213,7 +348,7 @@ export default async function BlogPostPage({
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: post.title,
-    description: post.description,
+    description: postDescription(post),
     image: `${SITE_URL}/opengraph-image`,
     datePublished: post.datePublished,
     dateModified: post.dateModified ?? post.datePublished,
@@ -301,8 +436,23 @@ export default async function BlogPostPage({
           ))}
         </div>
 
+        {/* Author box */}
+        <aside className="mt-12 flex items-start gap-4 rounded-2xl border border-line bg-surface p-5 md:p-6">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-accent-soft text-accent font-mono text-body-sm">
+            {FOUNDER_NAME.charAt(0)}
+          </span>
+          <div className="min-w-0">
+            <p className="text-heading-sm text-ink">{FOUNDER_NAME}</p>
+            <p className="mt-1 text-body-sm text-muted">
+              Founder at {APP_NAME}. Building AI sales prospecting for small teams. Based in
+              India. Writing about buying signals, local prospecting, and cold email that
+              earns replies.
+            </p>
+          </div>
+        </aside>
+
         {/* Footer CTA card */}
-        <div className="mt-14 rounded-2xl border border-line bg-surface p-6 md:p-7">
+        <div className="mt-8 rounded-2xl border border-line bg-surface p-6 md:p-7">
           <p className="text-heading-sm text-ink">
             {APP_NAME} runs this loop end to end.
           </p>
