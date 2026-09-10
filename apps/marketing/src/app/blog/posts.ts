@@ -13,12 +13,22 @@ export type Block =
   | { type: 'steps'; items: { title: string; text: string }[] }
   | { type: 'table'; headers: string[]; rows: string[][]; caption?: string }
   | { type: 'stat'; value: string; label: string }
-  | { type: 'faq'; items: { q: string; a: string }[] };
+  | { type: 'faq'; items: { q: string; a: string }[] }
+  | {
+      type: 'diagram';
+      kind: 'workflow' | 'decision-tree' | 'matrix' | 'ladder' | 'compare';
+      title: string;
+      caption?: string;
+      nodes: { id: string; label: string; sub?: string; emphasis?: boolean }[];
+      edges?: { from: string; to: string; label?: string }[];
+    }
+  | { type: 'newsletter'; text?: string };
 
 export type BlogPost = {
   slug: string;
   title: string;
-  description: string;
+  /** Meta description. Falls back to excerpt when omitted. */
+  description?: string;
   category: string;
   cluster?: string;
   tags?: string[];
@@ -35,21 +45,32 @@ export type BlogPost = {
 import { WAVE1_POSTS } from './waves/wave1';
 import { WAVE2_POSTS } from './waves/wave2';
 import { WAVE3_POSTS } from './waves/wave3';
+import { WAVE4A_POSTS } from './waves/wave4a';
+import { WAVE4B_POSTS } from './waves/wave4b';
+import { WAVE4C_POSTS } from './waves/wave4c';
 
 /**
  * All published posts. Wave 3 goes first so its refreshed versions of the three
- * existing pillars (no-website, deliverability, compliance) win the getPost()
- * lookup, and its new manual-vs-automated piece anchors the Prospecting cluster.
- * Waves 1 and 2 add new pillars and vertical playbooks.
+ * existing pillars win the getPost() lookup. Wave 4 adds the higher-standards
+ * batch (manifesto, definitions, taxonomies, benchmarks, cadence, verticals,
+ * comparisons, founder narrative).
  */
 export const BLOG_POSTS: BlogPost[] = [
   ...WAVE3_POSTS,
   ...WAVE1_POSTS,
   ...WAVE2_POSTS,
+  ...WAVE4A_POSTS,
+  ...WAVE4B_POSTS,
+  ...WAVE4C_POSTS,
 ];
 
 export function getPost(slug: string): BlogPost | undefined {
   return BLOG_POSTS.find((p) => p.slug === slug);
+}
+
+/** Description with a graceful fallback chain: description -> excerpt -> title. */
+export function postDescription(post: BlogPost): string {
+  return post.description ?? post.excerpt ?? post.title;
 }
 
 /**
@@ -72,6 +93,8 @@ export function readMinutes(post: BlogPost): number {
     else if (b.type === 'faq') b.items.forEach((qa) => { count(qa.q); count(qa.a); });
     else if (b.type === 'link') count(b.text);
     else if (b.type === 'stat') count(b.label);
+    else if (b.type === 'diagram') { count(b.title); b.nodes.forEach((n) => { count(n.label); count(n.sub); }); }
+    else if (b.type === 'newsletter') count(b.text);
   }
   return Math.max(1, Math.round(words / 230));
 }

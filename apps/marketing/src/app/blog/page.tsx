@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Reveal } from '@/components/reveal';
+import { CONTACT_EMAIL } from '@/lib/site';
 import { BLOG_POSTS, readMinutes } from './posts';
 import { BLOG_CLUSTERS, clusterIdFor, clusterLabel } from './clusters';
 
@@ -108,6 +109,26 @@ export default async function BlogIndexPage({
         </section>
       ) : null}
 
+      {/* Newsletter capture. Mailto fallback until an audience is wired. */}
+      <section className="shell pb-12 pt-6">
+        <Reveal className="mx-auto flex max-w-5xl flex-col items-start gap-4 rounded-2xl border border-accent bg-accent-soft/40 p-6 md:flex-row md:items-center md:justify-between md:gap-8 md:p-7">
+          <div className="min-w-0">
+            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
+              Playbook drops
+            </p>
+            <p className="mt-1 text-heading-sm text-ink">
+              One email when a new Milo playbook lands. No noise.
+            </p>
+          </div>
+          <a
+            href={`mailto:${CONTACT_EMAIL}?subject=Subscribe%20to%20the%20Milo%20playbook`}
+            className="shrink-0 rounded-md bg-accent px-5 py-2.5 text-body-sm font-medium text-white transition-colors hover:bg-accent-strong"
+          >
+            Subscribe by email
+          </a>
+        </Reveal>
+      </section>
+
       <section className="shell py-12">
         {rest.length ? (
           <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -121,7 +142,7 @@ export default async function BlogIndexPage({
                   <h2 className="mt-2 text-heading-md text-ink group-hover:text-accent">
                     {post.title}
                   </h2>
-                  <p className="mt-2 text-body-sm text-muted">{post.excerpt ?? post.description}</p>
+                  <p className="mt-2 text-body-sm text-muted">{post.excerpt ?? post.description ?? post.title}</p>
                   <p className="mt-4 text-body-sm text-muted/80">
                     {dateFmt(post.dateModified ?? post.datePublished)} · {readMinutes(post)} min read
                   </p>
