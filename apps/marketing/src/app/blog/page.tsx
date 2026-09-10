@@ -101,7 +101,7 @@ export default async function BlogIndexPage({
               </div>
               <div className="flex items-end justify-end">
                 <span className="rounded-full border border-line bg-canvas px-4 py-2 text-body-sm text-ink transition-colors group-hover:border-accent group-hover:text-accent">
-                  Read the piece &rarr;
+                  Read the piece
                 </span>
               </div>
             </Link>

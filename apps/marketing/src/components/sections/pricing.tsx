@@ -132,9 +132,7 @@ export function Pricing({
                       </span>
                     </li>
                     {i < arr.length - 1 ? (
-                      <li aria-hidden className="hidden items-center justify-center text-muted/50 sm:flex">
-                        <span className="px-0.5 text-lg">→</span>
-                      </li>
+                      <li aria-hidden className="hidden h-px w-4 self-center bg-line/70 sm:block" />
                     ) : null}
                   </Fragment>
                 );
