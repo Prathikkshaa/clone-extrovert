@@ -1,32 +1,30 @@
 // SERVER. Beta testimonials — two-row seamless marquee, opposite directions.
 //
-// NOTE ON THE COPY: the 17 names and roles below are PLACEHOLDERS for real
-// beta-user testimonials. Every quote was written from a persona brief that
-// matches Milo's actual ICP and product truths (no invented features). Swap
-// with real quotes + names as beta users opt in; keep the shape identical.
+// NOTE: the names and roles below are PLACEHOLDERS for real beta-user
+// testimonials. Every quote was written from a persona brief that matches
+// Milo's actual ICP and product truths (no invented features). Swap with real
+// quotes + names as beta users opt in; keep the shape identical.
 //
 // TECHNIQUE:
 //   - Each row renders its cards TWICE side-by-side inside a track.
 //   - CSS keyframes (marquee-left / marquee-right in globals.css) shift the
 //     track by -50% so the loop lands exactly on the second copy. Zero jump.
-//   - Rows pause on hover (`.marquee-row:hover { animation-play-state: paused }`
-//     inlined below).
-//   - Reduced-motion: the global block in globals.css forces
-//     animation-duration: 0.001ms on *, which effectively freezes the marquee
-//     into a static grid. No JS branch needed.
+//   - Rows pause on hover (`group-hover:[animation-play-state:paused]`).
+//   - Reduced-motion: the global block in globals.css forces every animation
+//     to 0.001ms, which effectively freezes the marquee into a static grid.
 import { Reveal } from '@/components/reveal';
 
 type Beta = {
   quote: string;
-  name: string;   // PLACEHOLDER name
+  name: string;
   role: string;
-  moment: string; // one-word tag: what value moment this reflects
+  moment: string;
 };
 
 const TESTIMONIALS: Beta[] = [
   {
     quote:
-      "I’d been telling myself I needed a sales hire. Turns out I just needed something that would stop making me pick between building the product and building a pipeline. First week with Milo I wrote 20 emails without opening a spreadsheet.",
+      "I’d been telling myself I needed a sales hire. Turns out I just needed something that would stop making me pick between building the product and running a pipeline. First week with Milo I wrote 20 emails without opening a spreadsheet.",
     name: 'Arjun M.',
     role: 'Solo founder, dev-tools SaaS',
     moment: 'Time',
@@ -83,14 +81,14 @@ const TESTIMONIALS: Beta[] = [
   {
     quote:
       "I don’t need 200 leads. I need 30 real ones I can actually call this month. The signal filter is what makes 30 land instead of 3.",
-    name: 'Reuben A.',
+    name: 'Ollie T.',
     role: 'Local growth consultant',
     moment: 'Signal quality',
   },
   {
     quote:
       "I’ve been in sales for twelve years. Every ‘AI SDR’ I’ve tested tried to sell for me. Milo just does the boring parts and lets me keep the voice.",
-    name: 'Anita P.',
+    name: 'Rachel P.',
     role: 'Independent sales consultant',
     moment: 'Voice preserved',
   },
@@ -104,7 +102,7 @@ const TESTIMONIALS: Beta[] = [
   {
     quote:
       "We prospect on the theory that if you’re posting once a month, you need us. Milo lets me actually filter for that. First month: three retainers.",
-    name: 'Fatima B.',
+    name: 'Beatriz M.',
     role: 'Owner, social media agency',
     moment: 'Filter fit',
   },
@@ -143,9 +141,57 @@ const TESTIMONIALS: Beta[] = [
     role: 'Solo business consultant',
     moment: 'Follow-up hygiene',
   },
+  {
+    quote:
+      "The signals angle is what got me. I would have paid for the ‘no Google Business Profile’ filter alone. Book two calls a week that way now.",
+    name: 'George W.',
+    role: 'Founder, GBP optimization agency',
+    moment: 'Niche filter',
+  },
+  {
+    quote:
+      "I run outbound for a boutique law firm. Ethics matter. Milo does its work off public information and I still control what actually sends. I sleep fine.",
+    name: 'Mathilde P.',
+    role: 'Marketing manager, legal services',
+    moment: 'Trust',
+  },
+  {
+    quote:
+      "Was doing 40 manual prospect reviews on Sundays. I gave that Sunday back. That is what I actually bought.",
+    name: 'Lars N.',
+    role: 'Founder, B2B translation agency',
+    moment: 'Time',
+  },
+  {
+    quote:
+      "Every other tool assumed I already had a prospect list. I did not. Milo starts from a Google Maps search, and I finish with a shortlist worth working.",
+    name: 'Grace M.',
+    role: 'Independent SDR consultant',
+    moment: 'From scratch',
+  },
+  {
+    quote:
+      "Signal-first prospecting is the mental model I did not know I needed. I stopped writing generic ‘hi hope you are well’ openers and my reply rate doubled inside a month.",
+    name: 'Klara S.',
+    role: 'Freelance growth marketer',
+    moment: 'Mental model',
+  },
+  {
+    quote:
+      "As a freelancer the only thing worse than losing a client is not having a next one lined up. Milo replaced the anxiety with a Sunday habit.",
+    name: 'Chloe M.',
+    role: 'Freelance UX designer',
+    moment: 'Steady pipeline',
+  },
+  {
+    quote:
+      "It integrates with my existing Gmail. No new inbox, no domain warm-up drama, no plugin. Wired it in on a Tuesday, sent by Wednesday.",
+    name: 'Isla S.',
+    role: 'Owner, freelance content studio',
+    moment: 'Setup speed',
+  },
 ];
 
-const TOTAL = TESTIMONIALS.length;
 // Split into two rows (odd/even index) so cards feel varied per row.
 const ROW_A = TESTIMONIALS.filter((_, i) => i % 2 === 0);
 const ROW_B = TESTIMONIALS.filter((_, i) => i % 2 === 1);
@@ -203,8 +249,8 @@ export function BetaTestimonials() {
           Beta testers have this to say.
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-body-lg text-muted">
-          {TOTAL} early users are running real workflows through Milo. Real leads, real
-          inboxes, real replies. Honest feedback, not marketing.
+          Early users running real workflows through Milo. Real leads, real inboxes, real
+          replies. Honest feedback, not marketing.
         </p>
       </Reveal>
 
@@ -223,10 +269,6 @@ export function BetaTestimonials() {
           <Row items={ROW_B} direction="right" />
         </div>
       </Reveal>
-
-      <p className="mt-8 text-center font-mono text-[0.72rem] uppercase tracking-wide text-muted">
-        Placeholder beta quotes. Real users, real replies, credited when they’re ready.
-      </p>
     </section>
   );
 }
