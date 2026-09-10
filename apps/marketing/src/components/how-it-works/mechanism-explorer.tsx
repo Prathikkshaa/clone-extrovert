@@ -97,18 +97,25 @@ function ArtSignal() {
 
 function ArtEmail() {
   return (
-    <div className="rounded-lg border border-line bg-gradient-to-b from-white to-surface shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-float p-5 text-body-sm">
-      <p className="text-muted">Subject</p>
-      <p className="mt-1 font-medium text-ink">Quick idea for Lone Star Roofing</p>
+    <div className="rounded-lg border border-line bg-gradient-to-b from-white to-surface p-5 text-body-sm shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-float">
+      <div className="flex items-center justify-between">
+        <p className="text-muted">Subject</p>
+        <span className="rounded-sm border border-line px-1.5 py-0.5 font-mono text-[0.62rem] uppercase tracking-wide text-muted">
+          Illustrative example
+        </span>
+      </div>
+      <p className="mt-1 font-medium text-ink">A note from a local contractor</p>
       <div className="mt-4 space-y-2 text-ink/80">
-        <p>Saw the 4.8 across 126 storm-damage jobs around Austin. Clear the crews deliver.</p>
+        <p>Hi Marcus,</p>
         <p>
-          Noticed there’s no site yet, so homeowners comparing roofers after a referral can’t find you.
-          I help contractors close that gap in a week.
+          Ran into Lone Star Roofing while looking through storm-damage crews in Austin. Wanted to
+          reach out because I work with contractors on a small first thing: getting the business
+          findable when a referral goes home and searches for you.
         </p>
+        <p>Open to a short call next week if it is useful?</p>
       </div>
       <div className="mt-4 border-t border-line pt-3 text-[0.78rem] text-muted">
-        Grounded in their reviews. Rewritten in your voice. Nothing sends yet.
+        Draft grounded in the lead sketch, rewritten in your voice. Waits for your approval.
       </div>
     </div>
   );
@@ -135,14 +142,20 @@ function ArtSend() {
 
 function ArtReply() {
   return (
-    <div className="rounded-lg border border-line bg-gradient-to-b from-white to-surface shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-float p-5 text-body-sm">
-      <p className="text-muted">From: owner@lonestarroofing.com</p>
-      <p className="mt-1 text-ink">
-        Interesting. Got 10 minutes Thursday? We just lost a job to a competitor with a site.
+    <div className="rounded-lg border border-line bg-gradient-to-b from-white to-surface p-5 text-body-sm shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-float">
+      <div className="flex items-center justify-between">
+        <p className="text-muted">Reply received</p>
+        <span className="rounded-sm border border-line px-1.5 py-0.5 font-mono text-[0.62rem] uppercase tracking-wide text-muted">
+          Illustrative example
+        </span>
+      </div>
+      <p className="mt-2 text-ink">
+        Thanks for reaching out. Can you send a bit more on what you had in mind? Not sure it is
+        the right time for us, but curious.
       </p>
-      <div className="mt-4 flex items-center gap-2 border-t border-line pt-3">
+      <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-3">
         <span className="rounded-md bg-accent-soft px-2.5 py-1 text-[0.78rem] font-medium text-accent">
-          Positive
+          Interested
         </span>
         <span className="text-[0.78rem] text-muted">Follow-ups paused. Reply in your inbox.</span>
       </div>

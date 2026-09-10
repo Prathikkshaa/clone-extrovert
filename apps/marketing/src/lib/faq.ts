@@ -38,28 +38,46 @@ export const FAQ_ITEMS: FaqItem[] = [
     q: 'What does it cost?',
     a: 'Start free with 100 credits, no card. After that you pay only for what you use, about 5-7 credits per lead end to end (roughly $0.30-0.42 each on Growth), so $39 (650 credits) ≈ 92-130 leads. Billed in USD; cards from any country.',
   },
+  {
+    q: 'What happens if I run out of credits mid-campaign?',
+    a: 'Nothing dramatic. Milo pauses the moment your balance hits zero. Nothing is charged, no email goes out unpaid, and your leads and drafts wait exactly where they are. Top up and the campaign continues from where it stopped.',
+  },
+  {
+    q: 'How do I stop or pause a campaign?',
+    a: 'One click from the app. Pending sends halt immediately, follow-ups stop, and your drafts stay saved. Resume when you are ready or delete the campaign; either way nothing else sends.',
+  },
 ];
 
 // /how-it-works FAQ: search/answer-intent questions AI answer engines ask about
-// AI-driven local lead generation and personalized cold outreach. Reuses two
-// FAQ_ITEMS answers verbatim (deliverability + legality) so wording stays
-// consistent across pages.
+// AI sales prospecting, buying signals, and personalized cold outreach.
+// Deliberately distinct from FAQ_ITEMS (landing) and PRICING_FAQ_ITEMS: this set
+// answers "how does the mechanism work?" so the FAQPage JSON-LD emitted for
+// /how-it-works never overlaps the landing or /pricing schema.
 export const HOW_IT_WORKS_FAQ_ITEMS: FaqItem[] = [
   {
-    q: 'How does AI lead generation work with Milo?',
-    a: 'You pick a market, an industry and a city, and Milo pulls real local businesses from public information anyone can look up. It then researches each one from its own website and reviews, drafts a personalized 3-email sequence in your voice, and sends the ones you approve from your own inbox. You only pay in credits when the work actually runs.',
+    q: 'How does AI sales prospecting work?',
+    a: 'You pick a market: an industry, a city, and the buying signal you can act on. Milo pulls real local businesses from public information anyone can look up, researches each one from its own website and reviews, drafts a personalized 3-email sequence in your voice, and sends the ones you approve from your own inbox. You only spend credits when the work actually runs.',
   },
   {
     q: 'How does AI find qualified local business leads?',
-    a: 'By starting from a buying signal, not a directory dump. You can filter for businesses that are missing something you can fix (no website, thin online presence, weak reviews) so every lead already has a reason to hear from you.',
+    a: 'By starting from a buying signal, not a directory dump. You filter for businesses that show an observable gap you can fix (no website, thin online presence, weak reviews) so every lead on the list already has a reason to hear from you.',
   },
   {
-    q: 'How does AI personalize cold emails without sounding generic?',
-    a: 'Milo reads the lead’s own site and reviews and writes each email grounded in what that specific business actually does. No mail-merge tokens, no "Hi {{first_name}}." You review every draft before it sends, so nothing goes out that doesn’t sound like you.',
+    q: 'How does AI identify a buying signal?',
+    a: 'The signal is a filter, not a bonus. A business only earns a place on the list when the signal is observable in its public profile. Milo checks its site, its reviews, and its category before it agrees the signal is real, so the outreach is grounded in a concrete gap.',
   },
-  FAQ_ITEMS[0], // deliverability
-  FAQ_ITEMS[1], // where do leads come from + legality
-  FAQ_ITEMS[3], // review-before-send
+  {
+    q: 'How does AI personalize cold outreach without sounding generic?',
+    a: 'Milo reads the specific business first: its site, its reviews, its category. Every claim in the draft is anchored in that sketch, not in a mail-merge token. There is no "Hi {{first_name}}." You review every draft before it sends.',
+  },
+  {
+    q: 'How does Milo keep sends out of the spam folder?',
+    a: 'Slow warm-up, one message at a time, natural randomized spacing, and automatic bounce pause. Every message ships from your own Gmail or Outlook inbox, carries a one-click unsubscribe token, and includes your physical address. The domain reputation stays yours.',
+  },
+  {
+    q: 'How do replies come back?',
+    a: 'Replies land in the same inbox you connected. Milo detects the reply, stops the follow-up sequence for that lead, labels the reply, and drafts an answer for you to review. From then on it behaves like normal email.',
+  },
 ];
 
 // Pricing-page FAQ: the money questions people ask before buying. Numbers match
@@ -100,5 +118,13 @@ export const PRICING_FAQ_ITEMS: FaqItem[] = [
   {
     q: 'Which plan should I choose?',
     a: 'Starter (free) to prove it on your first market, Growth for steady weekly prospecting and the best value per prospect, Scale for always-on high volume. Choose Custom if you need invoicing, purchase orders, or volume beyond the plans.',
+  },
+  {
+    q: 'What happens if I run out of credits mid-campaign?',
+    a: 'Milo pauses at zero. No email goes out unpaid, nothing is charged automatically, and your leads and drafts wait where they are. Top up and the campaign continues from where it stopped.',
+  },
+  {
+    q: 'How do I stop or pause a campaign?',
+    a: 'One click from the app. Pending sends halt immediately, follow-ups stop, and drafts stay saved. Resume when you are ready or delete the campaign.',
   },
 ];

@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import { FaqJsonLd } from '@/components/structured-data';
 import { Reveal } from '@/components/reveal';
 import { Differentiators } from '@/components/sections/differentiators';
-import { Demo } from '@/components/sections/demo';
 import { Faq } from '@/components/sections/faq';
 import { FinalCta } from '@/components/sections/final-cta';
 import { MechanismExplorer } from '@/components/how-it-works/mechanism-explorer';
+import Link from 'next/link';
 import { HOW_IT_WORKS_FAQ_ITEMS } from '@/lib/faq';
 import { FREE_SIGNUP_CREDITS } from '@extrovertai/shared';
 import { CREDITS_PER_LEAD_LOW, CREDITS_PER_LEAD_HIGH } from '@/lib/pricing-math';
@@ -13,7 +13,7 @@ import { CREDITS_PER_LEAD_LOW, CREDITS_PER_LEAD_HIGH } from '@/lib/pricing-math'
 export const metadata: Metadata = {
   title: 'How it works',
   description:
-    'The mechanism behind Milo. How AI lead generation actually works: define a market, discover local businesses, read them, confirm the buying signal, personalize outreach, send responsibly from your own inbox, and turn replies into conversations.',
+    'The mechanism behind Milo. How AI sales prospecting actually works: define a market, discover local businesses, read them, confirm the buying signal, personalize outreach, send responsibly from your own inbox, and turn replies into conversations.',
   alternates: { canonical: '/how-it-works' },
 };
 
@@ -39,7 +39,7 @@ export default function HowItWorksPage() {
             <span className="text-accent">Milo starts with a reason to reach out.</span>
           </h1>
           <p className="mt-6 max-w-2xl text-body-lg text-muted">
-            A short, honest look at how AI lead generation, buying-signal discovery, and
+            A short, honest look at how AI sales prospecting, buying-signal discovery, and
             personalized outreach actually fit together. Seven steps, one running example,
             nothing hidden.
           </p>
@@ -49,8 +49,9 @@ export default function HowItWorksPage() {
       {/* THE MECHANISM. Horizontal seven-step explorer, one running example. */}
       <MechanismExplorer />
 
-      {/* SEE IT AT WORK. The existing Demo, kept intentionally as concrete proof. */}
-      <Demo />
+      {/* Demo removed from /how-it-works: the MechanismExplorer above already
+          shows the running example end to end and the landing owns the animated
+          demo. A HIW-specific proof block is on the roadmap (see audit follow-up). */}
 
       {/* WHY CONTEXT WINS. One row from the shared Differentiators source. */}
       <Differentiators
@@ -59,6 +60,49 @@ export default function HowItWorksPage() {
         title="Context is what makes the outreach land."
         intro="Every draft is written from that specific business. That is the difference between an email a stranger deletes and a note an owner replies to."
       />
+
+      {/* INTEGRATIONS + WORKFLOW. What the mechanism plugs into. */}
+      <section className="shell py-section-y">
+        <Reveal className="mx-auto max-w-3xl">
+          <p className="text-eyebrow uppercase text-accent">Integrations & workflow</p>
+          <h2 className="mt-3 text-display-md text-ink">Fits the way you already sell.</h2>
+          <p className="mt-4 text-body-lg text-muted">
+            Milo runs on your existing inbox and your existing calendar. Replies stay where
+            you read email; bookings land where you book meetings. Agencies can run many
+            markets from many inboxes on one balance.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.05} className="mx-auto mt-12 max-w-5xl">
+          <ul className="grid gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-3">
+            {[
+              {
+                title: 'Calendar',
+                sub: 'Cal.com, BYO link.',
+                copy: 'Paste your Cal.com link once. Milo adds it to the outreach so a lead can book directly. Bookings arrive as a signed webhook and update the lead automatically.',
+              },
+              {
+                title: 'Multiple inboxes',
+                sub: 'Rotation and per-inbox caps.',
+                copy: 'Connect as many Gmail or Outlook mailboxes as you need. Milo rotates sends across them, warms each one on its own ramp, and never breaks a per-inbox daily cap.',
+              },
+              {
+                title: 'Replies',
+                sub: 'Land where you already read email.',
+                copy: 'Every reply comes back to the mailbox that sent it. Milo classifies the reply (positive, neutral, negative), pauses the follow-up sequence, and drafts a suggested response for you to approve.',
+              },
+            ].map((v) => (
+              <li key={v.title} className="flex flex-col gap-3 bg-surface p-6 md:p-8">
+                <p className="text-heading-sm text-ink">{v.title}</p>
+                <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">
+                  {v.sub}
+                </p>
+                <p className="mt-1 max-w-prose text-body-sm text-muted">{v.copy}</p>
+              </li>
+            ))}
+          </ul>
+        </Reveal>
+      </section>
 
       {/* TRUST + DELIVERABILITY. Outcome-first 2x2 value grid. */}
       <section className="shell py-section-y">
@@ -137,8 +181,8 @@ export default function HowItWorksPage() {
             </div>
             <p className="mt-4 max-w-prose text-body-sm text-muted">
               Roughly {CREDITS_PER_LEAD_LOW} to {CREDITS_PER_LEAD_HIGH} credits per lead, end
-              to end. Growth pack scales you to 550 to 650 credits when the mechanism proves out.
-              No seats, no monthly minimum, credits never expire.
+              to end. The Growth pack tops you up with 650 credits (about 92 to 130 leads) when
+              the mechanism proves out. No seats, no monthly minimum, credits never expire.
             </p>
           </div>
           <div className="rounded-2xl border border-line bg-surface p-6 md:p-8">
@@ -163,19 +207,82 @@ export default function HowItWorksPage() {
         </Reveal>
       </section>
 
+      {/* WHEN MILO FITS. AEO / GEO answer to "when should I use it versus another tool?" */}
+      <section className="shell pb-section-y">
+        <Reveal className="mx-auto max-w-3xl">
+          <p className="text-eyebrow uppercase text-accent">Fit</p>
+          <h2 className="mt-3 text-display-md text-ink">When Milo fits, and when it does not.</h2>
+        </Reveal>
+        <Reveal delay={0.05} className="mx-auto mt-10 grid max-w-5xl gap-6 md:grid-cols-2">
+          <div className="rounded-2xl border border-line bg-surface p-6 md:p-8">
+            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
+              A good fit
+            </p>
+            <ul className="mt-4 space-y-3 text-body text-ink/85">
+              <li>Founders, freelancers, and small agencies who sell to local businesses.</li>
+              <li>People who need clients, not another sales stack to learn.</li>
+              <li>Anyone whose offer is a concrete fix (website, marketing, ops, service) with an observable buying signal.</li>
+              <li>Teams who would rather send fewer, better emails than blast a bought list.</li>
+            </ul>
+          </div>
+          <div className="rounded-2xl border border-line bg-surface p-6 md:p-8">
+            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">
+              Not the right tool
+            </p>
+            <ul className="mt-4 space-y-3 text-body text-ink/85">
+              <li>Enterprise sales cycles that need multi-thread ABM into named accounts.</li>
+              <li>Outreach to consumers (B2C) or to regulated audiences without proper licensing.</li>
+              <li>Teams that need CRM sync, sequence branching, or a full sales-engagement suite today.</li>
+              <li>Anyone who wants to send templated blast at high volume. Milo will not help you do that.</li>
+            </ul>
+          </div>
+        </Reveal>
+      </section>
+
       {/* FAQ. Site-wide accordion, brand tone. Same pattern as landing / pricing. */}
       <Faq
         items={HOW_IT_WORKS_FAQ_ITEMS}
         tone="brand"
-        title="How AI outreach actually works."
-        intro="Short answers to the questions people ask about AI lead generation, buying signals, and personalized cold email."
+        title="Questions before you start."
+        intro="Short answers on AI sales prospecting, buying signals, personalized cold outreach, deliverability, and control."
       />
+
+      {/* RELATED READING. Internal linking into /blog and /pricing to close the cluster. */}
+      <section className="shell pb-section-y">
+        <div className="mx-auto max-w-3xl border-t border-line pt-8">
+          <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">
+            Related reading
+          </p>
+          <ul className="mt-4 space-y-2 text-body">
+            <li>
+              <Link href="/blog/how-to-find-local-business-leads" className="text-accent underline underline-offset-2 hover:text-accent-strong">
+                How to find local businesses with no website (and win them as clients)
+              </Link>
+            </li>
+            <li>
+              <Link href="/blog/why-cold-emails-go-to-spam" className="text-accent underline underline-offset-2 hover:text-accent-strong">
+                Why cold emails go to spam (and how to stay out of it)
+              </Link>
+            </li>
+            <li>
+              <Link href="/blog/is-cold-email-legal" className="text-accent underline underline-offset-2 hover:text-accent-strong">
+                Is cold email legal? CAN-SPAM, PECR, GDPR explained
+              </Link>
+            </li>
+            <li>
+              <Link href="/pricing" className="text-accent underline underline-offset-2 hover:text-accent-strong">
+                See the full pricing breakdown
+              </Link>
+            </li>
+          </ul>
+        </div>
+      </section>
 
       {/* CLOSE. Site-wide FinalCta, one primary action. */}
       <FinalCta
         title="Try the mechanism on your own market."
         body={`${FREE_SIGNUP_CREDITS} free credits. No card. You only pay when Milo does the work.`}
-        cta="Find my first 20 leads"
+        cta="Start free"
       />
     </>
   );

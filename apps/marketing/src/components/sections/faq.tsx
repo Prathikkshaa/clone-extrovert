@@ -12,7 +12,7 @@ export function Faq({
   withHeading = true,
   items = FAQ_ITEMS,
   title = 'The honest answers.',
-  intro = 'The things people actually worry about before trying a cold-outreach tool.',
+  intro = 'The things people actually worry about before trying an AI sales prospecting tool.',
   tone = 'plain',
 }: {
   withHeading?: boolean;

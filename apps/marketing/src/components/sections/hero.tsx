@@ -118,7 +118,7 @@ export function Hero() {
       <section className="shell grid items-center gap-10 pb-8 pt-10 md:grid-cols-[1fr_1.05fr] md:gap-14 md:pb-12 md:pt-20">
         <div>
           <Reveal>
-            <p className="text-eyebrow uppercase text-accent">AI prospecting that books meetings</p>
+            <p className="text-eyebrow uppercase text-accent">AI sales prospecting. From a buying signal to a reply.</p>
           </Reveal>
           <Reveal delay={0.05}>
             <h1 className="mt-4 text-display-md text-ink">

@@ -18,7 +18,7 @@ type Row = {
 // real screenshots - M00 §13).
 function EmailDraftVisual() {
   return (
-    <div className="rounded-xl border border-line bg-surface p-5 shadow-float">
+    <div className="relative rounded-xl border border-line bg-surface p-5 shadow-card">
       <p className="text-body-sm text-muted">To: owner@lonestarroofing.com</p>
       <p className="mt-1 text-body font-medium text-ink">Quick idea for Lone Star Roofing</p>
       <div className="mt-4 space-y-2 text-body-sm text-ink/80">
@@ -39,7 +39,7 @@ function EmailDraftVisual() {
 
 function ComplianceVisual() {
   return (
-    <div className="rounded-xl border border-line bg-surface p-5 shadow-float">
+    <div className="relative rounded-xl border border-line bg-surface p-5 shadow-card">
       <div className="flex items-center justify-between">
         <span className="text-body-sm text-ink">Sending from you@yourinbox.com</span>
         <span className="rounded-full bg-positive-soft px-2.5 py-1 text-[0.78rem] font-medium text-positive">
@@ -62,7 +62,7 @@ function ComplianceVisual() {
 
 function ApprovalVisual() {
   return (
-    <div className="rounded-xl border border-line bg-surface p-5 shadow-float">
+    <div className="relative rounded-xl border border-line bg-surface p-5 shadow-card">
       <div className="flex items-center justify-between">
         <p className="text-body-sm text-muted">Drafts waiting for you</p>
         <span className="rounded-full bg-accent-soft px-2.5 py-1 text-[0.78rem] font-medium text-accent">
@@ -158,7 +158,12 @@ export function Differentiators({
                 <h3 className="mt-3 text-heading-lg text-ink">{row.title}</h3>
                 <p className="mt-4 max-w-prose text-body-lg text-muted">{row.copy}</p>
               </div>
-              <div className={flip ? 'min-w-0 md:order-1' : 'min-w-0'}>{row.visual}</div>
+              <div className={flip ? 'relative min-w-0 md:order-1' : 'relative min-w-0'}>
+                {row.visual}
+                <span className="pointer-events-none absolute right-3 top-3 rounded-sm border border-line bg-surface px-1.5 py-0.5 font-mono text-[0.62rem] uppercase tracking-wide text-muted">
+                  Illustration
+                </span>
+              </div>
             </Reveal>
           );
         })}

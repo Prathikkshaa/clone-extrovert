@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import type { ComponentType } from 'react';
+import Link from 'next/link';
 import { Reveal } from '@/components/reveal';
-import { FounderNote } from '@/components/sections/founder-note';
 import { FinalCta } from '@/components/sections/final-cta';
 import { APP_NAME } from '@/lib/site';
 
@@ -270,6 +270,38 @@ export default function AboutPage() {
         </Reveal>
       </section>
 
+      {/* THE FACTS. Team + location + year + one-sentence origin. */}
+      <section className="shell pt-14 md:pt-20">
+        <div className="mx-auto grid max-w-5xl gap-8 border-y border-line py-8 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:gap-10 md:py-10">
+          <div>
+            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">Team</p>
+            <p className="mt-2 text-heading-sm text-ink">Small team, led by Arun.</p>
+          </div>
+          <span aria-hidden className="hidden h-full w-px bg-line md:block" />
+          <div>
+            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">
+              Based in
+            </p>
+            <p className="mt-2 text-heading-sm text-ink">India</p>
+          </div>
+          <span aria-hidden className="hidden h-full w-px bg-line md:block" />
+          <div>
+            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">
+              Founded
+            </p>
+            <p className="mt-2 text-heading-sm text-ink">2026</p>
+          </div>
+        </div>
+        <Reveal className="mx-auto mt-8 max-w-3xl">
+          <p className="text-body-lg text-ink/85">
+            Milo exists because small teams need clients, not another sales stack. The
+            existing options were fragmented, expensive, and built for headcount that most
+            founders and agencies do not have. We wanted one honest tool that finds the
+            right businesses, reaches out like a person, and gets out of the way.
+          </p>
+        </Reveal>
+      </section>
+
       {/* SECTION A - The problem & the bet (problem leads before the solution) */}
       <section className="shell py-section-y">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
@@ -341,59 +373,34 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* SECTION B - What we're building */}
+      {/* Mechanism restatement removed from /about. The Find / Write / Send / Book
+          loop is the subject of /how-it-works. Deep dive is one click away. */}
       <section className="shell py-section-y">
         <Reveal className="mx-auto max-w-2xl text-center">
-          <p className="text-eyebrow uppercase text-accent">What we&rsquo;re building</p>
+          <p className="text-eyebrow uppercase text-accent">The mechanism</p>
           <h2 className="mt-3 text-display-md text-ink">
-            More booked meetings - without building a sales team.
+            Read it, then decide.
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-body-lg text-muted">
-            Point {APP_NAME} at a market. It finds the right businesses, writes in your voice, and
-            sends from your own inbox - you show up to the calls.
+            {APP_NAME} runs a seven-step loop: define a market, discover businesses,
+            confirm the buying signal, personalize outreach, send from your inbox, turn
+            replies into conversations. The full walkthrough is one click away.
           </p>
-        </Reveal>
-
-        <Reveal className="mt-12">
-          <div className="grid grid-cols-2 auto-rows-fr gap-3 md:flex md:w-full md:flex-row md:items-stretch md:gap-2">
-            {STEPS.map((s, i) => (
-              <div key={s.title} className="flex flex-col md:flex-1 md:flex-row md:items-center md:gap-2">
-                <div className="relative flex-1 rounded-xl border border-line bg-surface p-4 pt-11 shadow-card md:p-5 md:pt-12">
-                  <span className="absolute left-4 top-4 grid h-6 w-6 place-items-center rounded-full bg-accent-soft text-xs font-medium text-accent">
-                    {s.n}
-                  </span>
-                  <div className="grid h-12 w-12 place-items-center rounded-lg bg-accent-soft text-accent">
-                    <s.Icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="mt-4 text-heading-sm text-ink">{s.title}</h3>
-                  <p className="mt-2 text-body-sm text-muted">{s.copy}</p>
-                </div>
-                {i < STEPS.length - 1 && (
-                  <div className="hidden shrink-0 items-center justify-center text-muted md:flex">
-                    <IconChevronRight className="h-5 w-5" />
-                  </div>
-                )}
-              </div>
-            ))}
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/how-it-works"
+              className="rounded-md border border-line bg-surface px-4 py-2 text-body-sm font-medium text-ink transition-colors hover:border-accent hover:text-accent"
+            >
+              Read How it works
+            </Link>
+            <Link
+              href="/blog"
+              className="rounded-md border border-line bg-surface px-4 py-2 text-body-sm font-medium text-ink transition-colors hover:border-accent hover:text-accent"
+            >
+              Read the playbook
+            </Link>
           </div>
         </Reveal>
-
-        <div className="mt-10 flex justify-center">
-          <span className="inline-flex items-center rounded-full bg-accent-soft px-4 py-1.5 text-xs font-medium tracking-wide text-accent">
-            REPEAT. MORE MEETINGS. MORE GROWTH.
-          </span>
-        </div>
-
-        <div className="mt-10 flex flex-col items-center gap-4 text-body-sm text-ink/80 md:flex-row md:justify-center md:gap-0 md:divide-x md:divide-line">
-          {BUILD_FOOTER.map((item) => (
-            <div key={item.label} className="flex items-center gap-2.5 md:px-6">
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent-soft text-accent">
-                <item.Icon className="h-4 w-4" />
-              </span>
-              <span>{item.label}</span>
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* SECTION C - Principles */}
@@ -425,7 +432,42 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <FounderNote />
+      {/* ORIGIN. Unique to /about (landing keeps the short FounderNote). */}
+      <section className="shell py-section-y">
+        <Reveal className="mx-auto max-w-2xl">
+          <p className="text-eyebrow uppercase text-accent">A note from Arun</p>
+          <h2 className="mt-3 text-display-md text-ink">Why we are building Milo.</h2>
+          <div className="mt-6 space-y-5 text-body-lg text-ink/85">
+            <p>
+              I have spent enough time watching small teams try to grow. The pattern is
+              always the same. Someone with a real thing to sell spends their week wiring
+              together five overlapping tools, paying seat fees they cannot use, and
+              writing cold emails they know are going to spam.
+            </p>
+            <p>
+              None of that is because the founders are lazy. It is because the incumbent
+              category is priced for headcount that does not exist yet, and the outputs
+              are lists that do not care whether the recipient has any reason to hear from
+              you.
+            </p>
+            <p>
+              Milo starts from the other end. Give it a market and it goes to work: it
+              looks for a real reason to reach out, reads the business, drafts a note in
+              your voice, and sends the ones you approve from your own inbox. The whole
+              loop is one tool, pay-as-you-go, and it stops the moment someone replies.
+            </p>
+            <p>
+              We are a small team based in India. We are shipping quickly, publishing
+              what we run (see{' '}
+              <Link href="/security">Security</Link> and{' '}
+              <Link href="/privacy">Privacy</Link>), and answering emails ourselves. If a
+              piece of the product is not right for you, we would rather hear it than lose
+              you.
+            </p>
+            <p className="text-body text-muted">Arun, founder.</p>
+          </div>
+        </Reveal>
+      </section>
 
       <FinalCta />
     </>
