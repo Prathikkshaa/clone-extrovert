@@ -13,7 +13,7 @@ import { CREDITS_PER_LEAD_LOW, CREDITS_PER_LEAD_HIGH } from '@/lib/pricing-math'
 export const metadata: Metadata = {
   title: 'How it works',
   description:
-    'The mechanism behind Milo. How AI lead generation actually works: define a market, discover local businesses, read them, confirm the buying signal, personalize outreach, send responsibly from your own inbox, and turn replies into conversations.',
+    'The mechanism behind Milo. How AI sales prospecting actually works: define a market, discover local businesses, read them, confirm the buying signal, personalize outreach, send responsibly from your own inbox, and turn replies into conversations.',
   alternates: { canonical: '/how-it-works' },
 };
 
@@ -39,7 +39,7 @@ export default function HowItWorksPage() {
             <span className="text-accent">Milo starts with a reason to reach out.</span>
           </h1>
           <p className="mt-6 max-w-2xl text-body-lg text-muted">
-            A short, honest look at how AI lead generation, buying-signal discovery, and
+            A short, honest look at how AI sales prospecting, buying-signal discovery, and
             personalized outreach actually fit together. Seven steps, one running example,
             nothing hidden.
           </p>
@@ -137,8 +137,8 @@ export default function HowItWorksPage() {
             </div>
             <p className="mt-4 max-w-prose text-body-sm text-muted">
               Roughly {CREDITS_PER_LEAD_LOW} to {CREDITS_PER_LEAD_HIGH} credits per lead, end
-              to end. Growth pack scales you to 550 to 650 credits when the mechanism proves out.
-              No seats, no monthly minimum, credits never expire.
+              to end. The Growth pack tops you up with 650 credits (about 92 to 130 leads) when
+              the mechanism proves out. No seats, no monthly minimum, credits never expire.
             </p>
           </div>
           <div className="rounded-2xl border border-line bg-surface p-6 md:p-8">
@@ -168,7 +168,7 @@ export default function HowItWorksPage() {
         items={HOW_IT_WORKS_FAQ_ITEMS}
         tone="brand"
         title="How AI outreach actually works."
-        intro="Short answers to the questions people ask about AI lead generation, buying signals, and personalized cold email."
+        intro="Short answers to the questions people ask about AI sales prospecting, buying signals, and personalized cold outreach."
       />
 
       {/* CLOSE. Site-wide FinalCta, one primary action. */}

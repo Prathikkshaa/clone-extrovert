@@ -13,8 +13,7 @@ export function GET(): Response {
 
 > ${SITE_DESCRIPTION}
 
-${APP_NAME} is a cold-email and local-business lead-generation tool for founders,
-freelancers, and small agencies. You search an industry and city; it finds real
+${APP_NAME} is AI sales prospecting for founders, freelancers, and small agencies. You search an industry and city; it finds real
 local businesses (built from public business information anyone can look up),
 writes personalized outreach in your voice from each business's public details
 and reviews, sends it from your own Gmail or Outlook with human-like pacing to

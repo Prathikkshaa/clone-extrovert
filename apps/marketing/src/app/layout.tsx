@@ -26,13 +26,13 @@ export const metadata: Metadata = {
   applicationName: APP_NAME,
   alternates: { canonical: '/' },
   keywords: [
-    'cold email tool',
-    'cold email tool for agencies',
+    'AI sales prospecting',
+    'AI sales prospecting for agencies',
+    'buying-signal prospecting',
     'find local business leads',
     'find businesses without a website',
-    'lead generation for freelancers',
+    'personalized cold outreach',
     'B2B outreach software',
-    'AI cold email',
   ],
   robots: { index: true, follow: true },
   openGraph: {
