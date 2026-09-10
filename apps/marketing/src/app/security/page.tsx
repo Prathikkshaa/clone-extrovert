@@ -19,9 +19,11 @@ const TOC: LegalTocEntry[] = [
   { id: 'summary', label: 'Summary' },
   { id: 'mailbox', label: 'Your mailbox' },
   { id: 'data', label: 'Data protection' },
+  { id: 'data-location', label: 'Where your data lives' },
   { id: 'deliverability', label: 'Deliverability and compliance' },
   { id: 'infrastructure', label: 'Infrastructure and access' },
   { id: 'subprocessors', label: 'Subprocessors' },
+  { id: 'certifications', label: 'Certifications and audits' },
   { id: 'operations', label: 'Operations' },
   { id: 'disclosure', label: 'Vulnerability disclosure' },
   { id: 'contact', label: 'Contact' },
@@ -109,7 +111,19 @@ export default function SecurityPage() {
         <Link href="/privacy">Privacy Policy</Link>.
       </p>
 
-      <h2 id="deliverability">4. Deliverability and compliance</h2>
+      <h2 id="data-location">4. Where your data lives</h2>
+      <p>
+        Application data (accounts, workspaces, drafts, sent messages, replies, and
+        suppression lists) is stored in a managed Postgres database. Background jobs run
+        through a managed Redis instance. Static assets are served from a global CDN. The
+        specific region hosting your data is documented in the account settings; on
+        request we will confirm the exact region for your account in writing. Subprocessor
+        regions are listed under <a href="#subprocessors">Subprocessors</a>. Cross-border
+        processing is governed by the safeguards in the{' '}
+        <Link href="/privacy#transfers">Privacy Policy</Link>.
+      </p>
+
+      <h2 id="deliverability">5. Deliverability and compliance</h2>
       <p>
         Cold outreach fails in the spam folder. It also fails legally when it hides the
         sender or ignores the recipient. {SERVICE_NAME} treats both problems as security
@@ -141,7 +155,7 @@ export default function SecurityPage() {
         </li>
       </ul>
 
-      <h2 id="infrastructure">5. Infrastructure and access</h2>
+      <h2 id="infrastructure">6. Infrastructure and access</h2>
       <ul>
         <li>The service runs on managed cloud infrastructure with hardened defaults.</li>
         <li>
@@ -155,7 +169,7 @@ export default function SecurityPage() {
         </li>
       </ul>
 
-      <h2 id="subprocessors">6. Subprocessors</h2>
+      <h2 id="subprocessors">7. Subprocessors</h2>
       <p>
         We use a small set of vendors to run the service. Each is bound by data
         protection terms and receives only the data it needs. The current list:
@@ -172,7 +186,20 @@ export default function SecurityPage() {
         ))}
       </ul>
 
-      <h2 id="operations">7. Operations</h2>
+      <h2 id="certifications">8. Certifications and audits</h2>
+      <p>
+        Milo is an early-stage product built by a small team. We do not currently hold a
+        SOC 2 report, an ISO 27001 certificate, or an equivalent third-party audit. What
+        we do instead is publish the controls we actually run (this page), name every
+        subprocessor, and offer a Data Processing Agreement to business customers who
+        need one. If you have specific compliance requirements before you can adopt the
+        product, please write to us at{' '}
+        <a href={`mailto:${PRIVACY_CONTACT}`}>{PRIVACY_CONTACT}</a> and we will tell you
+        honestly what we can and cannot meet today, and where a certification sits on our
+        roadmap.
+      </p>
+
+      <h2 id="operations">9. Operations</h2>
       <ul>
         <li>Backups run on a routine schedule and are restored on a test cadence.</li>
         <li>
@@ -185,7 +212,7 @@ export default function SecurityPage() {
         </li>
       </ul>
 
-      <h2 id="disclosure">8. Vulnerability disclosure</h2>
+      <h2 id="disclosure">10. Vulnerability disclosure</h2>
       <p>
         If you believe you have found a vulnerability, please email{' '}
         <a href={`mailto:${PRIVACY_CONTACT}`}>{PRIVACY_CONTACT}</a> with a description,
@@ -205,7 +232,7 @@ export default function SecurityPage() {
         computer-misuse laws.
       </p>
 
-      <h2 id="contact">9. Contact</h2>
+      <h2 id="contact">11. Contact</h2>
       <p>
         Security questions: <a href={`mailto:${PRIVACY_CONTACT}`}>{PRIVACY_CONTACT}</a>.
         For privacy and data-subject requests, see the{' '}

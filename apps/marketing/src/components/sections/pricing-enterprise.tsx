@@ -104,8 +104,8 @@ export function PricingRoiBand() {
               <span className="text-white/45">without another subscription.</span>
             </h1>
             <p className="mt-5 max-w-md text-body-lg text-white/70">
-              Find businesses, uncover buying signals, research prospects, personalize outreach, and
-              start conversations. Pay for the work you use, from {LOWEST_COST_PER_LEAD} a prospect,
+              Find businesses, uncover buying signals, research each lead, personalize outreach, and
+              start conversations. Pay for the work you use, from {LOWEST_COST_PER_LEAD} a lead,
               not seats, contracts, or monthly minimums.
             </p>
             <div className="mt-7">
@@ -350,7 +350,7 @@ const ROWS: { label: string; icon: keyof typeof ROW_ICONS; value: (p: Plan) => R
     value: (p) => (p.custom ? 'Volume' : p.credits!.toLocaleString('en-US')),
   },
   {
-    label: 'Prospects',
+    label: 'Leads',
     icon: 'bars',
     value: (p) => {
       if (p.custom) return 'Unlimited scale';
@@ -359,7 +359,7 @@ const ROWS: { label: string; icon: keyof typeof ROW_ICONS; value: (p: Plan) => R
     },
   },
   {
-    label: 'Cost per prospect',
+    label: 'Cost per lead',
     icon: 'users',
     value: (p) => {
       if (p.custom) return 'Best rates';

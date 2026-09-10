@@ -19,6 +19,12 @@ export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.extrovert
 export const SIGNUP_URL = APP_URL;
 
 /**
+ * PLACEHOLDER - login route for existing users. Defaults to a sibling of the
+ * signup URL; override at deploy time via NEXT_PUBLIC_LOGIN_URL.
+ */
+export const LOGIN_URL = process.env.NEXT_PUBLIC_LOGIN_URL ?? APP_URL.replace(/\/signup$/, '/login');
+
+/**
  * PLACEHOLDER - the marketing site's own canonical origin (used by metadataBase,
  * sitemap, robots, canonical URLs, and absolute OG image URLs). Set the real
  * production domain at deploy time via NEXT_PUBLIC_SITE_URL.
@@ -38,7 +44,7 @@ export const CTA_MICROCOPY = 'No card needed';
  * address (or point at a real /contact route) when it exists.
  * TODO(wiring): confirm the real sales inbox / contact route.
  */
-export const CONTACT_EMAIL = 'hello@extrovertai.example';
+export const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? 'stallwartofficial@gmail.com';
 export const CONTACT_URL = `mailto:${CONTACT_EMAIL}?subject=Volume%20pricing%20enquiry`;
 
 /** Primary nav (M00 §8 page inventory). */
@@ -57,6 +63,7 @@ export const FOOTER_GROUPS = [
       { href: '/how-it-works', label: 'How it works' },
       { href: '/pricing', label: 'Pricing' },
       { href: SIGNUP_URL, label: 'Start free' },
+      { href: LOGIN_URL, label: 'Log in' },
     ],
   },
   {
