@@ -169,7 +169,7 @@ export function HowItWorks({
     <section className="shell py-section-y">
       <Reveal className="max-w-prose">
         <p className="text-eyebrow uppercase text-accent">How it works</p>
-        <Heading className="mt-3 text-display-md text-ink">How does it work?</Heading>
+        <Heading className="mt-3 text-display-md text-ink">Four beats, one loop.</Heading>
         <p className="mt-4 text-body-lg text-muted">{subtitle}</p>
       </Reveal>
 

@@ -71,9 +71,10 @@ export const FOOTER_GROUPS = [
     links: [
       { href: '/privacy', label: 'Privacy' },
       { href: '/terms', label: 'Terms' },
+      { href: '/security', label: 'Security' },
     ],
   },
 ] as const;
 
-/** Founder placeholder (M00 §13 - clearly-labeled, swap when real). */
-export const FOUNDER_NAME = 'the founder'; // TODO(content): real founder name
+/** Founder name (used in the About page and Organization JSON-LD). */
+export const FOUNDER_NAME = 'Arun';

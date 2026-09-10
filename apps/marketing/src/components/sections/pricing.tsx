@@ -45,7 +45,7 @@ const DESIGNED_FOR: Record<string, string> = {
 const BEST_FOR: Record<string, string[]> = {
   starter: ['Your first outreach test', 'A single niche or city', 'Seeing replies before you commit'],
   growth: ['Consistent weekly campaigns', 'One or two niches at a time', 'Solo consultants & freelancers'],
-  scale: ['Always-on, high-volume outreach', 'Multiple clients & inboxes', 'Lowest price per credit'],
+  scale: ['Always-on, high-volume outreach', 'Multiple clients & inboxes', 'Largest single pack'],
 };
 
 export function Pricing({
