@@ -4,6 +4,7 @@
   "private": true,
   "description": "ExtrovertAI marketing site — Next.js (App Router), RSC-first, static-generated. Separate from apps/web (Angular); shares packages/shared.",
   "scripts": {
+    "predev": "node -e \"const{rmSync}=require('fs');try{rmSync('.next',{recursive:true,force:true})}catch{}\"",
     "dev": "next dev -p 4321",
     "build": "next build",
     "start": "next start -p 4321",
