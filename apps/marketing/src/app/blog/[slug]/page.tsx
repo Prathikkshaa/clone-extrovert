@@ -408,7 +408,7 @@ export default async function BlogPostPage({
       <Reveal className="mx-auto max-w-3xl">
         <div className="flex items-center gap-3 text-body-sm">
           <Link href="/blog" className="text-accent hover:text-accent-strong">
-            &larr; All posts
+            All posts
           </Link>
           <span aria-hidden className="h-3 w-px bg-line" />
           <span className="text-muted">{post.category}</span>

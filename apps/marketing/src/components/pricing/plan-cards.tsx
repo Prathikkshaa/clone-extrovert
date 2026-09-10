@@ -25,13 +25,6 @@ function IcoCheck(p: IP) {
     </svg>
   );
 }
-function IcoArrow(p: IP) {
-  return (
-    <svg viewBox="0 0 24 24" className={p.className} fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M5 12h14M13 6l6 6-6 6" />
-    </svg>
-  );
-}
 function IcoShield(p: IP) {
   return (
     <svg viewBox="0 0 24 24" className={p.className} fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -118,7 +111,6 @@ function PlanCard({ card, delayMs }: { card: PricingCard; delayMs: number }) {
           className="w-full"
         >
           {card.ctaLabel}
-          {card.ctaArrow ? <IcoArrow className="ml-1.5 h-4 w-4" /> : null}
         </CtaButton>
         <p className="mt-3 text-center text-[0.75rem] leading-snug text-muted">
           {card.microcopy}
@@ -144,7 +136,6 @@ function CustomStripView({ strip }: { strip: CustomStrip }) {
       </div>
       <CtaButton href={strip.ctaHref} variant="secondary" size="sm" className="shrink-0">
         {strip.ctaLabel}
-        <IcoArrow className="ml-1.5 h-3.5 w-3.5" />
       </CtaButton>
     </Reveal>
   );
