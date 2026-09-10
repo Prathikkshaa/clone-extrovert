@@ -114,9 +114,9 @@ export function PricingRoiBand() {
                 size="lg"
                 className="!bg-[#0f766e] text-white hover:!bg-[#0b5d56]"
               >
-                Start with 100 free credits
+                Start free
               </CtaButton>
-              <p className="mt-3 text-body-sm text-white/55">No card needed · No auto-charge</p>
+              <p className="mt-3 text-body-sm text-white/55">100 free credits · No card needed</p>
             </div>
             <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-body-sm text-white/70">
               {['No seats', 'No subscription', 'No monthly minimum', 'Credits never expire'].map((x) => (

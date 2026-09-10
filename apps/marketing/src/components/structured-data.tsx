@@ -3,6 +3,7 @@
 // FACTUAL and derived from single sources (APP_NAME, SITE_*, FAQ_ITEMS, the real
 // File 14 pack prices) - no fabricated ratings, review counts, or user numbers.
 import { APP_NAME, SITE_URL, SITE_DESCRIPTION, FOUNDER_NAME } from '@/lib/site';
+import { LEGAL_ADDRESS, LEGAL_ENTITY } from '@/lib/legal';
 import { FAQ_ITEMS, type FaqItem } from '@/lib/faq';
 import { CREDIT_PACKS } from '@extrovertai/shared';
 
@@ -37,10 +38,19 @@ export function OrganizationJsonLd() {
         '@context': 'https://schema.org',
         '@type': 'Organization',
         name: APP_NAME,
+        legalName: LEGAL_ENTITY,
         url: SITE_URL,
         description: SITE_DESCRIPTION,
         logo: `${SITE_URL}/opengraph-image`,
+        foundingDate: '2026',
         founder: { '@type': 'Person', name: FOUNDER_NAME },
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Coimbatore',
+          addressRegion: 'Tamil Nadu',
+          addressCountry: 'IN',
+          streetAddress: LEGAL_ADDRESS,
+        },
       }}
     />
   );

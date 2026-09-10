@@ -50,10 +50,23 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t border-line">
-        <div className="shell flex py-6 text-body-sm text-muted">
+        <div className="shell flex flex-col gap-3 py-6 text-body-sm text-muted sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {year} {APP_NAME}. Built by {FOUNDER_NAME}.
           </p>
+          <nav aria-label="Trust" className="flex items-center gap-4">
+            <Link href="/privacy" className="hover:text-ink">
+              Privacy
+            </Link>
+            <span aria-hidden className="h-3 w-px bg-line" />
+            <Link href="/security" className="hover:text-ink">
+              Security
+            </Link>
+            <span aria-hidden className="h-3 w-px bg-line" />
+            <Link href="/terms" className="hover:text-ink">
+              Terms
+            </Link>
+          </nav>
         </div>
       </div>
     </footer>

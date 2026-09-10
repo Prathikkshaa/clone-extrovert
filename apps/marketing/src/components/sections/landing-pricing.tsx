@@ -211,14 +211,14 @@ export function LandingPricing() {
       <Reveal delay={0.05} className="mt-12 flex flex-col items-center">
         <div className="flex flex-col items-center gap-3 sm:flex-row">
           <CtaButton href={SIGNUP_URL} size="lg">
-            Start with {FREE_SIGNUP_CREDITS} free credits
+            Start free
           </CtaButton>
           <CtaButton href="/pricing" variant="secondary" size="lg">
             See full pricing
           </CtaButton>
         </div>
         <p className="mt-3 text-body-sm text-muted">
-          No card required &middot; No auto-charge &middot; Decide later
+          {FREE_SIGNUP_CREDITS} free credits &middot; No card required &middot; Decide later
         </p>
         <p className="mt-2 text-body-sm text-muted">
           Need volume, invoicing, or purchase orders?{' '}

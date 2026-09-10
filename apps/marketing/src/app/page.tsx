@@ -11,12 +11,13 @@ import { FounderNote } from '@/components/sections/founder-note';
 import { LandingPricing } from '@/components/sections/landing-pricing';
 import { Faq } from '@/components/sections/faq';
 import { FinalCta } from '@/components/sections/final-cta';
-import { FaqJsonLd } from '@/components/structured-data';
 
 export default function LandingPage() {
   return (
     <>
-      <FaqJsonLd />
+      {/* FAQ JSON-LD lives on /pricing and /how-it-works (distinct question sets).
+          Landing's FAQ is rendered visually but the schema is emitted per-topic
+          on the canonical page for that intent, not duplicated here. */}
       <Hero />
       <Pain />
       <HowItWorks />

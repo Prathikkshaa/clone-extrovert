@@ -282,7 +282,7 @@ export default function HowItWorksPage() {
       <FinalCta
         title="Try the mechanism on your own market."
         body={`${FREE_SIGNUP_CREDITS} free credits. No card. You only pay when Milo does the work.`}
-        cta="Find my first 20 leads"
+        cta="Start free"
       />
     </>
   );
