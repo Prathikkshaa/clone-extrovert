@@ -8,6 +8,7 @@ import { HowItWorks } from '@/components/sections/how-it-works';
 import { Demo } from '@/components/sections/demo';
 import { Differentiators } from '@/components/sections/differentiators';
 import { FounderNote } from '@/components/sections/founder-note';
+import { BetaTestimonials } from '@/components/sections/beta-testimonials';
 import { LandingPricing } from '@/components/sections/landing-pricing';
 import { Faq } from '@/components/sections/faq';
 import { FinalCta } from '@/components/sections/final-cta';
@@ -24,6 +25,7 @@ export default function LandingPage() {
       <Demo />
       <Differentiators />
       <FounderNote />
+      <BetaTestimonials />
       <LandingPricing />
       <Faq tone="brand" />
       <FinalCta />
