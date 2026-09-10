@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Wordmark } from './wordmark';
 import { CtaButton } from './cta-button';
-import { NAV_LINKS, SIGNUP_URL } from '@/lib/site';
+import { LOGIN_URL, NAV_LINKS, SIGNUP_URL } from '@/lib/site';
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -100,6 +100,15 @@ export function SiteHeader() {
             aria-hidden
           />
 
+          <Link
+            href={LOGIN_URL}
+            className={[
+              'text-body-sm font-medium transition-colors duration-300',
+              onDark ? 'text-white/80 hover:text-white' : 'text-muted hover:text-ink',
+            ].join(' ')}
+          >
+            Log in
+          </Link>
           <CtaButton href={SIGNUP_URL}>Start free</CtaButton>
         </div>
 
@@ -157,10 +166,16 @@ export function SiteHeader() {
               {link.label}
             </Link>
           ))}
-          <div className="mt-3">
+          <div className="mt-3 flex flex-col gap-2">
             <CtaButton href={SIGNUP_URL} className="w-full">
               Start free
             </CtaButton>
+            <Link
+              href={LOGIN_URL}
+              className="rounded-md px-2 py-3 text-center text-body-sm font-medium text-muted hover:text-ink"
+            >
+              Log in
+            </Link>
           </div>
         </nav>
       </div>

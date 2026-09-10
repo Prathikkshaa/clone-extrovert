@@ -38,6 +38,14 @@ export const FAQ_ITEMS: FaqItem[] = [
     q: 'What does it cost?',
     a: 'Start free with 100 credits, no card. After that you pay only for what you use, about 5-7 credits per lead end to end (roughly $0.30-0.42 each on Growth), so $39 (650 credits) ≈ 92-130 leads. Billed in USD; cards from any country.',
   },
+  {
+    q: 'What happens if I run out of credits mid-campaign?',
+    a: 'Nothing dramatic. Milo pauses the moment your balance hits zero. Nothing is charged, no email goes out unpaid, and your leads and drafts wait exactly where they are. Top up and the campaign continues from where it stopped.',
+  },
+  {
+    q: 'How do I stop or pause a campaign?',
+    a: 'One click from the app. Pending sends halt immediately, follow-ups stop, and your drafts stay saved. Resume when you are ready or delete the campaign; either way nothing else sends.',
+  },
 ];
 
 // /how-it-works FAQ: search/answer-intent questions AI answer engines ask about
@@ -110,5 +118,13 @@ export const PRICING_FAQ_ITEMS: FaqItem[] = [
   {
     q: 'Which plan should I choose?',
     a: 'Starter (free) to prove it on your first market, Growth for steady weekly prospecting and the best value per prospect, Scale for always-on high volume. Choose Custom if you need invoicing, purchase orders, or volume beyond the plans.',
+  },
+  {
+    q: 'What happens if I run out of credits mid-campaign?',
+    a: 'Milo pauses at zero. No email goes out unpaid, nothing is charged automatically, and your leads and drafts wait where they are. Top up and the campaign continues from where it stopped.',
+  },
+  {
+    q: 'How do I stop or pause a campaign?',
+    a: 'One click from the app. Pending sends halt immediately, follow-ups stop, and drafts stay saved. Resume when you are ready or delete the campaign.',
   },
 ];

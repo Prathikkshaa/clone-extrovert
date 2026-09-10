@@ -113,7 +113,7 @@ export function LandingPricing() {
               <span className="mt-2 text-[0.72rem] font-medium leading-tight text-ink sm:mt-2.5 sm:text-body-sm">
                 {s.label}
               </span>
-              <span className="mt-1 text-[0.62rem] text-muted sm:text-[0.75rem]">{s.chip}</span>
+              <span className="mt-1 text-[0.6rem] text-muted/70 sm:text-[0.68rem]">{s.chip}</span>
             </li>
             {i < WORKFLOW.length - 1 ? (
               <li aria-hidden className="hidden h-12 items-center px-1 text-muted/40 sm:flex">
@@ -219,6 +219,13 @@ export function LandingPricing() {
         </div>
         <p className="mt-3 text-body-sm text-muted">
           No card required &middot; No auto-charge &middot; Decide later
+        </p>
+        <p className="mt-2 text-body-sm text-muted">
+          Need volume, invoicing, or purchase orders?{' '}
+          <a href="/pricing" className="text-accent underline underline-offset-2 hover:text-accent-strong">
+            See Custom pricing
+          </a>
+          .
         </p>
       </Reveal>
     </section>

@@ -25,10 +25,12 @@ const TOC: LegalTocEntry[] = [
   { id: 'how-we-use-it', label: 'How we use it' },
   { id: 'legal-bases', label: 'Legal bases (EU / UK)' },
   { id: 'sharing', label: 'Sharing and subprocessors' },
+  { id: 'data-location', label: 'Where your data lives' },
   { id: 'retention', label: 'How long we keep it' },
   { id: 'security', label: 'How we secure it' },
   { id: 'your-rights', label: 'Your rights' },
   { id: 'transfers', label: 'International transfers' },
+  { id: 'dpa', label: 'Data processing agreement' },
   { id: 'cookies', label: 'Cookies' },
   { id: 'children', label: 'Children' },
   { id: 'changes', label: 'Changes to this policy' },
@@ -205,7 +207,23 @@ export default function PrivacyPage() {
         assumes this policy or a comparable one.
       </p>
 
-      <h2 id="retention">7. How long we keep it</h2>
+      <h2 id="data-location">7. Where your data lives</h2>
+      <p>
+        Application data (accounts, workspaces, drafts, sent messages, replies,
+        suppression lists) is stored in a managed Postgres database in an EU or US
+        region depending on the project&rsquo;s configured location. Background jobs
+        run through a managed Redis instance in the same region. Static assets and the
+        marketing site are served from a global CDN. The specific region your account
+        uses is documented in the account settings and can be shared on request.
+      </p>
+      <p>
+        Third-party subprocessors process data in the regions listed in the previous
+        section. Where a subprocessor operates globally (for example the AI model
+        gateway or the payment processor), we rely on the contractual safeguards
+        described under <a href="#transfers">International transfers</a>.
+      </p>
+
+      <h2 id="retention">8. How long we keep it</h2>
       <ul>
         <li>
           <strong>Account data</strong> lives while your account is active and for up to
@@ -235,7 +253,7 @@ export default function PrivacyPage() {
         </li>
       </ul>
 
-      <h2 id="security">8. How we secure it</h2>
+      <h2 id="security">9. How we secure it</h2>
       <p>
         Security is not a checkbox. The core controls we run today:
       </p>
@@ -269,7 +287,7 @@ export default function PrivacyPage() {
         will respond promptly.
       </p>
 
-      <h2 id="your-rights">9. Your rights</h2>
+      <h2 id="your-rights">10. Your rights</h2>
       <p>Depending on where you live, you have some or all of the following rights:</p>
       <ul>
         <li>Access the personal data we hold about you.</li>
@@ -295,7 +313,7 @@ export default function PrivacyPage() {
         advertising. You may still exercise the rights above by emailing us.
       </p>
 
-      <h2 id="transfers">10. International transfers</h2>
+      <h2 id="transfers">11. International transfers</h2>
       <p>
         Some of our subprocessors are based outside the EU or the UK. Where personal data
         is transferred out of the EEA or the UK we rely on the European Commission&rsquo;s
@@ -304,7 +322,18 @@ export default function PrivacyPage() {
         copy of the relevant clauses on request.
       </p>
 
-      <h2 id="cookies">11. Cookies</h2>
+      <h2 id="dpa">12. Data processing agreement</h2>
+      <p>
+        If you are a business customer subject to GDPR, UK GDPR, or an equivalent framework,
+        you are entitled to a Data Processing Agreement (DPA) with us that incorporates
+        the current Standard Contractual Clauses and the UK International Data Transfer
+        Addendum where relevant. Our DPA is available on request: email{' '}
+        <a href={`mailto:${PRIVACY_CONTACT}`}>{PRIVACY_CONTACT}</a> with your legal entity
+        name and the account email, and we will send it for signature. Any material change
+        to the DPA is notified in-app and by email in advance.
+      </p>
+
+      <h2 id="cookies">13. Cookies</h2>
       <p>
         The marketing site uses a minimal set of first-party cookies for session state and
         for measuring aggregate site usage. We do not run advertising trackers. The
@@ -312,21 +341,21 @@ export default function PrivacyPage() {
         preferences.
       </p>
 
-      <h2 id="children">12. Children</h2>
+      <h2 id="children">14. Children</h2>
       <p>
         The service is a business tool. It is not directed at children under 16 and we do
         not knowingly collect personal data from them. If you believe a child has provided
         personal data, contact us and we will remove it.
       </p>
 
-      <h2 id="changes">13. Changes to this policy</h2>
+      <h2 id="changes">15. Changes to this policy</h2>
       <p>
         We may update this policy from time to time. When we make a material change we
         will update the effective date at the top and, where the change materially affects
         you, notify you by email or in-app before it takes effect.
       </p>
 
-      <h2 id="contact">14. Contact</h2>
+      <h2 id="contact">16. Contact</h2>
       <p>
         Privacy questions or requests: <a href={`mailto:${PRIVACY_CONTACT}`}>{PRIVACY_CONTACT}</a>.
         Postal address: {LEGAL_ENTITY}, {LEGAL_ADDRESS}.
