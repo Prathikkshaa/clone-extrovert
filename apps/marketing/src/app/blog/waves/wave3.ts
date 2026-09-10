@@ -703,7 +703,7 @@ export const WAVE3_POSTS: BlogPost[] = [
       {
         type: 'p',
         text:
-          'Milo runs the automatable half by default: discovery via Google Places, enrichment via a Firecrawl crawl of the site, signal scoring, first-touch drafting from your voice template, sending from your own Gmail or Outlook mailbox, and Cal.com routing. Milo also holds the "human in the loop" line: batch approval before send, and reply routing that hands the thread back to you the moment a real person answers.',
+          'Milo runs the automatable half by default: discovery on the public map, enrichment via a public-web read of the site, signal scoring, first-touch drafting from your voice template, sending from your own Gmail or Outlook mailbox, and Cal.com routing. Milo also holds the "human in the loop" line: batch approval before send, and reply routing that hands the thread back to you the moment a real person answers.',
       },
       {
         type: 'link',

@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Reveal } from '@/components/reveal';
-import { APP_NAME, CONTACT_EMAIL, FOUNDER_NAME, SITE_URL } from '@/lib/site';
+import { APP_NAME, CONTACT_EMAIL, SITE_URL } from '@/lib/site';
 import { BLOG_POSTS, getPost, postDescription, readMinutes, type Block } from '../posts';
 import { relatedFor, clusterIdFor, clusterLabel } from '../clusters';
+import { authorFor } from '../authors';
 
 export function generateStaticParams() {
   return BLOG_POSTS.map((p) => ({ slug: p.slug }));
@@ -343,17 +344,23 @@ export default async function BlogPostPage({
 
   const faqBlocks = post.body.filter((b): b is Extract<Block, { type: 'faq' }> => b.type === 'faq');
   const stepsBlocks = post.body.filter((b): b is Extract<Block, { type: 'steps' }> => b.type === 'steps');
+  const ldAuthor = authorFor(post.slug);
 
   const blogPostingLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: post.title,
     description: postDescription(post),
-    image: `${SITE_URL}/opengraph-image`,
+    image: `${SITE_URL}/blog/${post.slug}/opengraph-image`,
     datePublished: post.datePublished,
     dateModified: post.dateModified ?? post.datePublished,
-    author: { '@type': 'Person', name: FOUNDER_NAME },
-    publisher: { '@type': 'Organization', name: APP_NAME },
+    author: {
+      '@type': 'Person',
+      name: ldAuthor.name,
+      url: `${SITE_URL}/blog/authors/${ldAuthor.id}`,
+      jobTitle: ldAuthor.role,
+    },
+    publisher: { '@type': 'Organization', name: APP_NAME, url: SITE_URL },
     mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
     url: `${SITE_URL}/blog/${post.slug}`,
     articleSection: post.category,
@@ -398,26 +405,52 @@ export default async function BlogPostPage({
       }
     : null;
 
+  const author = authorFor(post.slug);
+  const toc = post.body
+    .map((b, i) => (b.type === 'h2' ? { i, text: b.text, id: b.id ?? slugify(b.text) } : null))
+    .filter((x): x is { i: number; text: string; id: string } => x !== null);
+
   return (
-    <article className="shell py-16 md:py-24">
+    <article className="shell py-14 md:py-20">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingLd).replace(/</g, '\\u003c') }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, '\\u003c') }} />
       {faqLd ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd).replace(/</g, '\\u003c') }} /> : null}
       {howToLd ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd).replace(/</g, '\\u003c') }} /> : null}
 
-      <Reveal className="mx-auto max-w-3xl">
-        <div className="flex items-center gap-3 text-body-sm">
-          <Link href="/blog" className="text-accent hover:text-accent-strong">
-            All posts
-          </Link>
-          <span aria-hidden className="h-3 w-px bg-line" />
-          <span className="text-muted">{post.category}</span>
-        </div>
+      {/* Breadcrumb + cluster tag. Full width; enterprise editorial anchor. */}
+      <Reveal className="mx-auto max-w-6xl">
+        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-body-sm text-muted">
+          <Link href="/" className="hover:text-ink">Home</Link>
+          <span aria-hidden>/</span>
+          <Link href="/blog" className="hover:text-ink">Blog</Link>
+          <span aria-hidden>/</span>
+          {clusterId ? (
+            <>
+              <Link href={`/blog?cluster=${clusterId}`} className="hover:text-ink">
+                {clusterLabel(clusterId)}
+              </Link>
+              <span aria-hidden>/</span>
+            </>
+          ) : null}
+          <span className="truncate text-ink/70">{post.title}</span>
+        </nav>
+      </Reveal>
 
-        <h1 className="mt-6 text-display-md text-ink">{post.title}</h1>
-
-        <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-body-sm text-muted">
-          <span>By <span className="text-ink">{FOUNDER_NAME}</span></span>
+      {/* Article hero: title + subline meta, comfortable full-width measure. */}
+      <Reveal className="mx-auto mt-6 max-w-6xl">
+        <p className="text-eyebrow uppercase tracking-wide text-accent">{post.category}</p>
+        <h1 className="mt-3 max-w-4xl text-display-lg text-ink">{post.title}</h1>
+        <p className="mt-5 max-w-3xl text-body-lg text-muted">{postDescription(post)}</p>
+        <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-body-sm text-muted">
+          <span className="inline-flex items-center gap-2">
+            <span className="grid h-7 w-7 place-items-center rounded-full bg-accent-soft font-mono text-[0.72rem] text-accent">
+              {author.initials}
+            </span>
+            <Link href={`/blog/authors/${author.id}`} className="text-ink hover:text-accent">
+              {author.name}
+            </Link>
+            <span className="text-muted">· {author.role}</span>
+          </span>
           <span aria-hidden>·</span>
           <span>{readMinutes(post)} min read</span>
           <span aria-hidden>·</span>
@@ -429,73 +462,135 @@ export default async function BlogPostPage({
             </>
           ) : null}
         </div>
-
-        <div className="mt-10 flex flex-col gap-6">
-          {post.body.map((block, i) => (
-            <BlockView key={i} block={block} />
-          ))}
-        </div>
-
-        {/* Author box */}
-        <aside className="mt-12 flex items-start gap-4 rounded-2xl border border-line bg-surface p-5 md:p-6">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-accent-soft text-accent font-mono text-body-sm">
-            {FOUNDER_NAME.charAt(0)}
-          </span>
-          <div className="min-w-0">
-            <p className="text-heading-sm text-ink">{FOUNDER_NAME}</p>
-            <p className="mt-1 text-body-sm text-muted">
-              Founder at {APP_NAME}. Building AI sales prospecting for small teams. Based in
-              India. Writing about buying signals, local prospecting, and cold email that
-              earns replies.
-            </p>
-          </div>
-        </aside>
-
-        {/* Footer CTA card */}
-        <div className="mt-8 rounded-2xl border border-line bg-surface p-6 md:p-7">
-          <p className="text-heading-sm text-ink">
-            {APP_NAME} runs this loop end to end.
-          </p>
-          <p className="mt-2 text-body text-muted">
-            Find the right businesses, research them, personalize outreach, send from your own inbox.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-3 text-body-sm">
-            <Link href="/how-it-works" className="rounded-md border border-line bg-canvas px-4 py-2 text-ink transition-colors hover:border-accent hover:text-accent">
-              How it works
-            </Link>
-            <Link href="/pricing" className="rounded-md border border-line bg-canvas px-4 py-2 text-ink transition-colors hover:border-accent hover:text-accent">
-              See pricing
-            </Link>
-          </div>
-        </div>
       </Reveal>
 
-      {related.length ? (
-        <Reveal delay={0.05} className="mx-auto mt-16 max-w-5xl">
-          <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">
-            Related reading
-          </p>
-          <ul className="mt-4 grid gap-4 md:grid-cols-3">
-            {related.map((r) => (
-              <li key={r.slug}>
-                <Link
-                  href={`/blog/${r.slug}`}
-                  className="flex h-full flex-col rounded-2xl border border-line bg-surface p-5 transition-shadow hover:shadow-card"
-                >
-                  <span className="text-body-sm text-muted">{r.category}</span>
-                  <span className="mt-2 text-heading-sm text-ink">{r.title}</span>
-                  <span className="mt-3 text-body-sm text-muted">{readMinutes(r)} min read</span>
-                </Link>
-              </li>
+      {/* Three-column editorial layout. Sticky TOC left, article center, meta rail right. */}
+      <div className="mx-auto mt-14 grid max-w-6xl gap-10 lg:grid-cols-[13rem_minmax(0,1fr)_13rem] lg:gap-12">
+        {/* Left rail: TOC. Renders as a compact top block below lg. */}
+        <aside className="order-2 lg:order-1">
+          {toc.length ? (
+            <nav aria-label="On this page" className="lg:sticky lg:top-24">
+              <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">
+                On this page
+              </p>
+              <ol className="mt-3 space-y-2 border-l border-line pl-4">
+                {toc.map((t) => (
+                  <li key={t.id}>
+                    <a
+                      href={`#${t.id}`}
+                      className="block text-body-sm leading-snug text-muted transition-colors hover:text-accent"
+                    >
+                      {t.text}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          ) : null}
+        </aside>
+
+        {/* Article body. Comfortable measure at the center. */}
+        <div className="order-1 min-w-0 lg:order-2">
+          <div className="mx-auto flex max-w-[46rem] flex-col gap-6">
+            {post.body.map((block, i) => (
+              <BlockView key={i} block={block} />
             ))}
+          </div>
+        </div>
+
+        {/* Right rail: author + cluster hub + CTA card. */}
+        <aside className="order-3 flex flex-col gap-6 lg:sticky lg:top-24 lg:h-max">
+          <div className="rounded-2xl border border-line bg-surface p-5">
+            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">Author</p>
+            <div className="mt-3 flex items-start gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-soft font-mono text-body-sm text-accent">
+                {author.initials}
+              </span>
+              <div className="min-w-0">
+                <Link
+                  href={`/blog/authors/${author.id}`}
+                  className="text-heading-sm text-ink hover:text-accent"
+                >
+                  {author.name}
+                </Link>
+                <p className="text-body-sm text-muted">{author.role}</p>
+              </div>
+            </div>
+            <p className="mt-3 text-body-sm text-ink/85">{author.bio}</p>
+          </div>
+
+          {clusterId ? (
+            <div className="rounded-2xl border border-line bg-surface p-5">
+              <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">Topic</p>
+              <Link
+                href={`/blog?cluster=${clusterId}`}
+                className="mt-2 block text-heading-sm text-ink hover:text-accent"
+              >
+                {clusterLabel(clusterId)}
+              </Link>
+              <p className="mt-2 text-body-sm text-muted">
+                Read the rest of this cluster.
+              </p>
+            </div>
+          ) : null}
+
+          <div className="rounded-2xl border border-accent bg-accent-soft/40 p-5">
+            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
+              {APP_NAME}
+            </p>
+            <p className="mt-2 text-heading-sm text-ink">Run this loop end to end.</p>
+            <p className="mt-2 text-body-sm text-muted">
+              Find the right businesses, personalize outreach, send from your own inbox.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2 text-body-sm">
+              <Link
+                href="/how-it-works"
+                className="rounded-md border border-line bg-canvas px-3 py-1.5 text-ink transition-colors hover:border-accent hover:text-accent"
+              >
+                How it works
+              </Link>
+              <Link
+                href="/pricing"
+                className="rounded-md border border-line bg-canvas px-3 py-1.5 text-ink transition-colors hover:border-accent hover:text-accent"
+              >
+                Pricing
+              </Link>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      {/* Related reading. Full width. */}
+      {related.length ? (
+        <Reveal delay={0.05} className="mx-auto mt-20 max-w-6xl">
+          <div className="flex items-baseline justify-between gap-4">
+            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-muted">
+              Related reading
+            </p>
+            <Link href="/blog" className="text-body-sm text-accent hover:text-accent-strong">
+              All posts
+            </Link>
+          </div>
+          <ul className="mt-5 grid gap-5 md:grid-cols-3">
+            {related.map((r) => {
+              const ra = authorFor(r.slug);
+              return (
+                <li key={r.slug}>
+                  <Link
+                    href={`/blog/${r.slug}`}
+                    className="flex h-full flex-col rounded-2xl border border-line bg-surface p-5 transition-shadow hover:shadow-card"
+                  >
+                    <span className="text-body-sm text-muted">{r.category}</span>
+                    <span className="mt-2 text-heading-sm text-ink">{r.title}</span>
+                    <span className="mt-auto pt-4 text-body-sm text-muted">
+                      {ra.name} · {readMinutes(r)} min read
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </Reveal>
-      ) : null}
-
-      {clusterId ? (
-        <div className="mx-auto mt-10 max-w-5xl text-center text-body-sm text-muted">
-          More in <Link href={`/blog?cluster=${clusterId}`} className="text-accent underline underline-offset-2">{clusterLabel(clusterId)}</Link>
-        </div>
       ) : null}
     </article>
   );
