@@ -14,6 +14,10 @@ export type Author = {
   role: string;
   bio: string;
   focus: readonly string[];
+  /** Optional external identity URLs for Person JSON-LD sameAs. */
+  sameAs?: readonly string[];
+  /** One-line editorial signature that captures the persona's voice. */
+  signature?: string;
 };
 
 export const AUTHORS: Record<AuthorId, Author> = {
@@ -23,8 +27,10 @@ export const AUTHORS: Record<AuthorId, Author> = {
     initials: 'A',
     role: 'Founder, Milo',
     bio:
-      'Founder at Milo. Writes about positioning, category, and the mechanics of AI sales prospecting for small teams. Based in India.',
+      'Bootstrapped Milo out of Coimbatore after a decade of watching teams pay per seat for lists their SDRs never worked. Writes about positioning, category, and the argument for signal-first prospecting. Opinionated, first-person, not neutral.',
     focus: ['Positioning', 'Category', 'Founder outbound', 'AI sales prospecting'],
+    signature: 'Writes from the founder chair. Names the tradeoff, picks a side, tells you why.',
+    sameAs: [],
   },
   tara: {
     id: 'tara',
@@ -32,8 +38,10 @@ export const AUTHORS: Record<AuthorId, Author> = {
     initials: 'T',
     role: 'Deliverability editor',
     bio:
-      'Ex-lifecycle marketer who now covers cold email deliverability, compliance, cadence, and reply-rate research for Milo. Reads the RFCs so you do not have to.',
+      'Spent six years running lifecycle at two Series B SaaS companies before the RFC rabbit hole ate her. Now she reads Postmaster Tools, SPF alignment specs, and the actual Google sender guidelines so you can send from your own domain without setting it on fire.',
     focus: ['Deliverability', 'Compliance', 'Cadence', 'Benchmarks'],
+    signature: 'Cites the RFC. Shows the header. Never says "best practice" without a source.',
+    sameAs: [],
   },
   zoya: {
     id: 'zoya',
@@ -41,8 +49,10 @@ export const AUTHORS: Record<AuthorId, Author> = {
     initials: 'Z',
     role: 'SEO and web signals editor',
     bio:
-      'SEO consultant turned editor. Writes the vertical playbooks for agencies that sell websites, SEO, and technical marketing services. Cares about Core Web Vitals as a personality trait.',
+      'Ex-technical SEO consultant, now writes for the teams that sell websites, redesigns, Core Web Vitals audits, and technical marketing retainers. Cares more about a lighthouse score than most people care about their own credit score.',
     focus: ['SEO', 'Web design signals', 'Agency verticals', 'Technical marketing'],
+    signature: 'Reads the code before the copy. Every claim gets an anchor tag.',
+    sameAs: [],
   },
   abhimanyu: {
     id: 'abhimanyu',
@@ -50,8 +60,10 @@ export const AUTHORS: Record<AuthorId, Author> = {
     initials: 'AB',
     role: 'Prospecting editor',
     bio:
-      'Ex-agency sales lead who ships the practical prospecting playbooks: contractor and trade verticals, Google Maps workflows, and list-building for people who bill by the hour.',
+      'Ran outbound for a two-partner agency selling into roofers, HVAC contractors, and dental practices for four years. Ships the playbooks the way he actually shipped lists: by hand first, automated once the pattern held.',
     focus: ['Contractor verticals', 'Local prospecting', 'List building', 'Agency operations'],
+    signature: 'Blue-collar prospecting. Names the town, names the vertical, names the ask.',
+    sameAs: [],
   },
 } as const;
 
@@ -64,7 +76,7 @@ export const AUTHOR_BY_SLUG: Record<string, AuthorId> = {
   'buying-signal-playbook-local-b2b': 'arun',
   'google-maps-prospecting-not-scraping': 'abhimanyu',
   'signal-vs-database-prospecting': 'arun',
-  'high-intent-local-leads': 'abhimanyu',
+  'high-intent-local-leads': 'arun',
 
   // Wave 2: wedge examples + verticals
   'buying-signal-examples': 'arun',
@@ -73,13 +85,12 @@ export const AUTHOR_BY_SLUG: Record<string, AuthorId> = {
   'roofing-leads-no-ads': 'abhimanyu',
 
   // Wave 3: refreshed pillars + one new
-  'find-local-businesses-without-a-website': 'zoya',
+  'find-local-businesses-without-a-website': 'abhimanyu',
   'why-cold-emails-go-to-spam': 'tara',
   'is-cold-email-legal': 'tara',
   'manual-vs-automated-prospecting': 'arun',
 
   // Wave 4A: manifesto / definition / taxonomy / benchmarks
-  'lead-databases-are-stale': 'arun',
   'what-is-an-ai-sdr': 'arun',
   'buying-signals-taxonomy': 'arun',
   'cold-email-reply-rate-benchmarks-2026': 'tara',
@@ -92,8 +103,7 @@ export const AUTHOR_BY_SLUG: Record<string, AuthorId> = {
 
   // Wave 4C: practical + freelance + comparison + founder
   'prospecting-list-from-google-maps': 'abhimanyu',
-  'freelance-clients-cold-email': 'tara',
-  'apollo-alternative-small-teams': 'arun',
+  'freelance-clients-cold-email': 'arun',
   'prospecting-bootstrapped-founder': 'arun',
 };
 

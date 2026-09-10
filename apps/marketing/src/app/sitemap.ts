@@ -4,9 +4,13 @@
 import type { MetadataRoute } from 'next';
 import { SITE_URL } from '@/lib/site';
 import { BLOG_POSTS } from './blog/posts';
+import { AUTHORS, type AuthorId } from './blog/authors';
+
+// Frozen edit date. Bump manually when static pages materially change,
+// rather than churning every build with `new Date()`.
+const STATIC_LAST_MODIFIED = new Date('2026-09-09T00:00:00Z');
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
   const staticRoutes = [
     '',
     '/pricing',
@@ -20,7 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const pages: MetadataRoute.Sitemap = staticRoutes.map((path) => ({
     url: `${SITE_URL}${path}`,
-    lastModified: now,
+    lastModified: STATIC_LAST_MODIFIED,
     changeFrequency: path === '' ? 'weekly' : 'monthly',
     priority: path === '' ? 1 : 0.7,
   }));
@@ -32,5 +36,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...pages, ...posts];
+  const authors: MetadataRoute.Sitemap = (Object.keys(AUTHORS) as AuthorId[]).map((id) => ({
+    url: `${SITE_URL}/blog/authors/${id}`,
+    lastModified: STATIC_LAST_MODIFIED,
+    changeFrequency: 'monthly',
+    priority: 0.4,
+  }));
+
+  return [...pages, ...posts, ...authors];
 }

@@ -17,15 +17,16 @@ type WavePost = Omit<BlogPost, 'body'> & { body: Array<BlogPost['body'][number] 
 
 const POST_1: WavePost = {
   slug: 'cold-email-follow-up-cadence',
+    seoTitle: 'Cold email follow-up cadence: stop-on-reply 4-step sequence',
   title: 'The stop-on-reply cadence: a 4-step cold email follow-up sequence that actually respects replies',
   description:
-    'A named follow-up framework for cold outbound. Four messages, clear day gaps, distinct intent per step, and a hard rule: the moment someone replies, the cadence ends. No exceptions.',
+    'A named cold email follow-up framework: 4 messages, clear day gaps, distinct intent per step, and one rule: the moment they reply, the cadence ends.',
   category: 'Cold email',
   cluster: 'Cold email',
   tags: ['cold email', 'follow-up', 'cadence', 'deliverability', 'sales'],
   excerpt:
     'The stop-on-reply cadence: four follow-ups, four intents, one rule. If the prospect replies, the sequence stops the same minute.',
-  datePublished: '2026-09-10',
+  datePublished: '2026-08-26',
   readMinutes: 9,
   related: [
     'cold-email-templates-seo',
@@ -33,7 +34,7 @@ const POST_1: WavePost = {
     'plumbing-leads-no-ads',
   ],
   body: [
-    { type: 'tldr', text: 'Most cold email sequences fail one of two ways. Either they stop after the first message and leave 60 percent of replies on the table, or they keep firing follow-ups after the prospect has already answered. The stop-on-reply cadence fixes both. Four messages across fourteen days, each with a different intent, and a hard stop the instant a reply lands in the inbox.' },
+    { type: 'stat', value: '60%', label: 'of eventual replies to a cold outbound thread land on messages two, three, or four, and single-touch senders never see them' },
 
     { type: 'p', text: 'Sales teams argue about follow-up counts the way developers argue about tabs versus spaces. Six touches. Nine. Twelve. The number is the wrong debate. The right question is what each follow-up is actually for, and how the sequence knows when to shut up.' },
     { type: 'p', text: 'This piece names a specific framework we use at Milo and ship as a product feature: the stop-on-reply cadence. Four messages, four intents, hard stop on any reply. It is opinionated on purpose. You can lengthen it, but you cannot skip the stop rule.' },
@@ -81,7 +82,7 @@ const POST_1: WavePost = {
       ],
     },
 
-    { type: 'h3', text: 'Message 1: the signal-anchored open (Day 0)' },
+    { type: 'h3', text: 'Message 1: the signal open (Day 0)' },
     { type: 'p', text: 'The first email is the whole game. If it does not name a real signal, follow-ups will not save it. A signal is something concrete you observed: a permit filed, a job posting live, a page missing schema, a review that just landed, a service page with no phone number. If your first line reads like it could go to anyone in the industry, rewrite it.' },
     {
       type: 'callout',
@@ -117,10 +118,7 @@ const POST_1: WavePost = {
       text: 'Last note from me on this. If this is not a fit right now, no problem, I will stop here. If it is, reply with any word and I will send a Cal link.',
     },
 
-    { type: 'h2', text: 'The stop rule is a product feature, not a policy', id: 'stop-rule' },
-    { type: 'p', text: 'A policy that says "stop sending when the prospect replies" is worth exactly as much as the tool enforcing it. In Milo, reply detection is wired directly to sequence state. When Gmail or Outlook logs an inbound reply on the thread, the queued follow-ups are cancelled the same minute. There is no "confirm cancellation" button. No 24-hour lag. If the prospect writes back at 2:07 pm, the 2:30 pm bump does not send.' },
-    { type: 'link', text: 'Milo product page', href: '/how-it-works', label: 'How Milo handles reply routing and stop-on-reply' },
-    { type: 'p', text: 'This matters because "reply then bump" is the single most common way a cold email operator burns a domain. Postmaster tools call it "user complaints" when the recipient responds by hitting spam instead of writing back a second time. Google is explicit about this in their sender guidelines.' },
+    { type: 'takeaway', title: 'The one thing to remember', text: 'A cadence works when each rung carries a different intent and the whole sequence stops the instant a human reply lands. Reply-then-bump is the single fastest way to burn a domain, because postmaster tools read ignored recipient signals as complaints, not copy problems. The stop rule is worth exactly as much as the tool that enforces it.' },
     { type: 'link', text: 'Google email sender guidelines', href: 'https://support.google.com/mail/answer/81126', label: 'Google sender guidelines' },
 
     { type: 'h2', text: 'Day gaps: why 0, 3, 7, 14', id: 'day-gaps' },
@@ -155,15 +153,16 @@ const POST_1: WavePost = {
 
 const POST_2: WavePost = {
   slug: 'hvac-leads-no-ads',
+    seoTitle: 'HVAC leads without ads: buying signals + cold email',
   title: 'HVAC leads without ads: buying signals, seasonality, and one cold email that actually converts',
   description:
-    'A field manual for HVAC contractors: the specific signals that flag a homeowner or property manager ready to replace a system, how to time outreach to the seasons, and a real cold email rooted in a permit-filing signal.',
+    'HVAC contractor field manual: signals that flag replacement-ready buyers, seasonal timing, and a cold email built around a real permit-filing signal.',
   category: 'Verticals',
   cluster: 'Verticals',
   tags: ['hvac', 'contractors', 'lead generation', 'cold email', 'local services'],
   excerpt:
     'Signals-first HVAC prospecting. Permit filings, SEER ratings, weather timing, and one cold email that reads like a neighbor, not a marketer.',
-  datePublished: '2026-09-10',
+  datePublished: '2026-08-29',
   readMinutes: 10,
   related: [
     'plumbing-leads-no-ads',
@@ -171,7 +170,7 @@ const POST_2: WavePost = {
     'cold-email-templates-seo',
   ],
   body: [
-    { type: 'tldr', text: 'HVAC lead gen through Google Ads is a bidding war against national aggregators. Cold outbound wins if it is signal-first: an aging SEER unit, a filed permit, a heat or cold snap, a weak Google Business Profile, or a missing certification badge on the site. This piece maps those signals to seasons and gives you a permit-anchored email you can send tomorrow.' },
+    { type: 'stat', value: '$60 to $180', label: 'per HVAC lead through Google Local Services in most US metros, with the same lead sold to three or four other contractors before you call' },
 
     { type: 'p', text: 'Every HVAC contractor with a decent truck and a real license has heard the same pitch from ad platforms: bid on "AC repair near me," pay 40 to 90 dollars a click, hope the lead is not a tire kicker. It is a tax, not a strategy. The alternative is not sexy. It is a spreadsheet of signals and a short email.' },
 
@@ -243,12 +242,12 @@ const POST_2: WavePost = {
     { type: 'h2', text: 'Discovery: how to build the target list', id: 'discovery' },
     { type: 'ol', items: [
       'Pull municipal permit filings from your metro. Most large US cities publish these via Socrata or OpenGov. Filter for HVAC, remodel, addition, and kitchen keywords.',
-      'Layer a residential Google Places pull for homes and small multifamily buildings in the ZIPs you already service. Milo does this natively via its map-based discovery.',
+      'Layer a residential public map data pull for homes and small multifamily buildings in the ZIPs you already service. Milo does this natively via its map-based discovery.',
       'For each address, enrich with owner contact via the county assessor if available, or capture the property manager if it is a multifamily.',
       'Score each row: 3 points for a permit filed in the last 60 days, 2 for a weather event forecast in the next 10 days, 1 for a weak GBP presence, 1 for R-22 references.',
       'Only send to rows scoring 3 or higher. The rest are lower-intent and burn your sender reputation.',
     ] },
-    { type: 'link', text: 'Milo product page', href: '/how-it-works', label: 'How Milo discovers, enriches, and drafts these' },
+    { type: 'takeaway', title: 'The one thing to remember', text: 'HVAC lead flow that beats paid search is anchored in public timing signals: a filed permit, an aging SEER unit, a forecast heat or cold snap. The calendar decides the offer. Spring sells tune-ups and replacements ahead of summer. Fall sells heating checks and heat-pump swaps ahead of winter. Same signal, different pitch, twice a year.' },
 
     { type: 'h2', text: 'What to avoid', id: 'avoid' },
     { type: 'ul', items: [
@@ -274,15 +273,16 @@ const POST_2: WavePost = {
 
 const POST_3: WavePost = {
   slug: 'plumbing-leads-no-ads',
+    seoTitle: 'Plumbing leads without ads: signals + cold email',
   title: 'Plumbing leads without ads: signals, storm timing, and a real cold email for service-area plumbers',
   description:
-    'A field manual for plumbing contractors: the specific signals that flag a homeowner or property manager ready to spend, how to time outreach around storms and burst-pipe events, and a real cold email rooted in a missing-emergency-line signal.',
+    'Plumbing contractor playbook: signals that flag ready-to-spend buyers, storm and burst-pipe timing, and a cold email built on a missing emergency line.',
   category: 'Verticals',
   cluster: 'Verticals',
   tags: ['plumbing', 'contractors', 'lead generation', 'cold email', 'local services'],
   excerpt:
     'Signals-first plumbing prospecting. Missing 24/7 lines, storm forecasts, review gaps after big jobs, and one email that lands.',
-  datePublished: '2026-09-10',
+  datePublished: '2026-09-01',
   readMinutes: 10,
   related: [
     'hvac-leads-no-ads',
@@ -302,8 +302,8 @@ const POST_3: WavePost = {
       rows: [
         ['No 24/7 emergency phone number visible on homepage', 'A competitor is losing 2am calls. A property manager reading their site notices this fast', 'public web research or manual review of local competitor sites'],
         ['Missing LocalBusiness or Plumber schema with areaServed', 'Local pack visibility is weak; homeowners cannot find them via Maps', 'Site source; Schema.org validator'],
-        ['Google reviews trend under 4.0 in the last 90 days after a storm', 'Competitor bit off more than they could chew; homeowners are looking for a replacement', 'Google Maps API; manual review scan'],
-        ['No financing page for jobs above $2,000', 'They are losing repipe and water heater jobs to bigger operators who offer 24-month terms', 'Site crawl'],
+        ['Google reviews trend under 4.0 in the last 90 days after a storm', 'Competitor bit off more than they could chew; homeowners are looking for a replacement', 'public map data; manual review scan'],
+        ['No financing page for jobs above $2,000', 'They are losing repipe and water heater jobs to bigger operators who offer 24-month terms', 'Public site review'],
         ['NOAA severe weather alert for the metro', 'Burst pipes in 24-72 hours; call volume triples', 'National Weather Service alerts'],
         ['Freeze warning below 20F for 12+ hours', 'Frozen pipe calls spike; unprepared homes fail first', 'NOAA'],
         ['Property manager site lists rental units without a "how to report an emergency" page', 'Portfolio is understaffed for after-hours; contract opportunity', 'Manager site'],
@@ -354,7 +354,7 @@ const POST_3: WavePost = {
 
     { type: 'h2', text: 'Discovery: how to build the target list', id: 'discovery' },
     { type: 'ol', items: [
-      'Pull plumbers in your target metros via Google Places, filtering for those with under 50 reviews or under 4.2 stars.',
+      'Pull plumbers in your target metros via public map data, filtering for those with under 50 reviews or under 4.2 stars.',
       'Crawl each competitor site for the presence or absence of a 24/7 phone number in the header, a financing page, and Plumber schema.',
       'Cross-reference NOAA alerts for the metro for the next 72 hours.',
       'For property manager outbound, pull commercial multifamily addresses from public records and match to their management company site.',
@@ -378,7 +378,7 @@ const POST_3: WavePost = {
         { q: 'How far in advance of a storm should I send?', a: '48 to 72 hours. Beyond 72, the forecast still shifts. Under 24, the property manager is already in reactive mode and will not read email.' },
         { q: 'Does the "no 24/7 line" signal really matter?', a: 'It matters as a filter more than as a pitch. A plumber that will not post an after-hours line is often not set up for after-hours work, which is where the highest-margin calls live.' },
         { q: 'What about the yard sign and door hanger route?', a: 'Still works in dense residential ZIPs. It complements outbound; it does not replace it. Yard signs win familiarity; email wins the property-manager contract.' },
-        { q: 'Can Milo handle plumbing-specific enrichment?', a: 'Yes. public map data for discovery, a web-research layer including schema and phone-number extraction, AI enrichment for tone and gap detection, and drafts sent from your own Gmail or Outlook with warm-up.' },
+        { q: 'Can Milo handle plumbing-specific enrichment?', a: 'Yes. public map data for discovery, a web-research layer including schema and phone-number extraction, signal enrichment for tone and gap detection, and drafts sent from your own Gmail or Outlook with warm-up.' },
       ],
     },
   ],
@@ -386,15 +386,16 @@ const POST_3: WavePost = {
 
 const POST_4: WavePost = {
   slug: 'cold-email-templates-seo',
+    seoTitle: 'Cold email templates for SEO agencies (5 templates)',
   title: 'Cold email templates for SEO agencies: 5 templates, each rooted in a real ranking signal',
   description:
-    'Not a template dump. Five SEO outreach emails, each anchored in a specific technical or content signal you can pull from a target site: Core Web Vitals, missing schema, thin content, broken sitemap, and weak backlinks.',
+    'Five SEO outreach cold emails, each anchored in a real technical signal: Core Web Vitals, missing schema, thin content, broken sitemap, weak backlinks.',
   category: 'Verticals',
   cluster: 'Verticals',
   tags: ['seo', 'agency', 'cold email', 'templates', 'core web vitals'],
   excerpt:
     'Five SEO cold email templates, each tied to a specific technical signal. Includes the Core Web Vitals thresholds you should be quoting.',
-  datePublished: '2026-09-10',
+  datePublished: '2026-09-03',
   readMinutes: 10,
   related: [
     'cold-email-follow-up-cadence',
@@ -402,7 +403,7 @@ const POST_4: WavePost = {
     'plumbing-leads-no-ads',
   ],
   body: [
-    { type: 'tldr', text: 'Generic SEO outreach is dead. Every prospect has seen the "I noticed some issues with your site" opener. What still works is a template anchored in one specific, verifiable signal you pulled from their site: their LCP, their missing schema, their thin category pages, their broken sitemap, their weak backlink profile. Five templates below, each named to its signal.' },
+    { type: 'p', text: 'A marketing director opens her inbox on a Monday. Nine cold emails from SEO agencies are stacked at the top, all with subject lines that begin "quick question" or "noticed some issues." She archives eight in about four seconds each. The one she opens says "your /pricing page has no H1 and takes 4.9 seconds to paint on mobile." She reads it twice, forwards it to her cofounder, and books a call by lunch. This piece is about the difference between those two subject lines.' },
 
     { type: 'p', text: 'The SEO agency cold email market is saturated because the barrier to sending is zero. What most senders miss is that specificity is the entire moat. If the first sentence of your email could plausibly have been written by any of the 400 agencies that sent something last week, it will not be read. If it references a real number pulled from the prospect\'s own site, it will.' },
 

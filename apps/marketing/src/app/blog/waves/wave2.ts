@@ -14,7 +14,7 @@ export const WAVE2_POSTS: BlogPost[] = [
       'signal-vs-database-prospecting',
       'find-local-businesses-without-a-website',
     ],
-    datePublished: '2026-09-10',
+    datePublished: '2026-08-04',
     readMinutes: 8,
     body: [
       { type: 'tldr', text: 'A buying signal is a public fact about a business that changes the odds a cold email lands. Below are 15 real signals, split across local, digital, and organizational categories, each with a way to spot it and a first line that references it.' },
@@ -107,7 +107,7 @@ export const WAVE2_POSTS: BlogPost[] = [
     slug: 'get-web-design-clients-no-ads',
     title: 'How to get web design clients without ads',
     description:
-      'A signal-first playbook for freelance and agency web designers. Find businesses with real, fixable website problems and open the conversation with the fix, not the pitch.',
+      'A playbook for freelance and agency web designers rooted in real website signals. Open the conversation with a fixable website problem, not a generic pitch.',
     category: 'Verticals',
     cluster: 'Verticals',
     tags: ['web design', 'freelancing', 'client acquisition', 'cold email', 'agencies'],
@@ -116,10 +116,10 @@ export const WAVE2_POSTS: BlogPost[] = [
       'find-local-businesses-without-a-website',
       'why-cold-emails-go-to-spam',
     ],
-    datePublished: '2026-09-10',
+    datePublished: '2026-08-07',
     readMinutes: 7,
     body: [
-      { type: 'tldr', text: 'Paid ads for web design clients are a losing game against agencies with 20x your budget. The alternative is signal-first outreach: find businesses whose current site is measurably broken, and open the email with the fix. This post is the full playbook.' },
+      { type: 'quote', text: 'The best web design pitch I ever wrote was three sentences long and started with the words "your homepage loads in 6.4 seconds." It closed a $9,000 project the same week.', cite: 'A freelancer we know, on why paid ads were never the answer' },
 
       { type: 'h2', text: 'Why ads do not work for most web designers', id: 'ads' },
       { type: 'p', text: 'Search ads for "web designer" cost $8 to $30 per click in most markets. Even at a 5% landing page conversion and a 20% close rate, you are paying $800 to $3000 to acquire one client. That math kills freelancers and most small agencies. The businesses that need you the most are also not searching Google for "web designer." They are running a business that is quietly losing traffic because their site is broken.' },
@@ -128,7 +128,7 @@ export const WAVE2_POSTS: BlogPost[] = [
       { type: 'p', text: 'A buying signal is a public, verifiable fact that says "this business would benefit from what you sell, right now." For web design, the strongest signals are visible in five minutes with public tools.' },
 
       { type: 'table', headers: ['Signal', 'How to spot it', 'Why it matters'], rows: [
-        ['No website on GBP', 'Google Places listing has no website link', 'They already rank locally; a site converts calls'],
+        ['No website on GBP', 'Public directory listing has no website link', 'They already rank locally; a site converts calls'],
         ['Broken SSL', 'Chrome shows "Not Secure"', 'Every visitor sees a trust warning'],
         ['Slow LCP', 'PageSpeed Insights over 2.5s', 'Google downranks and users bounce'],
         ['No mobile responsiveness', '375px viewport breaks layout', '60%+ of traffic is mobile'],
@@ -140,7 +140,7 @@ export const WAVE2_POSTS: BlogPost[] = [
       { type: 'h2', text: 'How to build the list', id: 'list' },
       { type: 'steps', items: [
         { title: 'Pick one vertical and one city', text: 'Roofers in Austin. Dentists in Coimbatore. Pilates studios in Melbourne. Narrower is better because your first-line references will be sharper.' },
-        { title: 'Pull the top 100 from Google Places', text: 'Manually or with a tool that queries the Places API. You want name, address, phone, category, review count, and website URL.' },
+        { title: 'Pull the top 100 from the public directory', text: 'Manually or with a tool that queries an official business-directory API. You want name, address, phone, category, review count, and website URL.' },
         { title: 'Enrich with a real site check', text: 'For each URL, capture SSL status, LCP, title tag, mobile viewport behavior, and whether a booking form exists.' },
         { title: 'Score and cut', text: 'Keep only businesses with at least one clear, fixable signal. This usually leaves 30 to 60 of the original 100.' },
         { title: 'Find the owner email', text: 'GBP owner-attributed pages, WHOIS on the domain, or LinkedIn. Not scraped generic inboxes.' },
@@ -155,8 +155,8 @@ export const WAVE2_POSTS: BlogPost[] = [
       { type: 'link', text: 'If you are hitting spam, read our note on why cold emails go to spam.', href: '/blog/why-cold-emails-go-to-spam', label: 'Cold email deliverability' },
 
       { type: 'h2', text: 'Scaling without becoming spam', id: 'scale' },
-      { type: 'p', text: 'A signal-first list of 40 businesses per week is more productive than a database blast to 4000. You are trading volume for reply rate. Realistic targets: 8 to 15% reply rate, 20 to 30% of replies convert to a call, 15 to 25% of calls convert to a paid project. On a list of 40 that is one to two projects per week.' },
-      { type: 'link', text: 'Milo automates the discovery, enrichment, and drafting parts of this loop.', href: '/', label: 'See Milo' },
+      { type: 'p', text: 'A tight list of 40 businesses per week is more productive than a database blast to 4000. You are trading volume for reply rate. Realistic targets: 8 to 15% reply rate, 20 to 30% of replies convert to a call, 15 to 25% of calls convert to a paid project. On a list of 40 that is one to two projects per week.' },
+      { type: 'takeaway', title: 'The one thing to remember', text: 'Web design clients are not searching Google for a web designer. They are running a business that is quietly losing traffic because their site is broken. If the first sentence of your email quantifies a specific defect on their own site, the rest of the offer barely needs to argue.' },
 
       { type: 'faq', items: [
         { q: 'How long until this produces clients?', a: 'Two to four weeks from first send if the vertical is narrow and the signal is strong. Longer if you spray across five verticals.' },
@@ -181,7 +181,7 @@ export const WAVE2_POSTS: BlogPost[] = [
       'high-intent-local-leads',
       'google-maps-prospecting-not-scraping',
     ],
-    datePublished: '2026-09-10',
+    datePublished: '2026-08-11',
     readMinutes: 7,
     body: [
       { type: 'tldr', text: 'In 2026, SEO buyers are skeptical and audit-fatigued. What still works is finding sites with specific, quantifiable SEO defects and leading the email with the defect, not the offer. This is the operator playbook.' },
@@ -247,7 +247,7 @@ export const WAVE2_POSTS: BlogPost[] = [
     slug: 'roofing-leads-no-ads',
     title: 'How to get roofing leads without paid ads',
     description:
-      'Roofing-specific buying signals: storm damage, permits, weak reviews, missing web presence. A seasonal playbook for contractors who want jobs without bidding on Google Local Services.',
+      'Roofing-specific buying signals (storm damage, permits, reviews, no website) and a seasonal playbook for contractors who want off Google Local Services.',
     category: 'Verticals',
     cluster: 'Verticals',
     tags: ['roofing', 'contractors', 'lead generation', 'local marketing', 'cold outreach'],
@@ -256,13 +256,13 @@ export const WAVE2_POSTS: BlogPost[] = [
       'high-intent-local-leads',
       'buying-signal-playbook-local-b2b',
     ],
-    datePublished: '2026-09-10',
+    datePublished: '2026-08-14',
     readMinutes: 7,
     body: [
-      { type: 'tldr', text: 'Google Local Services ads for roofers now cost $80 to $300 per lead in most US markets, with no guarantee of a job. The alternative is a signal-first outbound loop: neighborhoods with storm damage, homeowners who filed permits, and commercial buildings whose roofs are past useful life. Here is the playbook, with a seasonality note at the end.' },
+      { type: 'p', text: 'It is 6am on a Tuesday in April. A hail line ran through three zip codes overnight, the county permit portal will start updating by lunch, and forty roofers in the metro are about to spend the day fighting each other for the same Google Local Services impressions at $180 a click. The one who wins April is not the highest bidder. It is the one who knows the storm ran through, who is watching the permit portal, and who sends the first letter before the aggregator lead even lists.' },
 
       { type: 'h2', text: 'Why roofers overpay for leads', id: 'overpay' },
-      { type: 'p', text: 'Lead-gen aggregators sell the same lead to three or four roofers. By the time you call, the homeowner has taken two other quotes. You compete on price. A signal-first approach reverses this. You reach the homeowner or facility manager before they have started shopping, based on a public fact that says they will need a roofer soon.' },
+      { type: 'p', text: 'Lead-gen aggregators sell the same lead to three or four roofers. By the time you call, the homeowner has taken two other quotes. You compete on price. A signal-led approach reverses this. You reach the homeowner or facility manager before they have started shopping, based on a public fact that says they will need a roofer soon.' },
 
       { type: 'h2', text: 'What is a roofing buying signal?', id: 'signals' },
 
@@ -272,7 +272,7 @@ export const WAVE2_POSTS: BlogPost[] = [
         ['Insurance claim public notice', 'State insurance filings (varies)', '0 to 60 days'],
         ['Home sold in last 12 months with roof over 15 years', 'County assessor + sales records', '0 to 12 months'],
         ['Commercial building with visible roof wear', 'Aerial imagery, on-site drive-by', 'Ongoing'],
-        ['No website or thin GBP for a competitor', 'Places API', 'Ongoing'],
+        ['No website or thin GBP for a competitor', 'Public directory data', 'Ongoing'],
         ['Weak or falling review count after big job', 'GBP review pattern', '30 to 90 days'],
       ]},
 
@@ -305,6 +305,8 @@ export const WAVE2_POSTS: BlogPost[] = [
       { type: 'link', text: 'See how to find local businesses without a website.', href: '/blog/find-local-businesses-without-a-website', label: 'Businesses without a website' },
       { type: 'link', text: 'General playbook for high-intent local leads.', href: '/blog/high-intent-local-leads', label: 'High-intent local leads' },
 
+      { type: 'takeaway', title: 'The one thing to remember', text: 'Aggregator lead economics only work for whoever calls first, and by then the homeowner has two other quotes. Reach them before the lead lists at all, based on a public fact (permit, storm, roof age) that says a decision is coming. A nearby street reference and honest tone will beat a storm chaser every time.' },
+
       { type: 'faq', items: [
         { q: 'Is it legal to contact homeowners based on permit filings?', a: 'In most US states, permit records are public and outreach based on them is legal. Some states have specific rules for insurance claim signals; check your state.' },
         { q: 'Does direct mail still work for roofing?', a: 'For residential in a targeted zip after a storm, yes. Response rates of 1 to 3% are typical, which beats aggregator lead economics.' },
@@ -312,8 +314,6 @@ export const WAVE2_POSTS: BlogPost[] = [
         { q: 'How many touches before I move on?', a: 'For residential permit signals, one letter plus one door knock inside seven days. For commercial, three emails over three weeks.' },
         { q: 'Can Milo help with residential roofing outreach?', a: 'Milo is strongest for email-based B2B outreach: commercial roofing, property managers, and roofer-to-roofer service sales. Residential direct mail is outside the loop.' },
       ]},
-
-      { type: 'link', text: 'How Milo builds signal-first prospect lists for local B2B.', href: '/', label: 'See Milo' },
     ],
   },
 ];

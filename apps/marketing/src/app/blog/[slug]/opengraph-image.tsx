@@ -23,8 +23,9 @@ const CATEGORY_ACCENT: Record<string, string> = {
   Comparison: '#0F766E',
 };
 
-export default async function BlogOgImage({ params }: { params: { slug: string } }) {
-  const post = getPost(params.slug);
+export default async function BlogOgImage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = getPost(slug);
   const title = post?.title ?? 'Milo blog';
   const category = post?.category ?? 'Blog';
   const accent = CATEGORY_ACCENT[category] ?? '#0F766E';

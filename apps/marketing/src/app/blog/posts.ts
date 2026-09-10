@@ -22,11 +22,18 @@ export type Block =
       nodes: { id: string; label: string; sub?: string; emphasis?: boolean }[];
       edges?: { from: string; to: string; label?: string }[];
     }
-  | { type: 'newsletter'; text?: string };
+  /** Editorial takeaway block used in place of a "How Milo does this" closer. */
+  | { type: 'takeaway'; title?: string; text: string }
+  /** Explicit "who this piece is for" block, appears near top. */
+  | { type: 'who-this-is-for'; items: string[] }
+  /** Contextual product-mention callout, used at most twice per post at real insight moments. */
+  | { type: 'product-moment'; hook: string; text: string; ctaLabel?: string; ctaHref?: string };
 
 export type BlogPost = {
   slug: string;
   title: string;
+  /** Optional shorter title for <title> / SERP snippets. Use when `title` exceeds 60 chars. */
+  seoTitle?: string;
   /** Meta description. Falls back to excerpt when omitted. */
   description?: string;
   category: string;
@@ -40,7 +47,45 @@ export type BlogPost = {
   readMinutes?: number;
   body: Block[];
   related?: string[];
+  /**
+   * Explicit HowTo schema opt-in. Off by default because Google restricts HowTo
+   * to physical-outcome tasks and now suppresses desktop rich results.
+   */
+  emitHowTo?: boolean;
 };
+
+/** Rough word count for BlogPosting.wordCount. Uses the same counter as readMinutes. */
+export function wordCount(post: BlogPost): number {
+  let words = 0;
+  const count = (s: unknown) => {
+    if (typeof s === 'string') words += s.trim().split(/\s+/).length;
+  };
+  for (const b of post.body) {
+    if (b.type === 'p' || b.type === 'h2' || b.type === 'h3' || b.type === 'tldr' || b.type === 'quote') count(b.text);
+    else if (b.type === 'ul' || b.type === 'ol') b.items.forEach(count);
+    else if (b.type === 'callout') { count(b.title); count(b.text); }
+    else if (b.type === 'steps') b.items.forEach((s) => { count(s.title); count(s.text); });
+    else if (b.type === 'table') { b.headers.forEach(count); b.rows.forEach((r) => r.forEach(count)); }
+    else if (b.type === 'faq') b.items.forEach((qa) => { count(qa.q); count(qa.a); });
+    else if (b.type === 'link') count(b.text);
+    else if (b.type === 'stat') count(b.label);
+    else if (b.type === 'diagram') { count(b.title); b.nodes.forEach((n) => { count(n.label); count(n.sub); }); }
+    else if (b.type === 'takeaway') { count(b.title); count(b.text); }
+    else if (b.type === 'who-this-is-for') b.items.forEach(count);
+    else if (b.type === 'product-moment') { count(b.hook); count(b.text); }
+  }
+  return words;
+}
+
+/** Extract a pull-quote hero string. Uses first `tldr`, else first `callout` text, else first `p`. */
+export function heroQuote(post: BlogPost): string | null {
+  const tldr = post.body.find((b) => b.type === 'tldr') as Extract<Block, { type: 'tldr' }> | undefined;
+  if (tldr) return tldr.text;
+  const callout = post.body.find((b) => b.type === 'callout') as Extract<Block, { type: 'callout' }> | undefined;
+  if (callout) return callout.text;
+  const p = post.body.find((b) => b.type === 'p') as Extract<Block, { type: 'p' }> | undefined;
+  return p?.text ?? null;
+}
 
 import { WAVE1_POSTS } from './waves/wave1';
 import { WAVE2_POSTS } from './waves/wave2';
@@ -94,7 +139,9 @@ export function readMinutes(post: BlogPost): number {
     else if (b.type === 'link') count(b.text);
     else if (b.type === 'stat') count(b.label);
     else if (b.type === 'diagram') { count(b.title); b.nodes.forEach((n) => { count(n.label); count(n.sub); }); }
-    else if (b.type === 'newsletter') count(b.text);
+    else if (b.type === 'takeaway') { count(b.title); count(b.text); }
+    else if (b.type === 'who-this-is-for') b.items.forEach(count);
+    else if (b.type === 'product-moment') { count(b.hook); count(b.text); }
   }
   return Math.max(1, Math.round(words / 230));
 }

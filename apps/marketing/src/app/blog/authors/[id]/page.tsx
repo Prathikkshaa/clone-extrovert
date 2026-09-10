@@ -50,6 +50,7 @@ export default async function AuthorPage({
     url: `${SITE_URL}/blog/authors/${author.id}`,
     worksFor: { '@type': 'Organization', name: APP_NAME, url: SITE_URL },
     knowsAbout: author.focus,
+    ...(author.sameAs && author.sameAs.length ? { sameAs: author.sameAs } : {}),
   };
 
   return (
@@ -81,7 +82,10 @@ export default async function AuthorPage({
           </div>
         </div>
 
-        <p className="mt-6 max-w-2xl text-body-lg text-ink/85">{author.bio}</p>
+        <p className="mt-6 max-w-2xl text-body-lg text-ink/90">{author.bio}</p>
+        {author.signature ? (
+          <p className="mt-3 max-w-2xl text-body italic text-muted">{author.signature}</p>
+        ) : null}
 
         <div className="mt-6 flex flex-wrap gap-2">
           {author.focus.map((f) => (

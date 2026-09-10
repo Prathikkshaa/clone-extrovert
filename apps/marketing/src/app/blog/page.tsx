@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Reveal } from '@/components/reveal';
-import { CONTACT_EMAIL } from '@/lib/site';
 import { BLOG_POSTS, readMinutes } from './posts';
 import { BLOG_CLUSTERS, clusterIdFor, clusterLabel } from './clusters';
+import { authorFor } from './authors';
 
 export const metadata: Metadata = {
   title: 'Blog',
@@ -38,120 +37,141 @@ export default async function BlogIndexPage({
 
   return (
     <>
-      <section className="shell pt-16 md:pt-24">
-        <Reveal className="max-w-3xl">
-          <p className="text-eyebrow uppercase text-accent">Blog</p>
-          <h1 className="mt-3 text-display-md text-ink">
+      {/* Editorial masthead. Matches the article page rhythm; no dashboard cards. */}
+      <section className="shell pt-14 md:pt-20">
+        <div className="max-w-4xl">
+          <p className="font-mono text-[0.72rem] uppercase tracking-[0.18em] text-accent">
+            The Milo blog
+          </p>
+          <h1 className="mt-5 text-[2.25rem] font-medium leading-[1.05] tracking-tight text-ink sm:text-[2.75rem] md:text-[3.25rem] lg:text-[3.5rem]">
             Playbooks for founders who need clients, not another sales stack.
           </h1>
-          <p className="mt-5 max-w-2xl text-body-lg text-muted">
+          <p className="mt-6 max-w-2xl text-[1.25rem] leading-[1.5] text-muted md:text-[1.375rem]">
             Buying signals, local prospecting, personalized cold email, deliverability, and
             compliance. Written by operators. No fluff, no clickbait.
           </p>
-        </Reveal>
+        </div>
 
-        {/* Cluster pills */}
-        <Reveal delay={0.05} className="mt-10 flex flex-wrap gap-2">
+        {/* Cluster filter. Editorial pill-row, not dashboard tags. */}
+        <nav aria-label="Filter posts by cluster" className="mt-12 flex flex-wrap gap-x-6 gap-y-3 border-b border-line pb-4">
           <Link
             href="/blog"
-            className={[
-              'rounded-full border px-4 py-1.5 text-body-sm transition-colors',
-              !activeCluster
-                ? 'border-accent bg-accent text-white'
-                : 'border-line bg-surface text-ink hover:border-accent hover:text-accent',
-            ].join(' ')}
+            className={
+              'font-mono text-[0.75rem] uppercase tracking-[0.14em] transition-colors ' +
+              (!activeCluster
+                ? 'text-accent'
+                : 'text-muted hover:text-ink')
+            }
           >
-            All
+            All posts
           </Link>
           {BLOG_CLUSTERS.map((c) => (
             <Link
               key={c.id}
               href={`/blog?cluster=${c.id}`}
-              className={[
-                'rounded-full border px-4 py-1.5 text-body-sm transition-colors',
-                activeCluster === c.id
-                  ? 'border-accent bg-accent text-white'
-                  : 'border-line bg-surface text-ink hover:border-accent hover:text-accent',
-              ].join(' ')}
+              className={
+                'font-mono text-[0.75rem] uppercase tracking-[0.14em] transition-colors ' +
+                (activeCluster === c.id
+                  ? 'text-accent'
+                  : 'text-muted hover:text-ink')
+              }
             >
               {c.label}
             </Link>
           ))}
-        </Reveal>
+        </nav>
       </section>
 
+      {/* Featured piece. Editorial hero. No card frame; typography-forward. */}
       {featured ? (
-        <section className="shell pt-12">
-          <Reveal>
-            <Link
-              href={`/blog/${featured.slug}`}
-              className="group grid gap-8 rounded-2xl border border-line bg-surface p-6 shadow-card transition-shadow hover:shadow-float md:grid-cols-[1.1fr_1fr] md:p-8"
-            >
-              <div>
-                <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
-                  Featured · {featured.category}
-                </p>
-                <p className="mt-3 text-display-md text-ink group-hover:text-accent">
-                  {featured.title}
-                </p>
-                <p className="mt-4 max-w-prose text-body-lg text-muted">{featured.excerpt ?? featured.description}</p>
-                <p className="mt-6 text-body-sm text-muted">
-                  {dateFmt(featured.datePublished)} · {readMinutes(featured)} min read
-                </p>
+        <section className="shell mt-12 md:mt-16">
+          <Link href={`/blog/${featured.slug}`} className="group grid gap-8 md:grid-cols-[1.15fr_1fr] md:gap-12">
+            <div>
+              <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-accent">
+                Featured · {featured.category}
+              </p>
+              <h2 className="mt-4 text-[2rem] font-medium leading-[1.1] tracking-tight text-ink transition-colors group-hover:text-accent md:text-[2.5rem] lg:text-[2.75rem]">
+                {featured.title}
+              </h2>
+              <p className="mt-5 max-w-prose text-body-lg leading-[1.55] text-ink/85 md:text-[1.25rem]">
+                {featured.excerpt ?? featured.description}
+              </p>
+              <div className="mt-6 flex items-center gap-3 text-body-sm text-muted">
+                {(() => {
+                  const a = authorFor(featured.slug);
+                  return (
+                    <>
+                      <span className="grid h-6 w-6 place-items-center rounded-full bg-accent-soft font-mono text-[0.65rem] text-accent">
+                        {a.initials}
+                      </span>
+                      <span className="text-ink">{a.name}</span>
+                      <span aria-hidden>·</span>
+                    </>
+                  );
+                })()}
+                <span>{dateFmt(featured.datePublished)}</span>
+                <span aria-hidden>·</span>
+                <span>{readMinutes(featured)} min read</span>
               </div>
-              <div className="flex items-end justify-end">
-                <span className="rounded-full border border-line bg-canvas px-4 py-2 text-body-sm text-ink transition-colors group-hover:border-accent group-hover:text-accent">
-                  Read the piece
+            </div>
+            {/* Right column: pull-quote card built from featured post's TL;DR/callout — signature editorial visual */}
+            <div className="hidden md:block">
+              <figure className="border-y border-accent/40 bg-accent-soft/40 px-6 py-8">
+                <span aria-hidden className="block font-serif text-[3rem] leading-none text-accent">
+                  &ldquo;
                 </span>
-              </div>
-            </Link>
-          </Reveal>
+                <blockquote className="mt-2">
+                  <p className="text-[1.125rem] italic leading-[1.45] text-ink md:text-[1.25rem]">
+                    {(() => {
+                      const q = featured.excerpt ?? featured.description ?? featured.title;
+                      return q.length > 180 ? q.slice(0, 177).trimEnd() + '…' : q;
+                    })()}
+                  </p>
+                </blockquote>
+                <figcaption className="mt-4 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted">
+                  {featured.category}
+                </figcaption>
+              </figure>
+            </div>
+          </Link>
         </section>
       ) : null}
 
-      {/* Newsletter capture. Mailto fallback until an audience is wired. */}
-      <section className="shell pb-12 pt-6">
-        <Reveal className="mx-auto flex max-w-5xl flex-col items-start gap-4 rounded-2xl border border-accent bg-accent-soft/40 p-6 md:flex-row md:items-center md:justify-between md:gap-8 md:p-7">
-          <div className="min-w-0">
-            <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
-              Playbook drops
-            </p>
-            <p className="mt-1 text-heading-sm text-ink">
-              One email when a new Milo playbook lands. No noise.
-            </p>
-          </div>
-          <a
-            href={`mailto:${CONTACT_EMAIL}?subject=Subscribe%20to%20the%20Milo%20playbook`}
-            className="shrink-0 rounded-md bg-accent px-5 py-2.5 text-body-sm font-medium text-white transition-colors hover:bg-accent-strong"
-          >
-            Subscribe by email
-          </a>
-        </Reveal>
-      </section>
-
-      <section className="shell py-12">
+      {/* Grid — editorial-restrained, no shadow cards. Just typography, hover shift. */}
+      <section className="shell mt-16 pb-24 md:mt-20">
         {rest.length ? (
-          <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {rest.map((post, i) => (
-              <Reveal as="li" key={post.slug} delay={i * 0.04}>
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="group flex h-full flex-col rounded-xl border border-line bg-surface p-6 shadow-card transition-all hover:border-accent/40 hover:shadow-float"
-                >
-                  <p className="text-eyebrow uppercase text-accent">{post.category}</p>
-                  <h2 className="mt-2 text-heading-md text-ink group-hover:text-accent">
-                    {post.title}
-                  </h2>
-                  <p className="mt-2 text-body-sm text-muted">{post.excerpt ?? post.description ?? post.title}</p>
-                  <p className="mt-4 text-body-sm text-muted/80">
-                    {dateFmt(post.dateModified ?? post.datePublished)} · {readMinutes(post)} min read
-                  </p>
-                </Link>
-              </Reveal>
-            ))}
+          <ul className="grid gap-x-8 gap-y-14 border-t border-line pt-14 md:grid-cols-2 lg:grid-cols-3">
+            {rest.map((post) => {
+              const a = authorFor(post.slug);
+              return (
+                <li key={post.slug}>
+                  <Link href={`/blog/${post.slug}`} className="group block">
+                    <p className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-accent">
+                      {post.category}
+                    </p>
+                    <h2 className="mt-3 text-[1.25rem] font-medium leading-[1.2] tracking-tight text-ink transition-colors group-hover:text-accent md:text-[1.375rem]">
+                      {post.title}
+                    </h2>
+                    <p className="mt-3 line-clamp-3 text-body leading-[1.55] text-ink/80">
+                      {post.excerpt ?? post.description ?? ''}
+                    </p>
+                    <p className="mt-5 flex items-center gap-2 text-body-sm text-muted">
+                      <span className="grid h-5 w-5 place-items-center rounded-full bg-accent-soft font-mono text-[0.6rem] text-accent">
+                        {a.initials}
+                      </span>
+                      <span>{a.name}</span>
+                      <span aria-hidden>·</span>
+                      <span>{dateFmt(post.dateModified ?? post.datePublished)}</span>
+                      <span aria-hidden>·</span>
+                      <span>{readMinutes(post)} min</span>
+                    </p>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         ) : (
-          <p className="text-body-lg text-muted">
+          <p className="border-t border-line pt-14 text-body-lg text-muted">
             No posts in {activeCluster ? clusterLabel(activeCluster) : 'this cluster'} yet.{' '}
             <Link href="/blog" className="text-accent underline underline-offset-2">
               See all posts

@@ -11,12 +11,13 @@ export const WAVE1_POSTS: BlogPost[] = [
     tags: ['buying signals', 'local prospecting', 'outbound', 'intent data', 'sales playbook'],
     excerpt:
       'The complete taxonomy of local buying signals, how to score them, and how to turn each one into a real first meeting.',
-    datePublished: '2026-09-10',
+    datePublished: '2026-07-10',
     readMinutes: 11,
     body: [
       {
-        type: 'tldr',
-        text: 'A buying signal is any public change in a prospect\'s world that increases the odds they need what you sell right now. For local B2B, the highest-signal moves are visible on Google Maps, review sites, job boards, and permit records long before they show up in an intent-data feed. Watch them, score them, and reach out while the trigger is fresh.',
+        type: 'stat',
+        value: '72 hours',
+        label: 'the window most local buying signals stay hot before the trigger goes cold and you are competing on offer, not timing',
       },
       {
         type: 'p',
@@ -70,17 +71,17 @@ export const WAVE1_POSTS: BlogPost[] = [
         title: 'The 72-hour rule',
         text: 'For event signals, if you cannot personalize and send within 72 hours of the trigger, you are competing on offer, not timing. Choose your signals accordingly.',
       },
-      { type: 'h2', text: 'How to score a signal', id: 'scoring' },
+      { type: 'h2', text: 'How to score a signal: the Milo FTR Score', id: 'scoring' },
       {
         type: 'p',
-        text: 'Not every signal is equal. Score each one on three axes and add them up. This is the same rubric we walk new Milo users through in onboarding.',
+        text: 'Not every signal is equal. Score each one on three axes and add them up. We call this the Milo FTR Score: Fit, Timing, Reachability. Each axis scores 1 to 3, so a signal maxes at 9 out of 9. Anything under 6 out of 9 goes to a nurture list, not the send queue.',
       },
       {
         type: 'ul',
         items: [
-          'Fit: does the signal imply the business needs your specific offer, or is it just generic pain?',
-          'Timing: how fresh is the trigger, and how narrow is the window before it goes cold?',
-          'Reachability: can you contact the decision maker, or does the signal only touch a proxy?',
+          'Fit (1 to 3): does the signal imply the business needs your specific offer, or is it just generic pain?',
+          'Timing (1 to 3): how fresh is the trigger, and how narrow is the window before it goes cold?',
+          'Reachability (1 to 3): can you contact the decision maker, or does the signal only touch a proxy?',
         ],
       },
       {
@@ -101,7 +102,7 @@ export const WAVE1_POSTS: BlogPost[] = [
           },
           {
             title: 'Score',
-            text: 'Apply the fit/timing/reachability rubric. Anything under 6 out of 9 goes to a nurture list, not the send queue.',
+            text: 'Apply the Milo FTR Score (Fit + Timing + Reachability, each 1 to 3). Anything under 6 out of 9 goes to a nurture list, not the send queue.',
           },
           {
             title: 'Personalize',
@@ -181,12 +182,12 @@ export const WAVE1_POSTS: BlogPost[] = [
     tags: ['google maps', 'prospecting', 'lead generation', 'scraping', 'ethics'],
     excerpt:
       'Scraping Google Maps is a legal grey zone and a technical dead end. Signal-based prospecting from Places is the real workflow.',
-    datePublished: '2026-09-10',
+    datePublished: '2026-07-17',
     readMinutes: 10,
     body: [
       {
-        type: 'tldr',
-        text: 'You do not need to scrape Google Maps to prospect from it. The Google Places API returns the same public business data through a supported channel, and combining it with a signal layer produces cleaner lists than any Apify or Outscraper run. Scraping is a legal grey zone, a technical treadmill, and it produces worse leads.',
+        type: 'p',
+        text: 'A seller opens a Chrome tab, types "dentists in Austin" into Google Maps, and stares at 400 pins across the city. Somewhere in that grid is next quarter\'s pipeline. The tempting move is to reach for a scraper: paste a CSV into your sender, hit go, wait. The move that actually pays is quieter. It uses the same map, treats the data as reading not stealing, and layers the one thing a scraper never gives you.',
       },
       { type: 'h2', text: 'Why sellers keep reaching for scrapers', id: 'why-scrapers' },
       {
@@ -221,14 +222,14 @@ export const WAVE1_POSTS: BlogPost[] = [
       },
       {
         type: 'p',
-        text: 'The Google Places API returns the same underlying business data, with a documented schema, a stable rate limit, and a real support contract. It costs more per record than a shady scraper, and much less than a Google-flagged domain.',
+        text: 'Official directory data returns the same underlying business information, with a documented schema, a stable rate limit, and a real support contract. It costs more per record than a shady scraper, and much less than a Google-flagged domain.',
       },
       { type: 'h2', text: 'Scraper vs signal-based prospecting', id: 'comparison' },
       {
         type: 'table',
         headers: ['Dimension', 'Scraper workflow', 'Signal-based prospecting'],
         rows: [
-          ['Data source', 'Unofficial Maps scrape', 'Google Places API + public web crawl'],
+          ['Data source', 'Unofficial Maps scrape', 'Official directory data + public web research'],
           ['Legal posture', 'Grey zone, ToS violation', 'Supported API + public info'],
           ['Reliability', 'Breaks with DOM changes', 'Stable schema'],
           ['Enrichment', 'Name, phone, address', 'Signals + emails + context'],
@@ -248,8 +249,8 @@ export const WAVE1_POSTS: BlogPost[] = [
             text: 'Not a filter tree. "Independent dental practices in Austin with under 15 reviews and no website." The description drives the query and the signal filters.',
           },
           {
-            title: 'Query Google Places',
-            text: 'Milo uses the official Google Maps data. Same data any human sees on Maps, but returned as structured JSON with a stable rate limit.',
+            title: 'Query the public directory',
+            text: 'Milo uses official public map data. Same data any human sees on Maps, but returned as structured JSON with a stable rate limit.',
           },
           {
             title: 'Crawl the public footprint',
@@ -272,11 +273,11 @@ export const WAVE1_POSTS: BlogPost[] = [
       { type: 'h2', text: 'What about Apify and Outscraper?', id: 'competitors' },
       {
         type: 'p',
-        text: 'Both are real products with legitimate use cases. Apify runs a marketplace of actors, some of which are Maps scrapers and some of which use the Places API cleanly. Outscraper offers a hosted Maps extraction service and is transparent about its methods. If your only requirement is a raw list of businesses with phone numbers, they work.',
+        text: 'Both are real products with legitimate use cases. Apify runs a marketplace of actors, some of which are Maps scrapers and some of which use official APIs cleanly. Outscraper offers a hosted Maps extraction service and is transparent about its methods. If your only requirement is a raw list of businesses with phone numbers, they work.',
       },
       {
         type: 'p',
-        text: 'What they do not do is enrichment, signal tagging, drafting, or sending. You still need three more tools, three more subscriptions, and a way to keep them from stepping on each other. That is the gap that signal-first tools fill.',
+        text: 'What they do not do is enrichment, signal tagging, drafting, or sending. You still need three more tools, three more subscriptions, and a way to keep them from stepping on each other. That is the gap Milo fills.',
       },
       {
         type: 'callout',
@@ -284,16 +285,10 @@ export const WAVE1_POSTS: BlogPost[] = [
         title: 'The ethical version of "scraping"',
         text: 'Everything a human can see on Google Maps is fair to reference in outreach. "I noticed your practice does not have a site linked on Google" is honest and useful. It is not scraping, it is reading.',
       },
-      { type: 'h2', text: 'Where Milo fits', id: 'milo' },
       {
-        type: 'p',
-        text: 'Milo is the signal-based version of the workflow above. Places discovery, public-web research, LLM enrichment, email drafting, sending from your own inbox, reply routing, and Cal.com booking. No scrapers, no proxy pools, no legal grey zone. Pay per credit, no seats.',
-      },
-      {
-        type: 'link',
-        text: 'See pricing and credits',
-        href: '/pricing',
-        label: 'Milo pricing',
+        type: 'takeaway',
+        title: 'The one thing to remember',
+        text: 'Everything a human can see on Google Maps is fair to reference in outreach. Reading a public listing is not the same as scraping it, and the workflows that survive quarterly ToS changes are the ones built on supported directory data plus a signal layer, not on rotating proxy pools.',
       },
       {
         type: 'link',
@@ -313,7 +308,7 @@ export const WAVE1_POSTS: BlogPost[] = [
             a: 'Google has sent cease and desist letters and has sued repeat commercial scrapers. Individual sellers rarely see enforcement, but the sending domain and account risks are usually the bigger issue in practice.',
           },
           {
-            q: 'Does the Google Places API cost more than scraping?',
+            q: 'Does the official directory API cost more than scraping?',
             a: 'Per record, yes. Per meeting booked, usually less, because the data is cleaner and the workflow is stable.',
           },
           {
@@ -343,7 +338,7 @@ export const WAVE1_POSTS: BlogPost[] = [
     tags: ['prospecting', 'apollo', 'zoominfo', 'cognism', 'sales tools'],
     excerpt:
       'A fair comparison of database-first tools like Apollo and ZoomInfo against signal-first tools like Milo, with a clear guide to when each one wins.',
-    datePublished: '2026-09-10',
+    datePublished: '2026-07-24',
     readMinutes: 10,
     body: [
       {
@@ -357,7 +352,7 @@ export const WAVE1_POSTS: BlogPost[] = [
       },
       {
         type: 'p',
-        text: 'A signal-first tool is a smaller, denser workflow: discover accounts that just did something relevant, enrich the trigger, personalize the outreach, and send it. The database is a byproduct of the workflow, not the product.',
+        text: 'A signal tool is a smaller, denser workflow: discover accounts that just did something relevant, enrich the trigger, personalize the outreach, and send it. The database is a byproduct of the workflow, not the product.',
       },
       {
         type: 'p',
@@ -441,7 +436,7 @@ export const WAVE1_POSTS: BlogPost[] = [
       { type: 'h2', text: 'The hybrid stack', id: 'hybrid' },
       {
         type: 'p',
-        text: 'Some teams run both, and it is a defensible choice. Use the database for named-account penetration and a signal-first tool for opportunistic top-of-funnel. The one thing to avoid is running both against the same lead universe. That is how you burn a domain: two systems each sending "just one more" follow-up on the same account.',
+        text: 'Some teams run both, and it is a defensible choice. Use the database for named-account penetration and a signal tool for opportunistic top-of-funnel. The one thing to avoid is running both against the same lead universe. That is how you burn a domain: two systems each sending "just one more" follow-up on the same account.',
       },
       {
         type: 'callout',
@@ -483,7 +478,7 @@ export const WAVE1_POSTS: BlogPost[] = [
           },
           {
             q: 'What about ZoomInfo Copilot or Apollo Play?',
-            a: 'Both are moves toward signal-first workflows on top of a database foundation. If you already own the database, they are worth trying.',
+            a: 'Both are moves toward signal-driven workflows on top of a database foundation. If you already own the database, they are worth trying.',
           },
           {
             q: 'Which category has better email deliverability?',
@@ -508,12 +503,12 @@ export const WAVE1_POSTS: BlogPost[] = [
     tags: ['lead qualification', 'local prospecting', 'buying signals', 'sales frameworks'],
     excerpt:
       'The decision tree, scoring rubric, and worked examples we use to separate high-intent local leads from noise.',
-    datePublished: '2026-09-10',
+    datePublished: '2026-07-31',
     readMinutes: 11,
     body: [
       {
-        type: 'tldr',
-        text: 'High intent is not a mood, it is a stack of observable facts. For local B2B, three axes matter: signal strength, buyer reachability, and offer fit. Score each on a five-point scale, keep anything over 10 out of 15, and work the queue in order. Below is the exact rubric and three worked examples.',
+        type: 'p',
+        text: 'Every seller has a version of the same complaint: "our list is fine, the replies just are not there." Usually the list is not fine. It is a matched-ICP export where every row has an equal claim on the send queue, so nothing gets priority and the calendar stays quiet. High intent is what separates a row from a queue position, and in local B2B it is not a mood or a vibe. It is a stack of observable facts you can score.',
       },
       { type: 'h2', text: 'What does "high intent" mean in local B2B?', id: 'define' },
       {
@@ -638,16 +633,10 @@ export const WAVE1_POSTS: BlogPost[] = [
         title: 'The right first line',
         text: 'The first line of your email should reference the specific signal by name. If the reader cannot tell why you picked them out of a directory, the score does not matter.',
       },
-      { type: 'h2', text: 'How Milo runs this rubric for you', id: 'milo' },
       {
-        type: 'p',
-        text: 'Milo scores each discovered business against the rubric automatically, using Google Places, a public-web crawl, and an AI enrichment step. The output is a ranked queue plus a draft email for each row, sent from your Gmail or Outlook with warmup and reply routing. Cal.com handles the booking. You pay per credit.',
-      },
-      {
-        type: 'link',
-        text: 'How the pipeline works end to end',
-        href: '/how-it-works',
-        label: 'Milo pipeline',
+        type: 'takeaway',
+        title: 'The one thing to remember',
+        text: 'High intent in local B2B is not a mood, it is a stack of observable facts scored across three axes: signal strength, buyer reachability, and offer fit. Work the queue by score, not list order. A 13 today beats a 15 in three days, and a 7 today is not worth the send while the 13 is waiting.',
       },
       {
         type: 'link',

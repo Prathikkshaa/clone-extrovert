@@ -2,102 +2,13 @@ import type { BlogPost } from '../posts';
 
 export const WAVE4A_POSTS: BlogPost[] = [
   {
-    slug: 'lead-databases-are-stale',
-    title: 'Lead databases are stale by design. Signals are not.',
-    excerpt: 'Pull-based lead databases decay the moment they are collected. Signal-based prospecting works from live public data instead.',
-    category: 'Prospecting',
-    cluster: 'Prospecting',
-    tags: ['lead databases', 'signal prospecting', 'apollo', 'zoominfo', 'data quality'],
-    datePublished: '2026-09-10',
-    readMinutes: 9,
-    related: [
-      'signal-vs-database-prospecting',
-      'google-maps-prospecting-not-scraping',
-      'buying-signals-taxonomy',
-    ],
-    body: [
-      { type: 'tldr', text: 'Static B2B databases like Apollo, ZoomInfo and Cognism are snapshots of a workforce that changes every day. Roughly one in five professionals change jobs each year, so a database bought in January is materially wrong by summer. Signal-based prospecting reads live public sources instead, so the record is generated the moment you need it.' },
-
-      { type: 'p', text: 'Every lead database in the world starts decaying the second it is written. That is not a vendor problem, it is a physics problem. Companies get founded, funded, acquired, renamed and shut down. Employees switch roles, change titles, get promoted and leave. A pull-based database is a memory of a workforce that has already moved.' },
-      { type: 'p', text: 'This piece is not a hit-piece on Apollo, ZoomInfo or Cognism. They are useful tools. But treating them as sources of truth for outbound is where most teams lose money.' },
-
-      { type: 'h2', text: 'The staleness math', id: 'staleness-math' },
-      { type: 'p', text: 'LinkedIn Economic Graph research reports that global job transition rates run in the double digits each year, and studies of their own Job Change Data product describe tens of millions of role changes annually across the platform. That is the denominator every static database is fighting.' },
-      { type: 'link', text: 'LinkedIn Economic Graph: workforce and mobility research', href: 'https://economicgraph.linkedin.com/research', label: 'Primary source' },
-      { type: 'p', text: 'ZoomInfo publishes its own accuracy claims in its data quality documentation and marketing materials. Read them carefully: the numbers describe records that are verified within a rolling window, not records that are correct on the day you export them. That distinction is where reply rates die.' },
-      { type: 'link', text: 'ZoomInfo data quality overview', href: 'https://www.zoominfo.com/business/about-zoominfo/data-quality', label: 'Vendor source' },
-
-      { type: 'h2', text: 'Pull vs push, database vs signal', id: 'pull-vs-push' },
-      { type: 'p', text: 'A pull-based database asks: who exists that matches this filter. A signal-based system asks: who is doing something right now that matters. The first question is about inventory. The second is about behaviour.' },
-
-      { type: 'table', caption: 'Database prospecting vs signal-based prospecting', headers: ['Dimension', 'Database (Apollo, ZoomInfo, Cognism)', 'Signal-based (Milo pattern)'], rows: [
-        ['Freshness', 'Snapshot, verified on a rolling cycle', 'Generated at query time from live public sources'],
-        ['Trigger', 'Filter on static fields (title, size, geo)', 'Detects an event or state change'],
-        ['Coverage of long tail', 'Weak for SMB, service, local', 'Strong, because it reads the open web'],
-        ['Personalisation surface', 'Firmographics', 'What the business is doing this week'],
-        ['Failure mode', 'Wrong person, wrong company, silence', 'Fewer leads per query but each is defensible'],
-        ['Unit economics', 'Seat-based, use it or lose it', 'Pay-as-you-go per verified record'],
-      ]},
-
-      { type: 'diagram', kind: 'compare', title: 'Where each model wins',
-        nodes: [
-          { id: 'db', label: 'Database', sub: 'Broad, static, filter-first' },
-          { id: 'sig', label: 'Signal', sub: 'Narrow, live, event-first', emphasis: true },
-          { id: 'ent', label: 'Enterprise ICP', sub: 'Fits database' },
-          { id: 'smb', label: 'Local / SMB', sub: 'Fits signal' },
-          { id: 'time', label: 'Time sensitive plays', sub: 'Fits signal' },
-          { id: 'ttl', label: 'Long TTL plays', sub: 'Either works' },
-        ],
-        edges: [
-          { from: 'db', to: 'ent' },
-          { from: 'db', to: 'ttl' },
-          { from: 'sig', to: 'smb' },
-          { from: 'sig', to: 'time' },
-          { from: 'sig', to: 'ttl' },
-        ],
-      },
-
-      { type: 'h2', text: 'The three real failure modes of database outbound', id: 'failure-modes' },
-      { type: 'ol', items: [
-        'Wrong role. The contact left twelve months ago and nobody in the record set replaced them.',
-        'Wrong company state. The business is winding down, acquired or in a hiring freeze and none of that shows up in a firmographic filter.',
-        'Right person, dead reason. Your pitch has no anchor in what the company is doing today, so the reply rate collapses even when the email lands.',
-      ]},
-
-      { type: 'callout', tone: 'warn', title: 'Vendor accuracy claims are rolling, not absolute', text: 'When a data vendor says "95% accurate", they almost always mean "verified within the last N days on a sampled cohort". That is not the same as "correct on the day you exported it". Read the methodology footnote before you buy.' },
-
-      { type: 'h2', text: 'What signal-based prospecting actually looks like', id: 'signal-flow' },
-      { type: 'p', text: 'A signal-first workflow starts from an event. A restaurant opens a second location. A clinic starts running Google Ads. A gym rebrands. A law firm changes its website copy to mention a new practice area. Each of those is a public, verifiable, timestamped fact.' },
-      { type: 'p', text: 'That is the model Milo runs on. Discovery via Google Places, crawl via web research, structured AI enrichment, and drafting into a Gmail or Outlook inbox that the operator still owns.' },
-      { type: 'link', text: 'How signal beats database on local B2B', href: '/blog/signal-vs-database-prospecting', label: 'Internal' },
-      { type: 'link', text: 'Google Maps prospecting is not scraping', href: '/blog/google-maps-prospecting-not-scraping', label: 'Internal' },
-
-      { type: 'h2', text: 'When a database still makes sense', id: 'when-database-wins' },
-      { type: 'ul', items: [
-        'Named-account enterprise motion where the ICP is 400 companies you already know.',
-        'Compliance-heavy sectors where a verified corporate record matters more than freshness.',
-        'Territory planning and market sizing, where you want the shape of the market, not a person to email today.',
-      ]},
-
-      { type: 'h2', text: 'FAQ', id: 'faq' },
-      { type: 'faq', items: [
-        { q: 'Are databases useless for outbound?', a: 'No. They are useful for market sizing, ABM lists and enterprise plays. They are a weak fit for time-sensitive, SMB and local motions where the underlying data changes fastest.' },
-        { q: 'How stale is stale?', a: 'LinkedIn Economic Graph research puts annual role change rates in the double digits. A list bought six months ago has already lost a meaningful slice of its accuracy on the contact axis alone.' },
-        { q: 'Where does Milo sit?', a: 'Milo is signal-first. It generates the record at the moment of use from live public sources, then drafts email from your own inbox. It does not maintain a resold contact database.' },
-      ]},
-
-      { type: 'p', text: 'The lead database is stale by design because the world it describes moves faster than any vendor can re-verify it. Signals are not stale, because they are read at the moment of use. Build the outbound stack around that fact and the math starts working.' },
-    ],
-  },
-
-  {
     slug: 'what-is-an-ai-sdr',
     title: 'What is an AI SDR (and what it cannot do yet)',
     excerpt: 'A direct definition of the AI SDR category, what current products actually do, and where the human still has to sit in the loop.',
     category: 'AI SDR',
     cluster: 'AI SDR',
     tags: ['ai sdr', 'sales automation', 'autobound', '11x', 'regie', 'alta'],
-    datePublished: '2026-09-10',
+    datePublished: '2026-08-17',
     readMinutes: 9,
     related: [
       'manual-vs-automated-prospecting',
@@ -149,11 +60,11 @@ export const WAVE4A_POSTS: BlogPost[] = [
         'ICP definition and market carve-out, because the AI cannot decide who you should sell to.',
       ]},
 
-      { type: 'callout', tone: 'info', title: 'Where Milo sits, honestly', text: 'Milo is not an autonomous SDR. It is a signal-first prospecting and drafting layer that runs from your own Gmail or Outlook inbox. You still press send, or you approve a batch. That is a feature, not a limitation, in 2026 deliverability conditions.' },
+      { type: 'takeaway', title: 'The one thing to remember', text: 'An AI SDR is drafting and prospecting software, not a virtual worker. In current deliverability conditions the reliable configuration keeps a human on the send-approval step and on every reply. The failure mode is not a bad email, it is a bad email at scale from a domain you also use to talk to real customers.' },
 
       { type: 'h2', text: 'Why the "autonomous SDR" framing is dangerous today', id: 'autonomous-risk' },
       { type: 'p', text: 'Autonomy means an agent that decides who to email, when, and with what, and executes without a human in the loop. In a world where Google Postmaster, Yahoo and Microsoft have tightened bulk sender rules, a fully autonomous mis-step burns the sending domain, not just the campaign.' },
-      { type: 'link', text: 'Google email sender guidelines', href: 'https://support.google.com/mail/answer/81126', label: 'Primary source' },
+      { type: 'link', text: 'Google email sender guidelines', href: 'https://support.google.com/mail/answer/81126', label: 'Reference' },
       { type: 'p', text: 'The failure mode is not a bad email. It is a bad email at scale from a domain you also use to talk to customers.' },
 
       { type: 'h2', text: 'How to evaluate an AI SDR product', id: 'evaluation' },
@@ -184,7 +95,7 @@ export const WAVE4A_POSTS: BlogPost[] = [
     category: 'Buying signals',
     cluster: 'Buying signals',
     tags: ['buying signals', 'intent data', 'prospecting', 'framework', 'scoring'],
-    datePublished: '2026-09-10',
+    datePublished: '2026-08-20',
     readMinutes: 10,
     related: [
       'buying-signal-examples',
@@ -284,7 +195,7 @@ export const WAVE4A_POSTS: BlogPost[] = [
     category: 'Cold email',
     cluster: 'Cold email',
     tags: ['cold email', 'benchmarks', 'reply rate', 'sendr', 'woodpecker'],
-    datePublished: '2026-09-10',
+    datePublished: '2026-08-23',
     readMinutes: 9,
     related: [
       'why-cold-emails-go-to-spam',
@@ -308,10 +219,10 @@ export const WAVE4A_POSTS: BlogPost[] = [
         ['GMass benchmark reports', 'Gmail-based senders', '~1 to 5%', 'Mixed marketing and sales use cases'],
         ['Clay usage reports', 'High-personalisation workflows', '5 to 15%', 'Small n, strong ICP, heavy enrichment'],
       ]},
-      { type: 'link', text: 'Woodpecker Cold Email Benchmarks Report', href: 'https://woodpecker.co/blog/cold-email-benchmarks/', label: 'Primary source' },
-      { type: 'link', text: 'Sendr cold email statistics', href: 'https://sendr.com/', label: 'Primary source' },
-      { type: 'link', text: 'GMass email benchmarks', href: 'https://www.gmass.co/blog/email-benchmarks/', label: 'Primary source' },
-      { type: 'link', text: 'Clay resources on outbound benchmarks', href: 'https://www.clay.com/learning', label: 'Primary source' },
+      { type: 'callout', tone: 'info', title: 'Where these numbers come from', text: 'The bands below are triangulated from vendor benchmark posts published by Woodpecker, GMass, Sendr and Clay across 2023 to 2025. Each vendor reports on its own customer base, so we cite ranges rather than a single hero number. Search each vendor blog for their most recent "cold email benchmarks" post to see the current figures.' },
+      { type: 'link', text: 'Woodpecker blog (search for their cold email benchmarks post)', href: 'https://woodpecker.co/blog/', label: 'Vendor research' },
+      { type: 'link', text: 'GMass blog', href: 'https://www.gmass.co/blog/', label: 'Vendor research' },
+      { type: 'link', text: 'Clay learning hub', href: 'https://www.clay.com/learn', label: 'Vendor research' },
 
       { type: 'h2', text: 'Benchmarks by volume', id: 'by-volume' },
       { type: 'table', caption: 'Reply rate expectations by daily send volume', headers: ['Daily volume per inbox', 'Expected reply rate range', 'Comment'], rows: [
@@ -355,12 +266,12 @@ export const WAVE4A_POSTS: BlogPost[] = [
         'One clear ask. A single low-friction question outperforms a pitch plus a calendar link.',
         'Domain health. A cold domain with weak SPF and DKIM will not reach the inbox, so the reply rate cannot start.',
       ]},
-      { type: 'link', text: 'Google email sender guidelines', href: 'https://support.google.com/mail/answer/81126', label: 'Primary source' },
+      { type: 'link', text: 'Google email sender guidelines', href: 'https://support.google.com/mail/answer/81126', label: 'Reference' },
       { type: 'link', text: 'Why cold emails go to spam', href: '/blog/why-cold-emails-go-to-spam', label: 'Internal' },
       { type: 'link', text: 'Is cold email legal', href: '/blog/is-cold-email-legal', label: 'Internal' },
 
       { type: 'h2', text: 'How Milo users tend to sit on this ladder', id: 'milo-position' },
-      { type: 'p', text: 'Milo runs signal-first prospecting with sends from the operator own Gmail or Outlook inbox and per-send approval. Users typically sit in the 5 to 12 percent band on local and SMB motions, in line with the "good to great" range in the ladder above. That is a function of narrow lists and signal-anchored copy, not a magic number in the product.' },
+      { type: 'p', text: 'Milo runs signal-led prospecting with sends from the operator own Gmail or Outlook inbox and per-send approval. Users typically sit in the 5 to 12 percent band on local and SMB motions, in line with the "good to great" range in the ladder above. That is a function of narrow lists and copy that names the specific trigger, not a magic number in the product.' },
 
       { type: 'h2', text: 'FAQ', id: 'faq' },
       { type: 'faq', items: [

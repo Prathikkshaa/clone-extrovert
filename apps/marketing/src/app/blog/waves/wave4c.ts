@@ -7,16 +7,16 @@ export const WAVE4C_POSTS: BlogPost[] = [
     category: 'Local prospecting',
     cluster: 'Local prospecting',
     tags: ['google maps', 'prospecting', 'local sales', 'signals', 'list building'],
-    datePublished: '2026-09-10',
+    datePublished: '2026-09-05',
     readMinutes: 10,
     excerpt: 'A five step method for turning a Google Maps search into a prospecting list that is actually worth working.',
     related: [
-      'local-business-outbound-playbook',
-      'buying-signals-checklist',
-      'cold-email-first-line-signals',
+      'buying-signal-playbook-local-b2b',
+      'buying-signals-taxonomy',
+      'high-intent-local-leads',
     ],
     body: [
-      { type: 'tldr', text: 'Google Maps is a great starting point for local prospecting, but a raw scrape is not a list. We use a five step method we call The signal-first list build: pick a tight market, pull public data, apply buying signals, qualify by fit, then shape the outreach around the signal. Worked example inside: roofing companies in Peoria, Illinois.' },
+      { type: 'p', text: 'A founder pulls 900 roofers out of Google Maps on a Sunday night, loads them into a sender, and by Wednesday the domain is on a warmup timeout and the reply folder is empty. The list was not the problem. Google Maps returned exactly what it was asked for. What the founder built was a phonebook, and phonebooks do not book meetings. This piece is about what has to happen between the export and the send to turn one into the other.' },
 
       { type: 'h2', text: 'Why Google Maps is underrated for B2B' },
       { type: 'p', text: 'For any business that serves a physical geography, Google Maps is the closest thing to a live directory of the real economy. Every listing has a name, category, address, phone, website, hours, review count, and often a photo of the storefront. That is more first party context than most paid databases will give you for a local operator.' },
@@ -42,14 +42,13 @@ export const WAVE4C_POSTS: BlogPost[] = [
       { type: 'p', text: 'Search Maps for the vertical and city. Capture: business name, category, website, phone, address, review count, average rating, hours, and the Place ID. The Place ID is the stable key you want to dedupe on later.' },
       { type: 'p', text: 'Then crawl each website for a few extra fields: services offered, service area pages, staff or team page, careers page, any mention of financing partners, and the CMS or website builder in use. Every one of those becomes a possible signal.' },
       { type: 'table', caption: 'Fields to pull for a local prospecting list', headers: ['Field', 'Source', 'Why it matters'], rows: [
-        ['Business name, address, phone', 'Google Maps', 'Basic identity, dedupe key'],
-        ['Category and services', 'Maps + site crawl', 'Fit filter'],
-        ['Review count and rating', 'Google Maps', 'Proxy for company maturity'],
-        ['Careers or hiring page', 'Website crawl', 'Growth signal'],
+        ['Business name, address, phone', 'Public map data', 'Basic identity, dedupe key'],
+        ['Category and services', 'Public map data + site review', 'Fit filter'],
+        ['Review count and rating', 'Public map data', 'Proxy for company maturity'],
+        ['Careers or hiring page', 'Website review', 'Growth signal'],
         ['Financing partners', 'Website footer', 'Ticket size signal'],
-        ['Website CMS or age', 'Site crawl', 'Buying window signal'],
+        ['Website CMS or age', 'Public site review', 'Buying window signal'],
       ] },
-      { type: 'link', label: 'Google Places API docs', href: 'https://developers.google.com/maps/documentation/places/web-service/overview', text: 'The official interface for programmatic Maps data. Read the terms before you build anything.' },
 
       { type: 'h2', text: 'Step 3: apply signals' },
       { type: 'p', text: 'Signals are the reason a specific business would buy from you this quarter. For roofing in Peoria, three that work: (a) hiring for a project manager (growth stress on scheduling), (b) financing partner listed (they sell bigger tickets), (c) website last redesigned before 2020 (they are already in a refresh mindset).' },
@@ -59,7 +58,7 @@ export const WAVE4C_POSTS: BlogPost[] = [
       { type: 'p', text: 'Fit is about you, not them. Do you actually want to serve a five person roofer? Can your onboarding handle a shop that answers the phone by first name? If you sell software with a $12k floor, cut anything under about 15 crews. Better to have 30 qualified than 300 blurred.' },
 
       { type: 'h2', text: 'Step 5: shape outreach around the signal' },
-      { type: 'p', text: 'One email, one signal, one ask. If the signal was the hiring page, the first line names it. If it was the financing partner, the first line names that. The pitch is the same but the entry point is not. This is where a signal-first list finally pays off.' },
+      { type: 'p', text: 'One email, one signal, one ask. If the signal was the hiring page, the first line names it. If it was the financing partner, the first line names that. The pitch is the same but the entry point is not. This is where the work of curating a signal list finally pays off.' },
 
       { type: 'link', label: 'How Milo works', href: '/how-it-works', text: 'Milo runs this exact loop end to end: discover the businesses that match your signal, personalize the outreach, and send it from your own inbox.' },
 
@@ -67,7 +66,7 @@ export const WAVE4C_POSTS: BlogPost[] = [
       { type: 'callout', tone: 'warn', title: 'Stay on the right side of the line', text: 'Public data is fair to collect. Personal emails scraped through workarounds are not. Respect robots directives, respect the Google Maps terms of service, and never buy consumer data. If your outreach would embarrass you if the recipient forwarded it to a competitor, rewrite it.' },
 
       { type: 'faq', items: [
-        { q: 'Can I just export from Google Maps directly?', a: 'There is no first party export. Use the Places API within its terms, or a purpose-built tool. Manual copy-paste is legal and painful.' },
+        { q: 'Can I just export from public map data directly?', a: 'There is no first party export. Use the public map API within its terms, or a purpose-built tool. Manual copy-paste is legal and painful.' },
         { q: 'How large should a local list be?', a: 'For a single seller working one vertical in one metro, 60 to 200 signal-qualified accounts is the sweet spot per quarter.' },
         { q: 'Do I need emails for every contact?', a: 'No. Owner-operator businesses often respond to the general inbox. Send to info@ with the owner named in the greeting.' },
       ] },
@@ -76,11 +75,12 @@ export const WAVE4C_POSTS: BlogPost[] = [
 
   {
     slug: 'freelance-clients-cold-email',
+    seoTitle: 'Freelancer cold email: booking the first 10-20 clients',
     title: 'How a freelancer books the first 10 to 20 clients through cold email',
     category: 'Cold email',
     cluster: 'Cold email',
     tags: ['freelance', 'cold email', 'client acquisition', 'positioning', 'outbound'],
-    datePublished: '2026-09-10',
+    datePublished: '2026-09-07',
     readMinutes: 11,
     excerpt: 'A concrete first-100 leads workflow, a real cold email template, and how to price the offer so replies convert.',
     related: [
@@ -89,7 +89,7 @@ export const WAVE4C_POSTS: BlogPost[] = [
       'prospecting-bootstrapped-founder',
     ],
     body: [
-      { type: 'tldr', text: 'You do not need a big list. You need 100 well chosen prospects, one email rooted in a real signal, and a fixed-scope offer that is easy to say yes to. This is the playbook we would run today if we were a freelancer starting from zero.' },
+      { type: 'p', text: 'Every freelancer who has ever tried cold email has the same first instinct: build the biggest list possible, blast it, and hope the numbers do the work. It never does. What actually books the first ten clients is smaller than that, quieter than that, and more boring than that. A hundred prospects. One email. One offer someone can say yes to over lunch. This is the version of the playbook we would run tomorrow if we started over.' },
 
       { type: 'h2', text: 'The math is friendlier than you think' },
       { type: 'p', text: 'Freelancers do not need enterprise pipelines. If you send 100 well targeted emails and get an honest 8 percent reply rate, that is 8 conversations. Convert one in four into paid work and you have two clients from one week of prospecting. That is a working freelance business.' },
@@ -147,81 +147,22 @@ export const WAVE4C_POSTS: BlogPost[] = [
   },
 
   {
-    slug: 'apollo-alternative-small-teams',
-    title: 'Milo vs Apollo for small teams: an honest comparison',
-    category: 'Comparison',
-    cluster: 'Comparison',
-    tags: ['apollo alternative', 'comparison', 'small teams', 'sales tools'],
-    datePublished: '2026-09-10',
-    readMinutes: 10,
-    excerpt: 'Where Apollo wins, where Milo wins, and how to pick between them without hype.',
-    related: [
-      'milo-vs-clay',
-      'prospecting-list-from-google-maps',
-      'buying-signals-checklist',
-    ],
-    body: [
-      { type: 'tldr', text: 'Apollo is a strong choice if you need a large contact database and you have a real SDR team to work it. Milo is a better choice if you are a small team doing signal-first outbound, especially local, and you want to pay per use instead of per seat. Both tools are legitimate. Pick by team shape.' },
-
-      { type: 'h2', text: 'Why write this at all' },
-      { type: 'p', text: 'We get asked "how are you different from Apollo" every week. The honest answer is that we are not competing for the same buyer most of the time. Apollo is built for larger sales teams who want database-led prospecting. Milo is built for a founder or a two to five person team who want signal-led prospecting. Different jobs.' },
-
-      { type: 'h2', text: 'Where Apollo genuinely wins' },
-      { type: 'p', text: 'Apollo has a large B2B contact database, seat based pricing that scales predictably for SDR teams, deep filters on firmographics and job change data, and mature CRM integrations. If you have five or more SDRs pulling lists every week and pushing to a CRM, Apollo is a sensible pick.' },
-      { type: 'link', label: 'Apollo pricing', href: 'https://www.apollo.io/pricing', text: 'Primary source for Apollo plan tiers and per-seat pricing.' },
-      { type: 'link', label: 'Apollo on G2', href: 'https://www.g2.com/products/apollo-io/reviews', text: 'Independent reviews. Skim the three-star ones for the honest read.' },
-
-      { type: 'h2', text: 'Where Milo wins' },
-      { type: 'p', text: 'Milo is signal-first: Google Places discovery, public-web research-based site crawls, LLM enrichment for buying signals, and drafts sent from your own Gmail or Outlook with warm-up and reply routing. Pricing is pay-as-you-go credits, not per seat. That maps well to a solo founder or a small team who prospects in bursts and cares more about "why buy now" than "who else fits the ICP".' },
-      { type: 'callout', tone: 'info', title: 'Milo does not have a contact database', text: 'We are transparent about this. Milo queries public sources live per search rather than resell a static B2B database. That is a feature if you are chasing signal quality; it is a real limitation if you need to filter 50 million contacts by job title.' },
-
-      { type: 'h2', text: 'Side by side' },
-      { type: 'diagram', kind: 'compare', title: 'Milo vs Apollo at a glance', nodes: [
-        { id: 'm', label: 'Milo', sub: 'Signal-first, PAYG, own inbox' },
-        { id: 'a', label: 'Apollo', sub: 'Database-first, per seat, mid-market' },
-      ] },
-      { type: 'table', caption: 'Milo vs Apollo for small teams', headers: ['Dimension', 'Milo', 'Apollo'], rows: [
-        ['Pricing model', 'Pay-as-you-go credits', 'Per seat, tiered'],
-        ['Data source', 'Live from public sources per search', 'Large proprietary B2B DB'],
-        ['Seat model', 'No seat cost', 'Priced per seat'],
-        ['Personalization', 'Signal-first, LLM drafted', 'Template-first, sequence based'],
-        ['Sending', 'Your own Gmail or Outlook, warm-up included', 'Own inbox or Apollo sending'],
-        ['CRM sync', 'Not offered today', 'Salesforce, HubSpot, others'],
-        ['Best-fit team size', '1 to 5, founder or small team', '5+ SDRs, mid-market'],
-        ['Local prospecting', 'Native via Google Places', 'Possible but not core'],
-      ] },
-
-      { type: 'h2', text: 'How to choose without regret' },
-      { type: 'p', text: 'Ask three questions. One, do you have people whose full job is to work a list? If yes, database tools earn their seat cost. Two, is your ICP local or physical? If yes, a Maps-native tool beats a national DB. Three, do you personalize per account or per sequence? Per account maps to Milo, per sequence maps to Apollo.' },
-      { type: 'link', label: 'Milo product page', href: '/how-it-works', text: 'Full feature list and pricing.' },
-
-      { type: 'h2', text: 'Common misreads' },
-      { type: 'p', text: 'A few things we hear that are not quite right. Milo is not "Apollo but cheaper". The data model is different. Milo is not going to hand you two million contacts. Apollo is not "unusable for small teams". It is usable, just priced for a team that has more headcount than a two person startup usually does. Pick the shape, not the marketing.' },
-
-      { type: 'faq', items: [
-        { q: 'Can I use both?', a: 'Yes. Some teams use Apollo for national ICP research and Milo for signal-first outreach on the accounts that survive filtering.' },
-        { q: 'Is Milo cheaper?', a: 'For a solo founder sending a few hundred emails a month, almost always. For a five seat SDR team sending tens of thousands, the seat model can win on unit cost.' },
-        { q: 'Does Milo have CRM sync?', a: 'Not today. If a CRM push is non negotiable for you, that is a real reason to use Apollo instead.' },
-      ] },
-    ],
-  },
-
-  {
     slug: 'prospecting-bootstrapped-founder',
+    seoTitle: 'Sales prospecting for bootstrapped founders (90 days)',
     title: 'Sales prospecting for bootstrapped founders: the first 90 days',
     category: 'Prospecting',
     cluster: 'Prospecting',
     tags: ['bootstrapped', 'founder', 'prospecting', '90 day plan', 'outbound'],
-    datePublished: '2026-09-10',
+    datePublished: '2026-09-09',
     readMinutes: 11,
     excerpt: 'What we would do in the first 90 days of outbound as a bootstrapped founder with no headcount and no ad budget.',
     related: [
       'freelance-clients-cold-email',
       'prospecting-list-from-google-maps',
-      'buying-signals-checklist',
+      'buying-signal-playbook-local-b2b',
     ],
     body: [
-      { type: 'tldr', text: 'We are Arun and the team behind Milo, based in India, and we have run this loop ourselves. If you are a bootstrapped founder with no SDR and no ad budget, the answer is not "hire an agency". It is 90 days of signal-first outbound run by you, in your own inbox, with a rhythm that survives the rest of your job.' },
+      { type: 'quote', text: 'We built Milo because the advice we kept hearing as bootstrapped founders was some version of "hire an agency." We could not, and honestly we did not want to. What worked was 90 days of outbound we ran ourselves, out of our own inbox, in a rhythm that survived the rest of the job.', cite: 'Arun, co-founder, Milo' },
 
       { type: 'h2', text: 'The premise' },
       { type: 'p', text: 'A VC backed startup can afford to spend to learn. A bootstrapped founder cannot. Every outbound hour has to either produce a conversation or produce a lesson that changes the next batch. That constraint is a gift. It forces you to write better emails, pick tighter markets, and cut activity that does not pay.' },
@@ -246,7 +187,7 @@ export const WAVE4C_POSTS: BlogPost[] = [
       { type: 'p', text: 'At the end of the month we can write our ICP in one sentence, our top three buying signals as observable facts, and our pitch as a paragraph that names a specific pain in the buyer\'s own words. Without that paragraph, month 2 is a coin flip.' },
 
       { type: 'h2', text: 'Month 2: outbound with a rhythm you can hold' },
-      { type: 'p', text: 'We pick one niche and we run signal-first outbound. 100 emails a week, sent from our own domain, one signal per email. We send Tuesday and Thursday, we read replies at 4pm, and we do not touch the sequence during the day. Everything else in the business has to fit around this because a bootstrapped founder does not have an SDR to cover the gap.' },
+      { type: 'p', text: 'We pick one niche and we run outbound anchored in real signals. 100 emails a week, sent from our own domain, one signal per email. We send Tuesday and Thursday, we read replies at 4pm, and we do not touch the sequence during the day. Everything else in the business has to fit around this because a bootstrapped founder does not have an SDR to cover the gap.' },
       { type: 'callout', tone: 'info', title: 'One niche at a time', text: 'The pull to run three niches in parallel is strong and almost always wrong at this stage. Depth beats spread when you are the one doing the work. Prove you can close in one niche before you fork.' },
 
       { type: 'h2', text: 'Month 3: iterate, do not re-plan' },
