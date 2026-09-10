@@ -61,8 +61,8 @@ export const WAVE4C_POSTS: BlogPost[] = [
       { type: 'h2', text: 'Step 5: shape outreach around the signal' },
       { type: 'p', text: 'One email, one signal, one ask. If the signal was the hiring page, the first line names it. If it was the financing partner, the first line names that. The pitch is the same but the entry point is not. This is where a signal-first list finally pays off.' },
 
-      { type: 'link', label: 'Milo product tour', href: 'https://usemilo.com', text: 'Milo runs this exact loop: Places discovery, Firecrawl-based site crawl, LLM enrichment for signals, and drafting from your own inbox.' },
-      { type: 'link', label: 'Firecrawl', href: 'https://firecrawl.dev', text: 'The crawler we lean on for the website read step.' },
+      { type: 'link', label: 'Milo product tour', href: 'https://usemilo.com', text: 'Milo runs this exact loop: Places discovery, public-web research-based site crawl, LLM enrichment for signals, and drafting from your own inbox.' },
+      { type: 'link', label: 'public-web research', href: 'https://firecrawl.dev', text: 'The crawler we lean on for the website read step.' },
 
       { type: 'h2', text: 'Ethics note' },
       { type: 'callout', tone: 'warn', title: 'Stay on the right side of the line', text: 'Public data is fair to collect. Personal emails scraped through workarounds are not. Respect robots directives, respect the Google Maps terms of service, and never buy consumer data. If your outreach would embarrass you if the recipient forwarded it to a competitor, rewrite it.' },
@@ -173,7 +173,7 @@ export const WAVE4C_POSTS: BlogPost[] = [
       { type: 'link', label: 'Apollo on G2', href: 'https://www.g2.com/products/apollo-io/reviews', text: 'Independent reviews. Skim the three-star ones for the honest read.' },
 
       { type: 'h2', text: 'Where Milo wins' },
-      { type: 'p', text: 'Milo is signal-first: Google Places discovery, Firecrawl-based site crawls, LLM enrichment for buying signals, and drafts sent from your own Gmail or Outlook with warm-up and reply routing. Pricing is pay-as-you-go credits, not per seat. That maps well to a solo founder or a small team who prospects in bursts and cares more about "why buy now" than "who else fits the ICP".' },
+      { type: 'p', text: 'Milo is signal-first: Google Places discovery, public-web research-based site crawls, LLM enrichment for buying signals, and drafts sent from your own Gmail or Outlook with warm-up and reply routing. Pricing is pay-as-you-go credits, not per seat. That maps well to a solo founder or a small team who prospects in bursts and cares more about "why buy now" than "who else fits the ICP".' },
       { type: 'callout', tone: 'info', title: 'Milo does not have a contact database', text: 'We are transparent about this. Milo queries public sources live per search rather than resell a static B2B database. That is a feature if you are chasing signal quality; it is a real limitation if you need to filter 50 million contacts by job title.' },
 
       { type: 'h2', text: 'Side by side' },
@@ -260,7 +260,7 @@ export const WAVE4C_POSTS: BlogPost[] = [
       { type: 'p', text: 'A live discovery source (Google Places or a niche directory), a crawler for site reads, an LLM step for signal detection and drafting, our own Gmail or Outlook for sending, and a spreadsheet. That is enough. Milo bundles the first four so we can spend the founder hour on writing and reading replies instead of stitching tools.' },
       { type: 'link', label: 'Milo', href: 'https://usemilo.com', text: 'The tool we built for exactly this loop.' },
       { type: 'link', label: 'Google Places API', href: 'https://developers.google.com/maps/documentation/places/web-service/overview', text: 'The discovery source we lean on for local ICPs.' },
-      { type: 'link', label: 'Firecrawl', href: 'https://firecrawl.dev', text: 'The site crawler we use for signal extraction.' },
+      { type: 'link', label: 'public-web research', href: 'https://firecrawl.dev', text: 'The site crawler we use for signal extraction.' },
 
       { type: 'faq', items: [
         { q: 'Should we hire an SDR at day 90?', a: 'Only if you can hand them a written playbook that already produced revenue in your own hands. Hiring before that is expensive tuition.' },

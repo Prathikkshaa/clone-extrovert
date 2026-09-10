@@ -68,7 +68,7 @@ export const WAVE4A_POSTS: BlogPost[] = [
 
       { type: 'h2', text: 'What signal-based prospecting actually looks like', id: 'signal-flow' },
       { type: 'p', text: 'A signal-first workflow starts from an event. A restaurant opens a second location. A clinic starts running Google Ads. A gym rebrands. A law firm changes its website copy to mention a new practice area. Each of those is a public, verifiable, timestamped fact.' },
-      { type: 'p', text: 'That is the model Milo runs on. Discovery via Google Places, crawl via Firecrawl, structured enrichment via an LLM, and drafting into a Gmail or Outlook inbox that the operator still owns.' },
+      { type: 'p', text: 'That is the model Milo runs on. Discovery via Google Places, crawl via web research, structured AI enrichment, and drafting into a Gmail or Outlook inbox that the operator still owns.' },
       { type: 'link', text: 'How signal beats database on local B2B', href: '/blog/signal-vs-database-prospecting', label: 'Internal' },
       { type: 'link', text: 'Google Maps prospecting is not scraping', href: '/blog/google-maps-prospecting-not-scraping', label: 'Internal' },
 
@@ -262,7 +262,7 @@ export const WAVE4A_POSTS: BlogPost[] = [
       { type: 'callout', tone: 'success', title: 'Why three axes matter', text: 'A single-axis signal is easy to fake to yourself. Three axes filter out coincidences. A business doing one visible thing might be noise. A business doing three at once is almost never noise.' },
 
       { type: 'h2', text: 'How Milo produces these scores', id: 'milo-scoring' },
-      { type: 'p', text: 'Milo pulls Local from Google Places and public listings, Digital from a Firecrawl-based site read and public ad footprints, and Organisational from public web pages and news. The three-axis score is computed per record before drafting begins.' },
+      { type: 'p', text: 'Milo pulls Local signals from public map data and business listings, Digital from a public site reads and public ad footprints, and Organisational from public web pages and news. The three-axis score is computed per record before drafting begins.' },
       { type: 'link', text: 'Buying signal examples', href: '/blog/buying-signal-examples', label: 'Internal' },
       { type: 'link', text: 'Buying signal playbook for local B2B', href: '/blog/buying-signal-playbook-local-b2b', label: 'Internal' },
       { type: 'link', text: 'High intent local leads', href: '/blog/high-intent-local-leads', label: 'Internal' },

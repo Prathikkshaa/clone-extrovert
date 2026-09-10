@@ -93,7 +93,7 @@ export const WAVE1_POSTS: BlogPost[] = [
         items: [
           {
             title: 'Detect',
-            text: 'Pull candidates that match at least one signal, not a generic ICP filter. In Milo this is a Google Places query plus a crawl that tags each business against the taxonomy above.',
+            text: 'Pull candidates that match at least one signal, not a generic ICP filter. In Milo this scopes to public map data and reads their public web footprint that tags each business against the taxonomy above.',
           },
           {
             title: 'Enrich',
@@ -131,7 +131,7 @@ export const WAVE1_POSTS: BlogPost[] = [
       { type: 'h2', text: 'How Milo automates this', id: 'milo' },
       {
         type: 'p',
-        text: 'Milo runs the whole taxonomy on autopilot. You describe your ICP in plain English, and we discover businesses via Google Places, crawl their public footprint, tag every applicable signal, score the fit, draft the email, and send from your inbox. You pay per credit, not per seat, and the first 100 credits are free.',
+        text: 'Milo runs the whole taxonomy on autopilot. You describe your ICP in plain English, and we discover businesses on the public map, read their public footprint, tag every applicable signal, score the fit, draft the email, and send from your inbox. You pay per credit, not per seat, and the first 100 credits are free.',
       },
       {
         type: 'link',
@@ -249,7 +249,7 @@ export const WAVE1_POSTS: BlogPost[] = [
           },
           {
             title: 'Query Google Places',
-            text: 'Milo uses the official Places API. Same data any human sees on Maps, but returned as structured JSON with a stable rate limit.',
+            text: 'Milo uses the official Google Maps data. Same data any human sees on Maps, but returned as structured JSON with a stable rate limit.',
           },
           {
             title: 'Crawl the public footprint',
@@ -287,7 +287,7 @@ export const WAVE1_POSTS: BlogPost[] = [
       { type: 'h2', text: 'Where Milo fits', id: 'milo' },
       {
         type: 'p',
-        text: 'Milo is the signal-based version of the workflow above. Places discovery, Firecrawl-powered crawl, LLM enrichment, email drafting, sending from your own inbox, reply routing, and Cal.com booking. No scrapers, no proxy pools, no legal grey zone. Pay per credit, no seats.',
+        text: 'Milo is the signal-based version of the workflow above. Places discovery, public-web research, LLM enrichment, email drafting, sending from your own inbox, reply routing, and Cal.com booking. No scrapers, no proxy pools, no legal grey zone. Pay per credit, no seats.',
       },
       {
         type: 'link',
@@ -475,7 +475,7 @@ export const WAVE1_POSTS: BlogPost[] = [
           },
           {
             q: 'Can I import a database export into Milo?',
-            a: 'Not directly today. Milo pulls its own leads from Google Places and the public web because that is what the signal layer runs on.',
+            a: 'Not directly today. Milo pulls its own leads from public map data and the public web because that is what the signal layer runs on.',
           },
           {
             q: 'Do databases have buying signals?',
@@ -641,7 +641,7 @@ export const WAVE1_POSTS: BlogPost[] = [
       { type: 'h2', text: 'How Milo runs this rubric for you', id: 'milo' },
       {
         type: 'p',
-        text: 'Milo scores each discovered business against the rubric automatically, using Google Places, a public-web crawl, and an LLM enrichment step. The output is a ranked queue plus a draft email for each row, sent from your Gmail or Outlook with warmup and reply routing. Cal.com handles the booking. You pay per credit.',
+        text: 'Milo scores each discovered business against the rubric automatically, using Google Places, a public-web crawl, and an AI enrichment step. The output is a ranked queue plus a draft email for each row, sent from your Gmail or Outlook with warmup and reply routing. Cal.com handles the booking. You pay per credit.',
       },
       {
         type: 'link',
