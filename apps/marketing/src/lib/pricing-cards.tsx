@@ -22,7 +22,7 @@ export const LEGACY_CARDS: PricingCard[] = [
     features: ['Full workflow access', 'No card required', 'Credits never expire'],
     ctaLabel: 'Start free',
     ctaHref: '__SIGNUP__',
-    microcopy: '100 free credits on signup.',
+    microcopy: '100 free credits on signup. No card.',
   },
   {
     id: 'growth',
@@ -37,7 +37,7 @@ export const LEGACY_CARDS: PricingCard[] = [
     ctaLabel: 'Start growing',
     ctaArrow: true,
     ctaHref: '__SIGNUP__',
-    microcopy: 'Try free first. Buy when ready.',
+    microcopy: 'Where most freelancers find their rhythm.',
     highlight: 'popular',
   },
   {
@@ -52,7 +52,7 @@ export const LEGACY_CARDS: PricingCard[] = [
     features: ['Full workflow access', 'Volume-friendly', 'Credits never expire'],
     ctaLabel: 'Scale prospecting',
     ctaHref: '__SIGNUP__',
-    microcopy: 'Try free first. Buy when ready.',
+    microcopy: 'Cheapest per lead. No monthly minimum.',
   },
 ];
 
@@ -122,7 +122,7 @@ export const GA_CARDS: PricingCard[] = [
     features: ['Full workflow access', 'Credits never expire', 'One market at a time'],
     ctaLabel: 'Get started',
     ctaHref: '__SIGNUP__',
-    microcopy: 'Try free first. Upgrade when ready.',
+    microcopy: 'One-time pack. Enough runway for a real first campaign.',
   },
   {
     id: 'growth',
@@ -137,7 +137,7 @@ export const GA_CARDS: PricingCard[] = [
     ctaLabel: 'Start growing',
     ctaArrow: true,
     ctaHref: '__SIGNUP__',
-    microcopy: 'Try free first. Upgrade when ready.',
+    microcopy: 'Where most teams find their rhythm.',
     highlight: 'popular',
   },
   {
@@ -152,7 +152,7 @@ export const GA_CARDS: PricingCard[] = [
     features: ['Full workflow access', 'Lowest cost per lead', 'Credits never expire'],
     ctaLabel: 'Scale prospecting',
     ctaHref: '__SIGNUP__',
-    microcopy: 'Try free first. Upgrade when ready.',
+    microcopy: 'Cheapest per lead. No monthly minimum.',
   },
 ];
 
