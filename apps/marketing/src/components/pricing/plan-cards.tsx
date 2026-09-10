@@ -51,23 +51,12 @@ function PlanCard({ card, delayMs }: { card: PricingCard; delayMs: number }) {
       as="article"
       delay={delayMs}
       className={[
-        'relative flex h-full flex-col rounded-2xl border p-7 transition-shadow duration-200 md:p-8',
+        'relative flex h-full flex-col rounded-2xl border p-8 transition-shadow duration-200 md:p-9',
         highlighted
           ? 'border-accent bg-accent-soft/40 shadow-float'
           : 'border-line bg-surface shadow-card hover:shadow-float',
       ].join(' ')}
     >
-      {/* Mono index tag, top-right. Highlighted card uses accent. */}
-      <span
-        aria-hidden
-        className={[
-          'absolute right-6 top-6 font-mono text-[0.72rem] tracking-wide',
-          highlighted ? 'text-accent' : 'text-muted/70',
-        ].join(' ')}
-      >
-        {card.index}
-      </span>
-
       {highlighted ? (
         <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent px-3 py-1 text-[0.68rem] font-medium tracking-wide text-white shadow-card">
           Most popular
@@ -144,7 +133,7 @@ function CustomStripView({ strip }: { strip: CustomStrip }) {
     <Reveal
       as="aside"
       delay={0.05}
-      className="mx-auto mt-8 flex max-w-6xl flex-col items-start gap-4 rounded-2xl border border-line bg-surface p-6 shadow-card md:flex-row md:items-center md:justify-between md:gap-8"
+      className="mx-auto mt-8 flex max-w-7xl flex-col items-start gap-4 rounded-2xl border border-line bg-surface p-6 shadow-card md:flex-row md:items-center md:justify-between md:gap-8"
     >
       <div className="min-w-0">
         <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
@@ -163,10 +152,10 @@ function CustomStripView({ strip }: { strip: CustomStrip }) {
 
 function TrustStrip() {
   return (
-    <div className="mx-auto mt-10 flex max-w-6xl flex-wrap items-center justify-center gap-x-8 gap-y-3 text-body-sm text-muted">
+    <div className="mx-auto mt-8 flex max-w-7xl flex-wrap items-center justify-center gap-x-8 gap-y-3 text-body-sm text-muted">
       {TRUST_CHIPS.map((c, i) => (
         <span key={c} className="flex items-center gap-2">
-          {i === TRUST_CHIPS.length - 1 ? (
+          {i === TRUST_CHIPS.length - 2 ? (
             <IcoShield className="h-4 w-4 text-accent/80" />
           ) : (
             <IcoCheck className="h-4 w-4 text-accent/80" />
@@ -193,13 +182,13 @@ export function PlanCards({
         : 'md:grid-cols-3';
   return (
     <>
-      <div className={`mx-auto grid max-w-6xl items-stretch gap-6 ${gridClass}`}>
+      <div className={`mx-auto grid max-w-7xl items-stretch gap-8 ${gridClass}`}>
         {cards.map((card, i) => (
           <PlanCard key={card.id} card={card} delayMs={0.05 * i} />
         ))}
       </div>
-      <TrustStrip />
       {custom ? <CustomStripView strip={custom} /> : null}
+      <TrustStrip />
     </>
   );
 }

@@ -169,4 +169,5 @@ export const TRUST_CHIPS = [
   'No credit card required',
   'Credits never expire',
   'Your inbox, your data',
+  'No spam, ever',
 ] as const;
