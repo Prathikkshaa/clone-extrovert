@@ -63,7 +63,7 @@ export default function PricingPage() {
   );
 }
 
-/* ── GA comparison table. Clean typographic grid, no icon soup. ── */
+/* ── GA comparison table. Only rows that actually differ per plan. ── */
 type Row = {
   label: string;
   values: [string, string, string, string, string];
@@ -72,6 +72,9 @@ type Row = {
 
 const COMPARE_COLS = ['Free', 'Base', 'Growth', 'Scale', 'Custom'] as const;
 
+// Rows chosen from the persona-audit of what a real buyer asks about pricing:
+// price, what they get, per-unit economics, and how billing works. Uniform
+// product mechanics live in the "Every plan includes" strip below the table.
 const COMPARE_ROWS: Row[] = [
   {
     label: 'Price',
@@ -79,49 +82,46 @@ const COMPARE_ROWS: Row[] = [
     emphasis: 'header',
   },
   {
+    label: 'Best for',
+    values: [
+      'Kicking the tires',
+      'First real campaign',
+      'Steady prospecting',
+      'Always-on volume',
+      'Agencies + volume',
+    ],
+  },
+  {
     label: 'Credits',
-    values: ['100 on signup', '300', '900', '2,400', 'Volume'],
+    values: ['100 lifetime', '300', '900', '2,400', 'Volume'],
   },
   {
     label: 'Leads, end to end',
     values: ['~20', '~60', '~180', '~480', 'Unlimited'],
   },
   {
+    label: 'Cost per credit',
+    values: ['Free', '~$0.063', '~$0.054', '~$0.049', 'Negotiated'],
+  },
+  {
     label: 'Cost per lead',
     values: ['Free', '~$0.32', '~$0.27', '~$0.25', 'Negotiated'],
   },
   {
-    label: 'Full workflow',
-    values: ['Yes', 'Yes', 'Yes', 'Yes', 'Yes'],
+    label: 'Billing',
+    values: ['Free', 'One-time', 'One-time', 'One-time', 'Invoice / PO'],
   },
-  {
-    label: 'Multi-inbox rotation',
-    values: ['Yes', 'Yes', 'Yes', 'Yes', 'Yes'],
-  },
-  {
-    label: 'Warm-up and throttling',
-    values: ['Yes', 'Yes', 'Yes', 'Yes', 'Yes'],
-  },
-  {
-    label: 'Reply routing to your inbox',
-    values: ['Yes', 'Yes', 'Yes', 'Yes', 'Yes'],
-  },
-  {
-    label: 'Team access, no seat fee',
-    values: ['Yes', 'Yes', 'Yes', 'Yes', 'Yes'],
-  },
-  {
-    label: 'Credits never expire',
-    values: ['Yes', 'Yes', 'Yes', 'Yes', 'Yes'],
-  },
-  {
-    label: 'Invoicing and purchase orders',
-    values: ['–', '–', '–', '–', 'Yes'],
-  },
-  {
-    label: 'Volume terms',
-    values: ['–', '–', '–', '–', 'Yes'],
-  },
+];
+
+const INCLUDED_ON_EVERY_PLAN = [
+  'Full workflow',
+  'Connect Gmail or Outlook',
+  'Multi-inbox rotation',
+  'Warm-up and throttling',
+  'Reply routing to your inbox',
+  'Team access, no per-seat fee',
+  'Credits never expire',
+  'Compliance built-in (CAN-SPAM, PECR, GDPR)',
 ];
 
 function GaComparisonMatrix() {
@@ -143,10 +143,7 @@ function GaComparisonMatrix() {
                 Plan
               </th>
               {COMPARE_COLS.map((c) => (
-                <th
-                  key={c}
-                  className="py-3 text-left font-medium text-ink"
-                >
+                <th key={c} className="py-3 text-left font-medium text-ink">
                   {c}
                 </th>
               ))}
@@ -155,10 +152,7 @@ function GaComparisonMatrix() {
           <tbody>
             {COMPARE_ROWS.map((row) => (
               <tr key={row.label} className="border-b border-line last:border-0">
-                <th
-                  scope="row"
-                  className="py-3 pr-4 text-left font-normal text-muted"
-                >
+                <th scope="row" className="py-3 pr-4 text-left font-normal text-muted">
                   {row.label}
                 </th>
                 {row.values.map((v, i) => (
@@ -176,6 +170,23 @@ function GaComparisonMatrix() {
             ))}
           </tbody>
         </table>
+      </Reveal>
+
+      {/* Everything uniform lives here so the table above stops shouting "Yes". */}
+      <Reveal delay={0.1} className="mx-auto mt-8 max-w-5xl rounded-2xl border border-line bg-surface p-6 md:p-7">
+        <p className="font-mono text-[0.72rem] uppercase tracking-wide text-accent">
+          Every plan includes
+        </p>
+        <ul className="mt-4 grid gap-x-8 gap-y-2 sm:grid-cols-2 md:grid-cols-3">
+          {INCLUDED_ON_EVERY_PLAN.map((f) => (
+            <li key={f} className="flex items-start gap-2 text-body-sm text-ink/90">
+              <svg viewBox="0 0 24 24" className="mt-0.5 h-4 w-4 shrink-0 text-accent" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="m5 12 4 4 10-10" />
+              </svg>
+              <span>{f}</span>
+            </li>
+          ))}
+        </ul>
       </Reveal>
     </section>
   );
