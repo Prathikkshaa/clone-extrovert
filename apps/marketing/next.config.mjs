@@ -32,6 +32,16 @@ const nextConfig = {
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },
+  async redirects() {
+    return [
+      // Consolidate the local-lead pillar into the no-website pillar (audit finding).
+      {
+        source: '/blog/how-to-find-local-business-leads',
+        destination: '/blog/find-local-businesses-without-a-website',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
