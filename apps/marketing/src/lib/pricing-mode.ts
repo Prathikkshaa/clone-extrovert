@@ -14,8 +14,8 @@ export type PricingMode = 'legacy' | 'beta' | 'ga';
 
 export const PRICING_MODE: PricingMode = (() => {
   const raw = process.env.NEXT_PUBLIC_PRICING?.toLowerCase();
-  if (raw === 'beta' || raw === 'ga') return raw;
-  return 'legacy';
+  if (raw === 'beta' || raw === 'legacy') return raw;
+  return 'ga';
 })();
 
 /** A card the redesigned pricing component renders. Purely descriptive. */
