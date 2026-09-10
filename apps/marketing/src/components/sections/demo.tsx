@@ -39,7 +39,7 @@ export function Demo() {
               ))}
             </ul>
             <div className="mt-8 flex flex-col items-center text-center">
-              <CtaButton href={SIGNUP_URL} variant="secondary" size="lg">
+              <CtaButton href={SIGNUP_URL} variant="secondary" size="md">
                 Start free
               </CtaButton>
               <p className="mt-3 text-body-sm text-white/70">{CTA_MICROCOPY}</p>
