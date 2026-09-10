@@ -56,10 +56,16 @@ export const SUBPROCESSORS = [
     link: 'https://supabase.com/privacy',
   },
   {
-    name: 'Google (Gmail API, Places API)',
-    purpose: 'Sending outreach from your connected Gmail inbox and discovering local businesses from public information.',
+    name: 'Google (Gmail API)',
+    purpose: 'Sending outreach from your connected Gmail inbox.',
     region: 'Global.',
     link: 'https://policies.google.com/privacy',
+  },
+  {
+    name: 'Public business directory data provider',
+    purpose: 'Structured public information about local businesses (name, address, category, ratings) used for prospect discovery.',
+    region: 'Global.',
+    link: '/privacy',
   },
   {
     name: 'Microsoft (Outlook via Microsoft Graph)',
@@ -68,10 +74,10 @@ export const SUBPROCESSORS = [
     link: 'https://privacy.microsoft.com/privacystatement',
   },
   {
-    name: 'Firecrawl',
-    purpose: 'Crawling business websites and your own site during onboarding.',
+    name: 'Web content extraction service',
+    purpose: 'Reading public business websites and your own site during onboarding to extract signals and enrich context.',
     region: 'US.',
-    link: 'https://www.firecrawl.dev/privacy',
+    link: '/privacy',
   },
   {
     name: 'OpenRouter',

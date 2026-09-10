@@ -40,6 +40,17 @@ const nextConfig = {
         destination: '/blog/find-local-businesses-without-a-website',
         permanent: true,
       },
+      // Merged into signal-vs-database-prospecting to avoid cannibalization.
+      {
+        source: '/blog/lead-databases-are-stale',
+        destination: '/blog/signal-vs-database-prospecting',
+        permanent: true,
+      },
+      {
+        source: '/blog/apollo-alternative-small-teams',
+        destination: '/blog/signal-vs-database-prospecting',
+        permanent: true,
+      },
     ];
   },
 };

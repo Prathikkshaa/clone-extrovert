@@ -34,7 +34,6 @@ const IcoDoc = (p: IP) => (<svg {...sp(p.className)}><path d="M6 3h9l3 3v15H6z" 
 const IcoPen = (p: IP) => (<svg {...sp(p.className)}><path d="M12 20h8" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>);
 const IcoSend = (p: IP) => (<svg {...sp(p.className)}><path d="M21 3 10.5 13.5M21 3l-6.5 18-4-8-8-4z" /></svg>);
 const IcoChart = (p: IP) => (<svg {...sp(p.className)}><path d="M3 21h18M6 21v-6M11 21V9M16 21V4" /></svg>);
-const IcoArrow = (p: IP) => (<svg {...sp(p.className)}><path d="M5 12h14M13 6l6 6-6 6" /></svg>);
 
 const WORKFLOW = [
   { label: 'Find leads', chip: `${CREDIT_COSTS.search} credit`, Icon: IcoSearch },
@@ -80,8 +79,8 @@ export function LandingPricing() {
               </span>
             </li>
             {i < WORKFLOW.length - 1 ? (
-              <li aria-hidden className="hidden h-12 items-center px-1 text-muted/40 sm:flex">
-                <IcoArrow className="h-5 w-5" />
+              <li aria-hidden className="hidden h-12 items-center px-2 sm:flex">
+                <span className="h-px w-6 bg-line/70" />
               </li>
             ) : null}
           </Fragment>

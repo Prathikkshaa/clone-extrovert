@@ -105,11 +105,11 @@ export default function PrivacyPage() {
       <h3>Prospect and lead data</h3>
       <p>
         Business names, categories, ratings, review excerpts, addresses, phone numbers, and
-        publicly-listed contact emails discovered from public sources such as Google&rsquo;s
-        Places API and public business websites. This is business information anyone can
-        look up. Where those records include a natural person&rsquo;s contact detail (for
-        example the owner&rsquo;s public email), we treat it as personal data under the
-        GDPR and honor the rights below.
+        publicly-listed contact emails discovered from public business directories and
+        public business websites. This is business information anyone can look up. Where
+        those records include a natural person&rsquo;s contact detail (for example the
+        owner&rsquo;s public email), we treat it as personal data under the GDPR and honor
+        the rights below.
       </p>
       <h3>Message content</h3>
       <p>

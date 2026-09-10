@@ -149,6 +149,18 @@
   50% { transform: translate(-50%, 10px) scale(1.06); opacity: 1; }
 }
 
+/* Marquee (two-row testimonial carousel). Uses -50% because the track renders
+ * its cards TWICE so one full loop lands exactly on the second copy, giving a
+ * seamless reset. Reduced-motion block below neutralises the animation. */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
 /* Scroll-reveal initial state (see components/reveal.tsx). Elements start hidden
  * + nudged down; GSAP animates them in on enter. Under reduced motion, the media
  * query below neutralises the transform so content shows immediately (M00 §6). */

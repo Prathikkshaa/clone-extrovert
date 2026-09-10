@@ -18,9 +18,9 @@ export const WAVE3_POSTS: BlogPost[] = [
     ],
     body: [
       {
-        type: 'tldr',
-        text:
-          'To find local businesses with no website: pull a Google Places result set for a specific vertical in a specific city, drop any place with a website URL, verify the gap by checking Google Business Profile and a couple of directory listings, then reach the owner by phone first and email second. Milo does this end to end, but you can do the first pass by hand.',
+        type: 'stat',
+        value: 'about 1 in 5',
+        label: 'US small businesses on Google Maps still have no website linked to their profile, and most do not realize it is costing them calls',
       },
       {
         type: 'p',
@@ -36,14 +36,14 @@ export const WAVE3_POSTS: BlogPost[] = [
       {
         type: 'p',
         text:
-          'Google Places (part of Google Maps) is the source of truth for local business existence. If a place is open and taking customers, it is on Google Maps. Every Places entry has a set of fields: name, category, address, phone, opening hours, rating, review count, and sometimes a website URL. The absence of a website field is the signal you want.',
+          'Public map data is the source of truth for local business existence. If a place is open and taking customers, it is listed on the major map platforms. Every listing has a set of fields: name, category, address, phone, opening hours, rating, review count, and sometimes a website URL. The absence of a website field is the signal you want.',
       },
       {
         type: 'ul',
         items: [
-          'Google Places API returns website field per place. Empty means no website on file.',
+          'Official directory data returns a website field per place. Empty means no website on file.',
           'Google Business Profile is the owner-facing view of the same record.',
-          'Yelp, Bing Places, Apple Maps, and vertical directories (HomeAdvisor, Houzz, Avvo) mirror or extend the Places data.',
+          'Yelp, Bing Places, Apple Maps, and vertical directories (HomeAdvisor, Houzz, Avvo) mirror or extend the same directory data.',
           'Facebook and Instagram pages sometimes substitute for a real site. Whether you count those as "having a website" is a judgement call.',
         ],
       },
@@ -52,7 +52,7 @@ export const WAVE3_POSTS: BlogPost[] = [
         tone: 'info',
         title: 'Scraping vs API',
         text:
-          'The Google Maps front end is not a legal or reliable data source. Use the Places API. It costs money per request but the data is clean and Google is fine with you using it. See our note on the difference in the Google Maps prospecting post below.',
+          'The Google Maps front end is not a legal or reliable data source. Use the official map API. It costs money per request but the data is clean and the platform terms of service allow it. See our note on the difference in the Google Maps prospecting post below.',
       },
       { type: 'h2', text: 'The 6-step workflow', id: 'workflow' },
       {
@@ -64,9 +64,9 @@ export const WAVE3_POSTS: BlogPost[] = [
               'The narrower the better. "Roofers in Peoria IL" beats "contractors in Illinois" every time. A tight ICP means your email actually sounds like it was written for this person.',
           },
           {
-            title: '2. Pull the Places result set',
+            title: '2. Pull the directory result set',
             text:
-              'Query the Places API (or run Milo\'s discovery) for that vertical and city. Expect 40 to 200 results per pull depending on density.',
+              'Query the official map API (or run Milo\'s discovery) for that vertical and city. Expect 40 to 200 results per pull depending on density.',
           },
           {
             title: '3. Filter out any place with a website field',
@@ -76,7 +76,7 @@ export const WAVE3_POSTS: BlogPost[] = [
           {
             title: '4. Verify the gap',
             text:
-              'For each kept row, do a name + city Google search. If the top result is a real domain owned by this business, remove them. About 10 to 20 percent of "no website" rows in Places actually do have a site the owner never added to their listing.',
+              'For each kept row, do a name + city Google search. If the top result is a real domain owned by this business, remove them. About 10 to 20 percent of "no website" rows in the directory data actually do have a site the owner never added to their listing.',
           },
           {
             title: '5. Prioritize by proof of demand',
@@ -96,7 +96,7 @@ export const WAVE3_POSTS: BlogPost[] = [
         caption: 'Ways to find local businesses with no website, compared.',
         headers: ['Approach', 'Freshness', 'Website filter', 'Owner contact', 'Cost shape', 'Best for'],
         rows: [
-          ['Milo', 'Live Places pull', 'Native filter', 'Owner email drafted per lead', 'PAYG credits', 'Operators who want signal + outreach in one place'],
+          ['Milo', 'Live directory pull', 'Native filter', 'Owner email drafted per lead', 'PAYG credits', 'Operators who want signal + outreach in one place'],
           ['Apollo / ZoomInfo', 'B2B database, weeks to months stale', 'Not reliable for SMB', 'Employee emails, often no owner', 'Seat + contact credits', 'Mid-market B2B, not local SMB'],
           ['Manual Google Maps', 'Live', 'Manual eyeball', 'Manual scrape', 'Time only', 'Small pulls, one-off research'],
           ['Apify / scrapers', 'Live but grey-area', 'Depends on scraper', 'Public phone / listing only', 'Per-run compute', 'Engineers building their own pipeline'],
@@ -105,14 +105,14 @@ export const WAVE3_POSTS: BlogPost[] = [
       {
         type: 'p',
         text:
-          'Apollo and ZoomInfo are excellent for mid-market B2B, and terrible for local SMB. A 12-person roofing outfit is not in their database with the owner\'s email. The data was never collected. That is the gap Milo and manual Places work fill.',
+          'Apollo and ZoomInfo are excellent for mid-market B2B, and terrible for local SMB. A 12-person roofing outfit is not in their database with the owner\'s email. The data was never collected. That is the gap Milo and manual directory work fill.',
       },
       { type: 'h2', text: 'Three worked examples', id: 'examples' },
       { type: 'h3', text: 'Roofers in Peoria, IL', id: 'peoria' },
       {
         type: 'p',
         text:
-          'A Places pull for "roofing contractor" in Peoria typically returns 60 to 90 places. Roughly one third have no website field or point at a Facebook page. After verifying, expect 15 to 25 real no-website roofers. Storm-season timing (spring and late summer in the Midwest) doubles the response rate to a "we can build you a site" pitch.',
+          'A directory pull for "roofing contractor" in Peoria typically returns 60 to 90 places. Roughly one third have no website field or point at a Facebook page. After verifying, expect 15 to 25 real no-website roofers. Storm-season timing (spring and late summer in the Midwest) doubles the response rate to a "we can build you a site" pitch.',
       },
       { type: 'h3', text: 'Dentists in Bristol, UK', id: 'bristol' },
       {
@@ -152,9 +152,14 @@ export const WAVE3_POSTS: BlogPost[] = [
       },
       {
         type: 'link',
-        text: 'Google Places for developers',
-        href: 'https://developers.google.com/maps/documentation/places/web-service/overview',
-        label: 'Google docs',
+        text: 'Public map data, done right',
+        href: '/blog/google-maps-prospecting-not-scraping',
+        label: 'Method',
+      },
+      {
+        type: 'takeaway',
+        title: 'The one thing to remember',
+        text: 'A no-website local business is one of the highest-intent buyers you will ever find, because they already have reviews and phone calls and they know they are losing the customers who look them up on a phone. The real work is verifying the gap (roughly 10 to 20 percent of "no website" rows have a site the owner never listed) and reaching by phone first.',
       },
       { type: 'h2', text: 'FAQ', id: 'faq' },
       {
@@ -170,7 +175,7 @@ export const WAVE3_POSTS: BlogPost[] = [
           },
           {
             q: 'Can I just scrape Google Maps directly?',
-            a: 'You can, and Google will rate-limit or block you. The Places API is the supported path and the cost per record is low enough for prospecting.',
+            a: 'You can, and Google will rate-limit or block you. The official map API is the supported path and the cost per record is low enough for prospecting.',
           },
           {
             q: 'Should I call or email first?',
@@ -189,7 +194,7 @@ export const WAVE3_POSTS: BlogPost[] = [
     slug: 'why-cold-emails-go-to-spam',
     title: 'Why cold emails go to spam (and the 2026 deliverability fix)',
     description:
-      'A practical 2026 fix for cold emails landing in spam: SPF, DKIM, DMARC, a 30-day warm-up schedule, and the Gmail and Yahoo bulk-sender thresholds you must clear.',
+      'A 2026 fix for cold emails landing in spam: SPF, DKIM, DMARC, a 30-day warm-up, and the Gmail/Yahoo bulk-sender thresholds to clear.',
     datePublished: '2026-08-12',
     dateModified: '2026-09-10',
     category: 'Deliverability',
@@ -358,11 +363,10 @@ export const WAVE3_POSTS: BlogPost[] = [
           },
         ],
       },
-      { type: 'h2', text: 'What Milo does and does not do', id: 'milo' },
       {
-        type: 'p',
-        text:
-          'Milo sends from your own Gmail or Outlook mailbox using your existing SPF/DKIM/DMARC setup, includes a warm-up loop, respects per-mailbox daily limits, and adds a compliant unsubscribe footer. Milo will not fix a misconfigured domain for you, and will not push volume past a healthy per-mailbox limit. Deliverability is a shared job.',
+        type: 'takeaway',
+        title: 'The one thing to remember',
+        text: 'Inbox placement is authentication first, reputation second, content last. If SPF, DKIM, and DMARC do not pass and align, no amount of subject-line tuning will save the send. Ramp volume slowly, keep complaint rates under 0.1 percent, and send cold from a subdomain so a bad campaign never touches your transactional mail.',
       },
       {
         type: 'link',
@@ -566,6 +570,11 @@ export const WAVE3_POSTS: BlogPost[] = [
         href: '/blog/why-cold-emails-go-to-spam',
         label: 'Deliverability',
       },
+      {
+        type: 'takeaway',
+        title: 'The one thing to remember',
+        text: 'Cold B2B email is legal across every major English-speaking jurisdiction when you identify yourself honestly, publish a real postal address, honour opt-outs immediately, and can point to why you contacted each recipient. The variance across borders is in consent thresholds and enforcement appetite, not the fundamentals.',
+      },
       { type: 'h2', text: 'FAQ', id: 'faq' },
       {
         type: 'faq',
@@ -600,7 +609,7 @@ export const WAVE3_POSTS: BlogPost[] = [
     title: 'Manual vs automated prospecting: where to draw the line',
     description:
       'Which parts of B2B prospecting should always be automated, which parts should never be automated, and the hybrid workflow founders actually run.',
-    datePublished: '2026-09-10',
+    datePublished: '2026-06-12',
     category: 'Prospecting',
     cluster: 'Prospecting',
     tags: ['prospecting', 'automation', 'founder-led sales', 'workflow'],
@@ -628,7 +637,7 @@ export const WAVE3_POSTS: BlogPost[] = [
         headers: ['Step', 'Automate?', 'Why'],
         rows: [
           ['Pick the ICP and the vertical', 'Never', 'This is strategy. A wrong ICP scales wrong faster with automation.'],
-          ['Pull candidate accounts (Places, directories)', 'Always', 'Mechanical, high-volume, no judgement.'],
+          ['Pull candidate accounts (public directories)', 'Always', 'Mechanical, high-volume, no judgement.'],
           ['Enrich each account (website, size, tech, hiring)', 'Always', 'Same input to same output. A machine wins.'],
           ['Read the buying signal', 'Partially', 'A model can rank. A human should sanity-check the top slice.'],
           ['Draft the first-touch email', 'Always with human template', 'Model writes from your voice template. You approve the batch.'],
@@ -699,11 +708,10 @@ export const WAVE3_POSTS: BlogPost[] = [
         text:
           'A batch approval before send catches ninety percent of the "wait, that is our biggest customer already" and "wait, that phrasing is wrong" errors. Keep the approval step, even if it is fast.',
       },
-      { type: 'h2', text: 'What this looks like inside Milo', id: 'milo' },
       {
-        type: 'p',
-        text:
-          'Milo runs the automatable half by default: discovery via Google Places, enrichment via a Firecrawl crawl of the site, signal scoring, first-touch drafting from your voice template, sending from your own Gmail or Outlook mailbox, and Cal.com routing. Milo also holds the "human in the loop" line: batch approval before send, and reply routing that hands the thread back to you the moment a real person answers.',
+        type: 'takeaway',
+        title: 'The one thing to remember',
+        text: 'Founder-led sales works as a hybrid, not a purity test. Machines do the sixty percent that is mechanical: discovery, enrichment, drafting, sending, follow-ups, and booking. Founders do the forty percent that is judgement: who to target, every real reply, and the final approval before a batch ships. Skip either half and the loop breaks.',
       },
       {
         type: 'link',

@@ -13,7 +13,7 @@ export default function NotFound() {
         <CtaButton href="/">Back home</CtaButton>
       </div>
       <Link href="/how-it-works" className="mt-4 text-body-sm text-accent hover:text-accent-strong">
-        Or see how it works →
+        Or see how it works
       </Link>
     </section>
   );
