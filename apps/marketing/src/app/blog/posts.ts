@@ -5,7 +5,8 @@
 export type Block =
   | { type: 'p'; text: string }
   | { type: 'h2'; text: string }
-  | { type: 'ul'; items: string[] };
+  | { type: 'ul'; items: string[] }
+  | { type: 'link'; text: string; href: string; label: string };
 
 export type BlogPost = {
   slug: string;
@@ -39,6 +40,12 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'p',
         text: 'If you sell websites, marketing, or almost any local service, the businesses worth contacting first are the ones with an obvious gap you can close. The most obvious gap of all is not having a website. This guide walks through how to find local businesses with no website, how to tell which ones are actually worth your time, and how to reach out so you get replies instead of getting ignored.',
+      },
+      {
+        type: 'link',
+        text: 'Milo automates the whole loop end to end.',
+        href: '/how-it-works',
+        label: 'See how it works',
       },
       {
         type: 'h2',
@@ -134,6 +141,12 @@ export const BLOG_POSTS: BlogPost[] = [
         text: 'The fastest way to find local business leads is to start from public business information anyone can look up - the industry, location, ratings, reviews, and web presence a business already shows the world - and filter for the ones with a visible gap you can close. This guide walks freelancers and agencies through building that list, qualifying it by buying signals, and reaching out in a way that gets replies.',
       },
       {
+        type: 'link',
+        text: 'Milo runs this exact loop for you: discovery, buying signals, research, personalized outreach.',
+        href: '/how-it-works',
+        label: 'See the mechanism',
+      },
+      {
         type: 'h2',
         text: 'What makes a good local business lead?',
       },
@@ -200,6 +213,12 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'p',
         text: 'Cold emails go to spam mostly because of how they are sent, not just what they say: a cold or shared sending reputation, too much volume too fast, and content that pattern-matches to bulk mail. The good news is that all three are things you control. This guide explains what really drives deliverability and the habits that keep your outreach in the inbox.',
+      },
+      {
+        type: 'link',
+        text: 'Milo bakes these habits in: warm-up, throttling, natural spacing, bounce pause.',
+        href: '/how-it-works',
+        label: 'See how sends stay in the inbox',
       },
       {
         type: 'h2',
@@ -272,6 +291,12 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'p',
         text: 'Yes - cold email to businesses is legal in most places, as long as you follow the rules for the region you are sending to. In the US that means CAN-SPAM; in the UK and EU it means PECR and GDPR. None of them ban cold outreach outright, but each sets conditions. This is a plain-English overview for small businesses, not legal advice - check your specifics if you are unsure.',
+      },
+      {
+        type: 'link',
+        text: 'Milo puts the one-click unsubscribe token, the address, and the compliance guardrails on every send.',
+        href: '/how-it-works',
+        label: 'See the compliance mechanics',
       },
       {
         type: 'h2',

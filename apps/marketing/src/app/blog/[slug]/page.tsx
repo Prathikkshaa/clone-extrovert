@@ -46,6 +46,16 @@ function BlockView({ block }: { block: Block }) {
       </ul>
     );
   }
+  if (block.type === 'link') {
+    return (
+      <p className="rounded-md border-l-2 border-accent bg-accent-soft/40 py-3 pl-4 pr-3 text-body text-ink/85">
+        {block.text}{' '}
+        <Link href={block.href} className="font-medium text-accent underline underline-offset-2 hover:text-accent-strong">
+          {block.label}
+        </Link>
+      </p>
+    );
+  }
   return <p className="text-body-lg text-ink/90">{block.text}</p>;
 }
 

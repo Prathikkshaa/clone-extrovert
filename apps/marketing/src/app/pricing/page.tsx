@@ -33,8 +33,8 @@ export default function PricingPage() {
       />
       <FinalCta
         title="Find your first opportunities."
-        body="Start with 100 free credits. No card. No subscription."
-        cta="Find my first leads"
+        body="100 free credits. No card. No subscription."
+        cta="Start free"
       />
     </>
   );
