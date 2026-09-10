@@ -140,7 +140,7 @@ export const GA_CARDS: PricingCard[] = [
       '~60 leads is a real test market',
       'Pays back with one signed client',
     ],
-    ctaLabel: 'Run my first campaign',
+    ctaLabel: 'Start testing',
     ctaHref: '__SIGNUP__',
     microcopy: 'One-time pack. Enough runway for a real first campaign.',
   },
