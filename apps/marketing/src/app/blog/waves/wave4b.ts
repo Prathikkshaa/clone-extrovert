@@ -119,7 +119,7 @@ const POST_1: WavePost = {
 
     { type: 'h2', text: 'The stop rule is a product feature, not a policy', id: 'stop-rule' },
     { type: 'p', text: 'A policy that says "stop sending when the prospect replies" is worth exactly as much as the tool enforcing it. In Milo, reply detection is wired directly to sequence state. When Gmail or Outlook logs an inbound reply on the thread, the queued follow-ups are cancelled the same minute. There is no "confirm cancellation" button. No 24-hour lag. If the prospect writes back at 2:07 pm, the 2:30 pm bump does not send.' },
-    { type: 'link', text: 'Milo product page', href: 'https://usemilo.com/', label: 'How Milo handles reply routing and stop-on-reply' },
+    { type: 'link', text: 'Milo product page', href: '/how-it-works', label: 'How Milo handles reply routing and stop-on-reply' },
     { type: 'p', text: 'This matters because "reply then bump" is the single most common way a cold email operator burns a domain. Postmaster tools call it "user complaints" when the recipient responds by hitting spam instead of writing back a second time. Google is explicit about this in their sender guidelines.' },
     { type: 'link', text: 'Google email sender guidelines', href: 'https://support.google.com/mail/answer/81126', label: 'Google sender guidelines' },
 
@@ -248,7 +248,7 @@ const POST_2: WavePost = {
       'Score each row: 3 points for a permit filed in the last 60 days, 2 for a weather event forecast in the next 10 days, 1 for a weak GBP presence, 1 for R-22 references.',
       'Only send to rows scoring 3 or higher. The rest are lower-intent and burn your sender reputation.',
     ] },
-    { type: 'link', text: 'Milo product page', href: 'https://usemilo.com/', label: 'How Milo discovers, enriches, and drafts these' },
+    { type: 'link', text: 'Milo product page', href: '/how-it-works', label: 'How Milo discovers, enriches, and drafts these' },
 
     { type: 'h2', text: 'What to avoid', id: 'avoid' },
     { type: 'ul', items: [
@@ -360,7 +360,7 @@ const POST_3: WavePost = {
       'For property manager outbound, pull commercial multifamily addresses from public records and match to their management company site.',
       'Score each row: 3 points for storm warning in the window, 2 for missing 24/7 line, 2 for review dip in last 90 days, 1 for missing schema.',
     ] },
-    { type: 'link', text: 'Milo product page', href: 'https://usemilo.com/', label: 'How Milo runs the discovery + crawl + draft loop' },
+    { type: 'link', text: 'Milo product page', href: '/how-it-works', label: 'How Milo runs the end-to-end prospecting loop' },
 
     { type: 'h2', text: 'What to avoid', id: 'avoid' },
     { type: 'ul', items: [

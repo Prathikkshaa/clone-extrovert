@@ -61,8 +61,7 @@ export const WAVE4C_POSTS: BlogPost[] = [
       { type: 'h2', text: 'Step 5: shape outreach around the signal' },
       { type: 'p', text: 'One email, one signal, one ask. If the signal was the hiring page, the first line names it. If it was the financing partner, the first line names that. The pitch is the same but the entry point is not. This is where a signal-first list finally pays off.' },
 
-      { type: 'link', label: 'Milo product tour', href: 'https://usemilo.com', text: 'Milo runs this exact loop: Places discovery, public-web research-based site crawl, LLM enrichment for signals, and drafting from your own inbox.' },
-      { type: 'link', label: 'public-web research', href: 'https://firecrawl.dev', text: 'The crawler we lean on for the website read step.' },
+      { type: 'link', label: 'How Milo works', href: '/how-it-works', text: 'Milo runs this exact loop end to end: discover the businesses that match your signal, personalize the outreach, and send it from your own inbox.' },
 
       { type: 'h2', text: 'Ethics note' },
       { type: 'callout', tone: 'warn', title: 'Stay on the right side of the line', text: 'Public data is fair to collect. Personal emails scraped through workarounds are not. Respect robots directives, respect the Google Maps terms of service, and never buy consumer data. If your outreach would embarrass you if the recipient forwarded it to a competitor, rewrite it.' },
@@ -132,7 +131,7 @@ export const WAVE4C_POSTS: BlogPost[] = [
       { type: 'h2', text: 'Sending mechanics' },
       { type: 'p', text: 'Send from your own domain, warmed up for at least two weeks before volume. Cap at 20 to 30 per day per inbox for the first month. Reply routing back to a real inbox you actually read. Anything that looks like a mass send in the raw email will land in spam eventually.' },
       { type: 'link', label: 'Google bulk sender guidelines', href: 'https://support.google.com/mail/answer/81126', text: 'The rules Gmail actually enforces for senders. Read this before you send.' },
-      { type: 'link', label: 'Milo for freelancers', href: 'https://usemilo.com', text: 'Milo drafts from your own Gmail or Outlook, with warm-up and reply routing built in. Pay-as-you-go credits, no seat cost.' },
+      { type: 'link', label: 'Milo for freelancers', href: '/how-it-works', text: 'Milo drafts from your own Gmail or Outlook, with warm-up and reply routing built in. Pay-as-you-go credits, no seat cost.' },
 
       { type: 'callout', tone: 'success', title: 'One rule that saved us a year', text: 'Never send an email you would not be proud to have a friend forward. Cold does not mean careless. If the observation is real and the offer is real, the email will feel human even at volume.' },
 
@@ -194,7 +193,7 @@ export const WAVE4C_POSTS: BlogPost[] = [
 
       { type: 'h2', text: 'How to choose without regret' },
       { type: 'p', text: 'Ask three questions. One, do you have people whose full job is to work a list? If yes, database tools earn their seat cost. Two, is your ICP local or physical? If yes, a Maps-native tool beats a national DB. Three, do you personalize per account or per sequence? Per account maps to Milo, per sequence maps to Apollo.' },
-      { type: 'link', label: 'Milo product page', href: 'https://usemilo.com', text: 'Full feature list and pricing.' },
+      { type: 'link', label: 'Milo product page', href: '/how-it-works', text: 'Full feature list and pricing.' },
 
       { type: 'h2', text: 'Common misreads' },
       { type: 'p', text: 'A few things we hear that are not quite right. Milo is not "Apollo but cheaper". The data model is different. Milo is not going to hand you two million contacts. Apollo is not "unusable for small teams". It is usable, just priced for a team that has more headcount than a two person startup usually does. Pick the shape, not the marketing.' },
@@ -257,10 +256,8 @@ export const WAVE4C_POSTS: BlogPost[] = [
       { type: 'p', text: 'We do not buy a database. We do not hire an agency. We do not run paid ads before we know the message works cold. We do not add a second product wedge in month two because a customer asked. All of these look like progress and none of them are.' },
 
       { type: 'h2', text: 'What tools we would use' },
-      { type: 'p', text: 'A live discovery source (Google Places or a niche directory), a crawler for site reads, an LLM step for signal detection and drafting, our own Gmail or Outlook for sending, and a spreadsheet. That is enough. Milo bundles the first four so we can spend the founder hour on writing and reading replies instead of stitching tools.' },
-      { type: 'link', label: 'Milo', href: 'https://usemilo.com', text: 'The tool we built for exactly this loop.' },
-      { type: 'link', label: 'Google Places API', href: 'https://developers.google.com/maps/documentation/places/web-service/overview', text: 'The discovery source we lean on for local ICPs.' },
-      { type: 'link', label: 'public-web research', href: 'https://firecrawl.dev', text: 'The site crawler we use for signal extraction.' },
+      { type: 'p', text: 'A live way to discover businesses in your ICP, a way to read their public profile, a way to draft in your voice, your own Gmail or Outlook for sending, and a spreadsheet for tracking. That is enough. Milo bundles the first four so you can spend the founder hour writing and reading replies instead of stitching tools.' },
+      { type: 'link', label: 'How Milo works', href: '/how-it-works', text: 'The tool we built for exactly this loop.' },
 
       { type: 'faq', items: [
         { q: 'Should we hire an SDR at day 90?', a: 'Only if you can hand them a written playbook that already produced revenue in your own hands. Hiring before that is expensive tuition.' },
