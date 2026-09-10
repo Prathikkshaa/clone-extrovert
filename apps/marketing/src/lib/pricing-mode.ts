@@ -8,8 +8,6 @@
 // explicit env flip. The Stripe products in @extrovertai/shared are the source
 // of truth for real transactions; the entries below are UI descriptors only.
 // Wire the Stripe products before flipping to `beta` or `ga` in production.
-import type { ComponentType } from 'react';
-
 export type PricingMode = 'legacy' | 'beta' | 'ga';
 
 export const PRICING_MODE: PricingMode = (() => {
@@ -21,17 +19,24 @@ export const PRICING_MODE: PricingMode = (() => {
 /** A card the redesigned pricing component renders. Purely descriptive. */
 export type PricingCard = {
   id: string;
+  /** 2-char mono index shown top-right, e.g. "01". */
+  index: string;
   label: string;
-  bestIf: string;
+  /** One-sentence audience line: "For solo founders running..." */
+  audience: string;
   price: string;
   priceSuffix?: string;
+  /** Bold outcome anchor: "~180 leads end to end". */
   outcome: string;
+  /** One-line value under the outcome. Kept short. */
+  outcomeNote: string;
   features: string[];
   ctaLabel: string;
+  /** Show a small arrow after the CTA label. */
+  ctaArrow?: boolean;
   ctaHref: string;
   microcopy: string;
   highlight?: 'popular';
-  Icon: ComponentType<{ className?: string }>;
 };
 
 /** Compact strip rendered below the card row when a mode has a Custom tier. */
