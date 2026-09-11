@@ -112,6 +112,17 @@ export const AUTHOR_BY_SLUG: Record<string, AuthorId> = {
   'milo-vs-clay-signal-first-prospecting': 'arun',
   'what-to-say-when-they-reply-cold-email-response-playbook': 'tara',
   'cold-email-deliverability-from-gmail-workspace-2026': 'tara',
+
+  // Wave 6: services-sold-to-contractors verticals
+  'selling-marketing-services-to-roofers': 'zoya',
+  'selling-marketing-services-to-hvac-contractors': 'zoya',
+  'selling-marketing-services-to-plumbing-contractors': 'zoya',
+
+  // Wave 7: higher-margin verticals (legal, dental, med-spa, veterinary)
+  'legal-firm-lead-generation-signals': 'abhimanyu',
+  'dental-practice-new-patient-leads-2026': 'abhimanyu',
+  'med-spa-cold-outreach-playbook': 'abhimanyu',
+  'veterinary-clinic-outbound-playbook': 'abhimanyu',
 };
 
 export function authorFor(slug: string): Author {
