@@ -34,11 +34,11 @@ export const AUTHORS: Record<AuthorId, Author> = {
   },
   tara: {
     id: 'tara',
-    name: 'Tara',
-    initials: 'T',
+    name: 'Prathikkshaa',
+    initials: 'P',
     role: 'Deliverability editor',
     bio:
-      'Spent six years running lifecycle at two Series B SaaS companies before the RFC rabbit hole ate her. Now she reads Postmaster Tools, SPF alignment specs, and the actual Google sender guidelines so you can send from your own domain without setting it on fire.',
+      'Spent six years running lifecycle at two Series B SaaS companies before the RFC rabbit hole took over. Now reads Postmaster Tools, SPF alignment specs, and the actual Google sender guidelines so you can send from your own domain without setting it on fire.',
     focus: ['Deliverability', 'Compliance', 'Cadence', 'Benchmarks'],
     signature: 'Cites the RFC. Shows the header. Never says "best practice" without a source.',
     sameAs: [],
@@ -105,6 +105,24 @@ export const AUTHOR_BY_SLUG: Record<string, AuthorId> = {
   'prospecting-list-from-google-maps': 'abhimanyu',
   'freelance-clients-cold-email': 'arun',
   'prospecting-bootstrapped-founder': 'arun',
+
+  // Wave 5: anti-features, booking flow, comparison, reply playbook, deliverability
+  'what-milo-does-not-do': 'arun',
+  'cold-email-to-booked-call-with-cal-com': 'abhimanyu',
+  'milo-vs-clay-signal-first-prospecting': 'arun',
+  'what-to-say-when-they-reply-cold-email-response-playbook': 'tara',
+  'cold-email-deliverability-from-gmail-workspace-2026': 'tara',
+
+  // Wave 6: services-sold-to-contractors verticals
+  'selling-marketing-services-to-roofers': 'zoya',
+  'selling-marketing-services-to-hvac-contractors': 'zoya',
+  'selling-marketing-services-to-plumbing-contractors': 'zoya',
+
+  // Wave 7: higher-margin verticals (legal, dental, med-spa, veterinary)
+  'legal-firm-lead-generation-signals': 'abhimanyu',
+  'dental-practice-new-patient-leads-2026': 'abhimanyu',
+  'med-spa-cold-outreach-playbook': 'abhimanyu',
+  'veterinary-clinic-outbound-playbook': 'abhimanyu',
 };
 
 export function authorFor(slug: string): Author {

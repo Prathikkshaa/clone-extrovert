@@ -1,7 +1,7 @@
-// /llms.txt — a curated, plain-text summary for AI assistants (ChatGPT, Claude,
+// /llms.txt - a curated, plain-text summary for AI assistants (ChatGPT, Claude,
 // Perplexity, Google AI Overviews). Served as a build-time static route so it
 // reuses the same single sources as the rest of the site (no drift) and never
-// discloses the lead data source — leads are only ever described as "public
+// discloses the lead data source - leads are only ever described as "public
 // business information anyone can look up" (same framing as the FAQ).
 import { APP_NAME, SITE_URL, SITE_DESCRIPTION } from '@/lib/site';
 import { FREE_SIGNUP_CREDITS } from '@extrovertai/shared';

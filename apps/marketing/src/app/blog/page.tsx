@@ -15,7 +15,7 @@ export async function generateMetadata({
     ? params.cluster
     : null;
   const base: Metadata = {
-    title: activeCluster ? `${clusterLabel(activeCluster)} — Milo blog` : 'Blog',
+    title: activeCluster ? `${clusterLabel(activeCluster)} · Milo blog` : 'Blog',
     description:
       'Practical playbooks on finding local business leads, buying signals, personalized cold email, deliverability, and compliance. Written by operators, not marketers.',
     alternates: { canonical: '/blog' },
@@ -68,51 +68,65 @@ export default async function BlogIndexPage({
           </p>
         </div>
 
-        {/* Cluster filter. Editorial pill-row, not dashboard tags. */}
-        <nav aria-label="Filter posts by cluster" className="mt-12 flex flex-wrap gap-x-6 gap-y-3 border-b border-line pb-4">
-          <Link
-            href="/blog"
-            className={
-              'font-mono text-[0.75rem] uppercase tracking-[0.14em] transition-colors ' +
-              (!activeCluster
-                ? 'text-accent'
-                : 'text-muted hover:text-ink')
-            }
-          >
-            All posts
-          </Link>
-          {BLOG_CLUSTERS.map((c) => (
+        {/* Cluster filter. Labeled row of pills so the reader knows it filters. */}
+        <div className="mt-12 flex flex-wrap items-center gap-2 border-b border-line pb-4">
+          <p className="mr-3 font-mono text-[0.72rem] uppercase tracking-[0.18em] text-muted">
+            Filter by topic:
+          </p>
+          <nav aria-label="Filter posts by cluster" className="flex flex-wrap gap-2">
             <Link
-              key={c.id}
-              href={`/blog?cluster=${c.id}`}
+              href="/blog#posts"
+              scroll={false}
+              aria-current={!activeCluster ? 'page' : undefined}
               className={
-                'font-mono text-[0.75rem] uppercase tracking-[0.14em] transition-colors ' +
-                (activeCluster === c.id
-                  ? 'text-accent'
-                  : 'text-muted hover:text-ink')
+                'rounded-full border px-3.5 py-1.5 font-mono text-[0.7rem] uppercase tracking-[0.12em] transition-colors ' +
+                (!activeCluster
+                  ? 'border-accent bg-accent text-white'
+                  : 'border-line text-muted hover:border-accent hover:text-accent')
               }
             >
-              {c.label}
+              All ({BLOG_POSTS.length})
             </Link>
-          ))}
-        </nav>
+            {BLOG_CLUSTERS.map((c) => {
+              const count = BLOG_POSTS.filter((p) => clusterIdFor(p) === c.id).length;
+              const active = activeCluster === c.id;
+              return (
+                <Link
+                  key={c.id}
+                  href={`/blog?cluster=${c.id}#posts`}
+                  scroll={false}
+                  aria-current={active ? 'page' : undefined}
+                  className={
+                    'rounded-full border px-3.5 py-1.5 font-mono text-[0.7rem] uppercase tracking-[0.12em] transition-colors ' +
+                    (active
+                      ? 'border-accent bg-accent text-white'
+                      : 'border-line text-muted hover:border-accent hover:text-accent')
+                  }
+                >
+                  {c.label} ({count})
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
       </section>
 
-      {/* Featured piece. Editorial hero. No card frame; typography-forward. */}
+      {/* Featured piece. Fixed structure so layout does not shift between filters:
+          consistent h2/excerpt line clamps, fixed thumbnail aspect. */}
       {featured ? (
-        <section className="shell mt-12 md:mt-16">
-          <Link href={`/blog/${featured.slug}`} className="group grid gap-8 md:grid-cols-[1.15fr_1fr] md:gap-12">
-            <div>
+        <section className="shell mt-12 md:mt-16" id="posts" style={{ scrollMarginTop: '5rem' }}>
+          <Link href={`/blog/${featured.slug}`} className="group grid gap-8 md:grid-cols-[1.15fr_1fr] md:gap-12 md:items-start">
+            <div className="flex flex-col md:min-h-[16rem]">
               <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-accent">
                 Featured · {featured.category}
               </p>
-              <h2 className="mt-4 text-[2rem] font-medium leading-[1.1] tracking-tight text-ink transition-colors group-hover:text-accent md:text-[2.5rem] lg:text-[2.75rem]">
+              <h2 className="mt-4 line-clamp-2 text-[1.75rem] font-medium leading-[1.15] tracking-tight text-ink transition-colors group-hover:text-accent md:text-[2.125rem] lg:text-[2.375rem]">
                 {featured.title}
               </h2>
-              <p className="mt-5 max-w-prose text-body-lg leading-[1.55] text-ink/85 md:text-[1.25rem]">
+              <p className="mt-5 line-clamp-3 max-w-prose text-body-lg leading-[1.55] text-ink/85 md:text-[1.125rem]">
                 {featured.excerpt ?? featured.description}
               </p>
-              <div className="mt-6 flex items-center gap-3 text-body-sm text-muted">
+              <div className="mt-auto flex items-center gap-3 pt-6 text-body-sm text-muted">
                 {(() => {
                   const a = authorFor(featured.slug);
                   return (
@@ -130,7 +144,6 @@ export default async function BlogIndexPage({
                 <span>{readMinutes(featured)} min read</span>
               </div>
             </div>
-            {/* Right column: themed cover figure (image SEO surface) */}
             <div className="hidden md:block">
               <PostThumbnail
                 post={featured}
@@ -141,15 +154,17 @@ export default async function BlogIndexPage({
         </section>
       ) : null}
 
-      {/* Grid — editorial-restrained, no shadow cards. Just typography, hover shift. */}
+      {/* Grid - consistent card structure: fixed thumbnail aspect + clamped
+          title (2 lines) + clamped excerpt (3 lines) + meta row = every card
+          renders the same height across every filter. */}
       <section className="shell mt-16 pb-24 md:mt-20">
         {rest.length ? (
           <ul className="grid gap-x-8 gap-y-14 border-t border-line pt-14 md:grid-cols-2 lg:grid-cols-3">
             {rest.map((post) => {
               const a = authorFor(post.slug);
               return (
-                <li key={post.slug}>
-                  <Link href={`/blog/${post.slug}`} className="group block">
+                <li key={post.slug} className="flex">
+                  <Link href={`/blog/${post.slug}`} className="group flex w-full flex-col">
                     <PostThumbnail
                       post={post}
                       className="aspect-[5/3] w-full rounded-md border border-line transition-colors group-hover:border-accent/40"
@@ -157,13 +172,13 @@ export default async function BlogIndexPage({
                     <p className="mt-4 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-accent">
                       {post.category}
                     </p>
-                    <h2 className="mt-2 text-[1.25rem] font-medium leading-[1.2] tracking-tight text-ink transition-colors group-hover:text-accent md:text-[1.375rem]">
+                    <h2 className="mt-2 line-clamp-2 min-h-[3rem] text-[1.25rem] font-medium leading-[1.2] tracking-tight text-ink transition-colors group-hover:text-accent md:min-h-[3.3rem] md:text-[1.375rem]">
                       {post.title}
                     </h2>
-                    <p className="mt-3 line-clamp-3 text-body leading-[1.55] text-ink/80">
+                    <p className="mt-3 line-clamp-3 min-h-[4.5rem] text-body leading-[1.55] text-ink/80">
                       {post.excerpt ?? post.description ?? ''}
                     </p>
-                    <p className="mt-5 flex items-center gap-2 text-body-sm text-muted">
+                    <p className="mt-auto flex items-center gap-2 pt-5 text-body-sm text-muted">
                       <span className="grid h-5 w-5 place-items-center rounded-full bg-accent-soft font-mono text-[0.6rem] text-accent">
                         {a.initials}
                       </span>
@@ -181,7 +196,7 @@ export default async function BlogIndexPage({
         ) : (
           <p className="border-t border-line pt-14 text-body-lg text-muted">
             No posts in {activeCluster ? clusterLabel(activeCluster) : 'this cluster'} yet.{' '}
-            <Link href="/blog" className="text-accent underline underline-offset-2">
+            <Link href="/blog" scroll={false} className="text-accent underline underline-offset-2">
               See all posts
             </Link>
             .

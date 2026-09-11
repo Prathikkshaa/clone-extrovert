@@ -449,15 +449,31 @@ const POST_4: WavePost = {
 
     { type: 'h2', text: 'Template 1: how do you pitch poor Core Web Vitals?', id: 'tpl-cwv' },
     { type: 'p', text: 'Signal: their LCP or INP is in the "poor" band per CrUX. Pull it from PageSpeed Insights, screenshot for evidence.' },
+    { type: 'h3', text: 'Worked example' },
+    {
+      type: 'callout',
+      tone: 'info',
+      title: 'Template 1, worked (Loomstack, Austin SaaS on WordPress)',
+      text: 'Subject: your LCP is 4.9s on mobile, Google\'s threshold is 2.5s\n\nHi Sarah, ran the Loomstack homepage through PageSpeed Insights this morning. Your mobile LCP is 4.9 seconds. Google\'s "good" threshold is 2.5 seconds per web.dev, and pages that stay in the "poor" band (over 4s) are demonstrably down-weighted in mobile rankings. The typical culprit on WordPress sites is a hero image that is not preloaded, and yours is loading a 1.4 MB PNG below the fold-blocking scripts. 20 minute call this week to walk you through the fix list?',
+    },
+    { type: 'h3', text: 'Blank template' },
     {
       type: 'callout',
       tone: 'info',
       title: 'Template 1 (signal: poor CWV)',
-      text: 'Subject: your LCP is {X.Xs} on mobile, Google\'s threshold is 2.5s\n\nHi {name}, ran your homepage through PageSpeed Insights this morning. Your mobile LCP is {X.X seconds}. Google\'s "good" threshold is 2.5 seconds per web.dev, and pages that stay in the "poor" band ({over 4s}) are demonstrably down-weighted in mobile rankings. The typical culprit on {CMS} sites is {hero image not preloaded / third-party script}. 20 minute call this week to walk you through the fix list?',
+      text: 'Subject: your LCP is {X.Xs} on mobile, Google\'s threshold is 2.5s\n\nHi {name}, ran your homepage through PageSpeed Insights this morning. Your mobile LCP is {X.X seconds}. Google\'s "good" threshold is 2.5 seconds per web.dev, and pages that stay in the "poor" band (over 4s) are demonstrably down-weighted in mobile rankings. The typical culprit on {CMS} sites is {hero image not preloaded / third-party script}. 20 minute call this week to walk you through the fix list?',
     },
 
     { type: 'h2', text: 'Template 2: how do you flag missing schema?', id: 'tpl-schema' },
     { type: 'p', text: 'Signal: their product, article, or local business pages are missing the appropriate schema.org markup. Verify with the Rich Results Test.' },
+    { type: 'h3', text: 'Worked example' },
+    {
+      type: 'callout',
+      tone: 'info',
+      title: 'Template 2, worked (Northshore Cycles, Manchester e-commerce)',
+      text: 'Subject: your product pages are missing schema Google actually uses\n\nHi James, I looked at northshorecycles.co.uk/products/trailhawk-29 through the Rich Results Test and it is not returning any structured data. For e-commerce, Product markup is what unlocks rich results (stars, price, availability) in the SERP. Your top three competitors (Rutland Cycling, Leisure Lakes, Tredz) all have it. Rough estimate: adding Product schema to your top 20 pages is 4-6 hours of work and typically moves CTR 10-15%. Worth a look?',
+    },
+    { type: 'h3', text: 'Blank template' },
     {
       type: 'callout',
       tone: 'info',
@@ -468,6 +484,14 @@ const POST_4: WavePost = {
 
     { type: 'h2', text: 'Template 3: how do you call out thin content?', id: 'tpl-thin' },
     { type: 'p', text: 'Signal: category or service pages under 300 words with no unique substance. This maps directly to Google\'s "helpful content" guidance.' },
+    { type: 'h3', text: 'Worked example' },
+    {
+      type: 'callout',
+      tone: 'info',
+      title: 'Template 3, worked (Verdant Home Cleaning, Melbourne)',
+      text: 'Subject: your end-of-lease cleaning page is 180 words, top competitor is 1,800\n\nHi Amelia, your verdanthomecleaning.com.au/services/end-of-lease page clocks in at ~180 words with mostly navigation. sparklecleanmelbourne.com.au/end-of-lease-cleaning is at ~1,800 words with FAQ, pricing signals, and internal links. Google\'s helpful content system explicitly rewards depth on commercial-intent queries. We could rewrite that page against the top three ranking pages for "end of lease cleaning Melbourne" and hand it back in a week. No lock-in on the trial page.',
+    },
+    { type: 'h3', text: 'Blank template' },
     {
       type: 'callout',
       tone: 'info',
@@ -478,6 +502,14 @@ const POST_4: WavePost = {
 
     { type: 'h2', text: 'Template 4: Broken sitemap', id: 'tpl-sitemap' },
     { type: 'p', text: 'Signal: their sitemap.xml is missing, returns non-200, includes noindex pages, or is not referenced in robots.txt.' },
+    { type: 'h3', text: 'Worked example' },
+    {
+      type: 'callout',
+      tone: 'info',
+      title: 'Template 4, worked (Brightlane Legal, Chicago)',
+      text: 'Subject: your sitemap is returning 404\n\nHi Marcus, hit brightlanelegal.com/sitemap.xml this morning. It 404s. That is one of the most common reasons Google Search Console shows "crawled - currently not indexed" for otherwise fine pages. Free fix, and I can send you the exact steps if you want, or we can pick it up as part of a broader technical audit. Either way, worth pulling into Search Console before your next Googlebot crawl.',
+    },
+    { type: 'h3', text: 'Blank template' },
     {
       type: 'callout',
       tone: 'info',
@@ -488,6 +520,14 @@ const POST_4: WavePost = {
 
     { type: 'h2', text: 'Template 5: Weak backlink profile', id: 'tpl-backlinks' },
     { type: 'p', text: 'Signal: their referring domain count is materially lower than the top three ranking competitors for their target keyword. Pull from Ahrefs, Semrush, or Moz.' },
+    { type: 'h3', text: 'Worked example' },
+    {
+      type: 'callout',
+      tone: 'info',
+      title: 'Template 5, worked (Kettlebrook Coffee Roasters, Portland)',
+      text: 'Subject: your competitors rank on 340 referring domains, you have 62\n\nHi Priya, checked the top three results for "specialty coffee subscription" this week. They average 340 referring domains (Trade Coffee, Atlas Coffee Club, Angels\' Cup). Kettlebrook is at 62, which is why you are stuck on page 2 despite better content. We run a digital PR loop that lands 3-5 real editorial mentions per month, no PBNs. Worth showing you the last three campaigns we ran for Ridgeline Roasters?',
+    },
+    { type: 'h3', text: 'Blank template' },
     {
       type: 'callout',
       tone: 'info',
