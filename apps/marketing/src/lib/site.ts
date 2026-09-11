@@ -52,8 +52,16 @@ export const NAV_LINKS = [
   { href: '/how-it-works', label: 'How it works' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/about', label: 'About' },
-  { href: '/blog', label: 'Blog' },
 ] as const;
+
+/** Resources group - surfaced as a dropdown in the primary nav. */
+export const NAV_RESOURCES = {
+  label: 'Resources',
+  items: [
+    { href: '/blog', label: 'Blog', description: 'Playbooks by operators' },
+    { href: '/ebooks', label: 'E-Books', description: 'Deeper guides, one PDF each' },
+  ],
+} as const;
 
 /** Footer link groups - real destinations, no fake badges (M00 §7). */
 export const FOOTER_GROUPS = [
@@ -70,7 +78,13 @@ export const FOOTER_GROUPS = [
     heading: 'Company',
     links: [
       { href: '/about', label: 'About' },
+    ],
+  },
+  {
+    heading: 'Resources',
+    links: [
       { href: '/blog', label: 'Blog' },
+      { href: '/ebooks', label: 'E-Books' },
     ],
   },
   {

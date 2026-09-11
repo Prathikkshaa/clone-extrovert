@@ -1,4 +1,4 @@
-// SERVER. Beta testimonials — two-row seamless marquee, opposite directions.
+// SERVER. Beta testimonials - two-row seamless marquee, opposite directions.
 //
 // NOTE: the names and roles below are PLACEHOLDERS for real beta-user
 // testimonials. Every quote was written from a persona brief that matches

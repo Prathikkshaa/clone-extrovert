@@ -8,13 +8,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Wordmark } from './wordmark';
 import { CtaButton } from './cta-button';
-import { LOGIN_URL, NAV_LINKS, SIGNUP_URL } from '@/lib/site';
+import { LOGIN_URL, NAV_LINKS, NAV_RESOURCES, SIGNUP_URL } from '@/lib/site';
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [onDark, setOnDark] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [resourcesOpen, setResourcesOpen] = useState(false);
   const pathname = usePathname();
+  const resourcesActive = NAV_RESOURCES.items.some((i) => pathname === i.href || pathname.startsWith(i.href + '/'));
 
   useEffect(() => {
     // Track scroll (for the hairline border) and whether the header currently
@@ -65,12 +67,12 @@ export function SiteHeader() {
       ].join(' ')}
     >
       <div className="shell flex items-center justify-between py-4">
-        <Wordmark onDark={onDark} />
+        {/* Left group: wordmark + primary nav clustered together */}
+        <div className="flex items-center gap-8 lg:gap-10">
+          <Wordmark onDark={onDark} />
 
-        {/* Right group: primary nav + CTA clustered on the right */}
-        <div className="hidden items-center gap-8 md:flex">
-          {/* Desktop nav */}
-          <nav aria-label="Primary" className="flex items-center gap-8">
+          {/* Desktop nav - sits next to the wordmark on the left */}
+          <nav aria-label="Primary" className="hidden items-center gap-7 md:flex lg:gap-8">
             {NAV_LINKS.map((link) => {
               const active = pathname === link.href;
               return (
@@ -92,14 +94,57 @@ export function SiteHeader() {
                 </Link>
               );
             })}
+
+            {/* Resources dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setResourcesOpen(true)}
+              onMouseLeave={() => setResourcesOpen(false)}
+            >
+              <button
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded={resourcesOpen}
+                onFocus={() => setResourcesOpen(true)}
+                onBlur={() => setResourcesOpen(false)}
+                className={[
+                  'text-body-sm transition-colors duration-200',
+                  onDark
+                    ? resourcesActive
+                      ? 'text-white'
+                      : 'text-white/70 hover:text-white'
+                    : resourcesActive
+                      ? 'text-accent'
+                      : 'text-muted hover:text-ink',
+                ].join(' ')}
+              >
+                {NAV_RESOURCES.label}
+              </button>
+              {resourcesOpen ? (
+                <div
+                  role="menu"
+                  aria-label={NAV_RESOURCES.label}
+                  className="absolute left-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-md border border-line bg-canvas shadow-float"
+                >
+                  {NAV_RESOURCES.items.map((it) => (
+                    <Link
+                      key={it.href}
+                      href={it.href}
+                      role="menuitem"
+                      className="block px-4 py-3 text-body-sm text-ink transition-colors hover:bg-accent-soft/60"
+                    >
+                      <span className="block font-medium">{it.label}</span>
+                      <span className="mt-0.5 block text-body-sm text-muted">{it.description}</span>
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </nav>
+        </div>
 
-          {/* Subtle divider between wayfinding links and the action */}
-          <span
-            className={['h-5 w-px transition-colors duration-300', onDark ? 'bg-white/25' : 'bg-line'].join(' ')}
-            aria-hidden
-          />
-
+        {/* Right group: log in + primary CTA */}
+        <div className="hidden items-center gap-6 md:flex">
           <Link
             href={LOGIN_URL}
             className={[
@@ -164,6 +209,21 @@ export function SiteHeader() {
               ].join(' ')}
             >
               {link.label}
+            </Link>
+          ))}
+          <p className="mt-2 px-2 pt-3 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-muted">
+            {NAV_RESOURCES.label}
+          </p>
+          {NAV_RESOURCES.items.map((it) => (
+            <Link
+              key={it.href}
+              href={it.href}
+              className={[
+                'rounded-md px-2 py-3 text-body transition-colors',
+                pathname === it.href ? 'bg-accent-soft text-accent' : 'text-ink hover:bg-accent-soft/60',
+              ].join(' ')}
+            >
+              {it.label}
             </Link>
           ))}
           <div className="mt-3 flex flex-col gap-2">

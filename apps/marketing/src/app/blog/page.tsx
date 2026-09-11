@@ -15,7 +15,7 @@ export async function generateMetadata({
     ? params.cluster
     : null;
   const base: Metadata = {
-    title: activeCluster ? `${clusterLabel(activeCluster)} — Milo blog` : 'Blog',
+    title: activeCluster ? `${clusterLabel(activeCluster)} · Milo blog` : 'Blog',
     description:
       'Practical playbooks on finding local business leads, buying signals, personalized cold email, deliverability, and compliance. Written by operators, not marketers.',
     alternates: { canonical: '/blog' },
@@ -154,7 +154,7 @@ export default async function BlogIndexPage({
         </section>
       ) : null}
 
-      {/* Grid — consistent card structure: fixed thumbnail aspect + clamped
+      {/* Grid - consistent card structure: fixed thumbnail aspect + clamped
           title (2 lines) + clamped excerpt (3 lines) + meta row = every card
           renders the same height across every filter. */}
       <section className="shell mt-16 pb-24 md:mt-20">

@@ -2,12 +2,12 @@ import type { BlogPost } from './posts';
 
 /**
  * Content-aware SVG thumbnail per post. Reads `category` (and lightly, `tags`)
- * to pick a mockup template and populate real labels — badge stacks for
+ * to pick a mockup template and populate real labels - badge stacks for
  * deliverability, email mockup for cold email, side-by-side for comparison,
  * defect list for verticals, signal ladder for buying signals, capability
  * matrix for AI SDR, anti-features grid for positioning.
  *
- * Inline SVG — no HTTP request, real <title>/<desc> for image SEO + a11y.
+ * Inline SVG - no HTTP request, real <title>/<desc> for image SEO + a11y.
  * Deterministic slug-hash chooses ONE emphasized item per template so no
  * two posts read identical.
  */
@@ -57,7 +57,7 @@ function pickCategory(post: BlogPost): 'deliverability' | 'coldEmail' | 'compari
 /* ─────── Sub-templates (each returns SVG children within a 240x144 viewBox) ─────── */
 
 function BadgeStack({ theme, hash, tags }: { theme: typeof THEMES['primary']; hash: number; tags: string[] }) {
-  // Deliverability / Compliance — stack of protocol badges + a "sent" pill.
+  // Deliverability / Compliance - stack of protocol badges + a "sent" pill.
   const badges = ['SPF', 'DKIM', 'DMARC', 'TLS'];
   if (tags.some((t) => /can-spam|gdpr|legal/i.test(t))) badges.splice(0, 4, 'CAN-SPAM', 'GDPR', 'CCPA');
   const emphasize = hash % badges.length;
@@ -102,7 +102,7 @@ function BadgeStack({ theme, hash, tags }: { theme: typeof THEMES['primary']; ha
 }
 
 function EmailMockup({ theme, hash }: { theme: typeof THEMES['primary']; hash: number }) {
-  // Cold email — envelope-shaped mockup with subject/body/CTA.
+  // Cold email - envelope-shaped mockup with subject/body/CTA.
   const openers = [
     'Noticed your LCP is 4.2s on mobile',
     'Saw the permit filed on Congress St',
@@ -134,7 +134,7 @@ function EmailMockup({ theme, hash }: { theme: typeof THEMES['primary']; hash: n
 }
 
 function CompareSideBySide({ theme, hash, post }: { theme: typeof THEMES['primary']; hash: number; post: BlogPost }) {
-  // Comparison — two columns with the compared entities.
+  // Comparison - two columns with the compared entities.
   const t = post.title.toLowerCase();
   const leftRight =
     t.includes('clay') ? ['Milo', 'Clay'] :
@@ -180,7 +180,7 @@ function CompareSideBySide({ theme, hash, post }: { theme: typeof THEMES['primar
 }
 
 function DefectList({ theme, hash, post }: { theme: typeof THEMES['primary']; hash: number; post: BlogPost }) {
-  // Verticals — bulleted defect rows the operator can act on.
+  // Verticals - bulleted defect rows the operator can act on.
   const t = post.title.toLowerCase();
   const defects =
     t.includes('roof') ? ['No storm-response page', 'Weak GBP reviews', 'No financing partner'] :
@@ -221,7 +221,7 @@ function DefectList({ theme, hash, post }: { theme: typeof THEMES['primary']; ha
 }
 
 function SignalLadder({ theme, hash, post }: { theme: typeof THEMES['primary']; hash: number; post: BlogPost }) {
-  // Buying signals / Local prospecting / Prospecting — signal cards with a scored top row.
+  // Buying signals / Local prospecting / Prospecting - signal cards with a scored top row.
   const t = post.title.toLowerCase();
   const rows =
     t.includes('local') || t.includes('map') ? ['New location opened', 'Permit filed', 'Weak reviews', 'No website'] :
@@ -259,7 +259,7 @@ function SignalLadder({ theme, hash, post }: { theme: typeof THEMES['primary']; 
 }
 
 function CapabilityMatrix({ theme, hash }: { theme: typeof THEMES['primary']; hash: number }) {
-  // AI SDR — 2x2 capability matrix.
+  // AI SDR - 2x2 capability matrix.
   const cells = [
     { label: 'Prospecting', mark: 'yes' },
     { label: 'Draft first line', mark: 'yes' },
@@ -293,7 +293,7 @@ function CapabilityMatrix({ theme, hash }: { theme: typeof THEMES['primary']; ha
 }
 
 function AntiFeatures({ theme, hash }: { theme: typeof THEMES['primary']; hash: number }) {
-  // Positioning — "what Milo does not do" grid.
+  // Positioning - "what Milo does not do" grid.
   const items = ['Contact DB', 'LinkedIn scrape', 'CRM sync', 'Cold call'];
   return (
     <>
@@ -327,7 +327,7 @@ export function PostThumbnail({ post, className, ariaHidden }: Props) {
   const h = hashSlug(post.slug);
   const kind = pickCategory(post);
 
-  const title = `${post.category} — ${post.title}`;
+  const title = `${post.category} · ${post.title}`;
   const desc = post.excerpt ?? post.description ?? `${post.category} playbook on ${post.title.toLowerCase()}.`;
   const titleId = `t-${post.slug}`;
   const descId = `d-${post.slug}`;

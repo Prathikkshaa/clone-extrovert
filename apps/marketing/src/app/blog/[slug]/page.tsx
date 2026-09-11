@@ -187,7 +187,7 @@ function BlockView({ block }: { block: Block }) {
           {block.text}
         </p>
         {block.cite ? (
-          <cite className="mt-3 block text-body-sm not-italic text-muted">— {block.cite}</cite>
+          <cite className="mt-3 block text-body-sm not-italic text-muted">{block.cite}</cite>
         ) : null}
       </blockquote>
     );
@@ -848,7 +848,7 @@ export default async function BlogPostPage({
                 </p>
               </blockquote>
               <figcaption className="mt-4 font-mono text-[0.68rem] uppercase tracking-[0.18em] text-muted">
-                — {author.name}, {author.role}
+                {author.name}, {author.role}
               </figcaption>
             </figure>
           ) : null}
@@ -969,7 +969,7 @@ export default async function BlogPostPage({
         </div>
       </div>
 
-      {/* Related — editorial grid with author + read time, no shadow cards. */}
+      {/* Related - editorial grid with author + read time, no shadow cards. */}
       {related.length ? (
         <section aria-labelledby="keep-reading" className="article-shell mt-24">
           <div className="flex items-baseline justify-between gap-4 border-b border-line pb-4">
