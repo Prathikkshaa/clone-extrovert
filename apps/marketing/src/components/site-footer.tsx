@@ -23,19 +23,46 @@ function ChatGptMark({ className }: { className?: string }) {
 }
 
 function ClaudeMark({ className }: { className?: string }) {
-  // Anthropic wordmark A + I glyph (Simple Icons: anthropic).
+  // Claude sunburst: 10 tapered rays radiating from a small core, matching
+  // Anthropic's product mark.
   return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="currentColor" className={className}>
-      <path d="M13.827 3.52h3.603L24 20.48h-3.603zm-7.258 0L0 20.48h3.603l1.319-3.535h6.223l1.319 3.535h3.603L9.402 3.52zM7.568 12.94l2.011-5.395 2.011 5.395z" />
+    <svg viewBox="0 0 100 100" width="18" height="18" aria-hidden fill="currentColor" className={className}>
+      {Array.from({ length: 10 }).map((_, i) => (
+        <ellipse
+          key={i}
+          cx="50"
+          cy="18"
+          rx="5"
+          ry="32"
+          transform={`rotate(${i * 36} 50 50)`}
+        />
+      ))}
+      <circle cx="50" cy="50" r="9" />
     </svg>
   );
 }
 
 function PerplexityMark({ className }: { className?: string }) {
-  // Perplexity mark (Simple Icons: perplexity).
+  // Perplexity 8-point compass: hex outline with cross + diagonal lines.
   return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="currentColor" className={className}>
-      <path d="M22.3977 7.0896h-2.313V.7519L11.4485 7.0896H2.4023v9.821h2.9208v6.5985l6.2662-6.6547v6.4147l7.4593-6.4147v6.4708h2.9208v-9.821h2.313zm-4.6349 0h-3.0247l3.0247-2.6996zm-7.6113 0-3.0247 2.6996 3.0247-2.6996Z" />
+    <svg
+      viewBox="0 0 24 24"
+      width="18"
+      height="18"
+      aria-hidden
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+      strokeLinecap="round"
+      className={className}
+    >
+      <path d="M12 2.5 L18.5 9 L18.5 15 L12 21.5 L5.5 15 L5.5 9 Z" />
+      <path d="M12 2.5 L12 21.5" />
+      <path d="M5.5 9 L18.5 9" />
+      <path d="M5.5 15 L18.5 15" />
+      <path d="M5.5 9 L18.5 15" />
+      <path d="M18.5 9 L5.5 15" />
     </svg>
   );
 }
