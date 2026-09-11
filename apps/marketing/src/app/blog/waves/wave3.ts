@@ -5,7 +5,7 @@ export const WAVE3_POSTS: BlogPost[] = [
     slug: 'find-local-businesses-without-a-website',
     title: 'How to find local businesses with no website (2026 playbook)',
     description:
-      'The operator guide to finding local businesses that still do not have a website, verifying the gap, and reaching the owner without spamming.',
+      'The operator guide to finding local businesses that still have no website, verifying the gap, and reaching the owner by phone before any email goes out.',
     datePublished: '2026-08-01',
     dateModified: '2026-09-10',
     category: 'Local prospecting',
@@ -194,7 +194,7 @@ export const WAVE3_POSTS: BlogPost[] = [
     slug: 'why-cold-emails-go-to-spam',
     title: 'Why cold emails go to spam (and the 2026 deliverability fix)',
     description:
-      'A 2026 fix for cold emails landing in spam: SPF, DKIM, DMARC, a 30-day warm-up, and the Gmail/Yahoo bulk-sender thresholds to clear.',
+      'Cold emails go to spam for three fixable reasons: broken SPF, DKIM, DMARC; a cold sending domain; and reply patterns Gmail and Yahoo read as complaints.',
     datePublished: '2026-08-12',
     dateModified: '2026-09-10',
     category: 'Deliverability',

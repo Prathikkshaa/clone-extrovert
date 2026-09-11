@@ -4,6 +4,8 @@ export const WAVE4A_POSTS: BlogPost[] = [
   {
     slug: 'what-is-an-ai-sdr',
     title: 'What is an AI SDR (and what it cannot do yet)',
+    description:
+      'A working definition of the AI SDR category, what shipping products like 11x, Regie, and Alta actually do, and where a human still has to sit in the loop.',
     excerpt: 'A direct definition of the AI SDR category, what current products actually do, and where the human still has to sit in the loop.',
     category: 'AI SDR',
     cluster: 'AI SDR',
@@ -91,6 +93,8 @@ export const WAVE4A_POSTS: BlogPost[] = [
   {
     slug: 'buying-signals-taxonomy',
     title: 'Buying signals: local, digital, and organisational',
+    description:
+      'A three axis taxonomy for buying signals: local, digital, organisational. Score each 0 to 3, act on totals of 5 or more, and stop guessing which lead is warm.',
     excerpt: 'A three-axis taxonomy for buying signals with a scoring rubric you can adopt directly.',
     category: 'Buying signals',
     cluster: 'Buying signals',
@@ -109,6 +113,15 @@ export const WAVE4A_POSTS: BlogPost[] = [
       { type: 'p', text: 'Most "buying signal" content flattens the concept into a single list. That is why teams end up chasing a mix of weak digital breadcrumbs and strong organisational events with the same urgency. A taxonomy fixes that.' },
 
       { type: 'callout', tone: 'info', title: 'Framework', text: 'The three-axis signal score. Rate each prospect 0 to 3 on Local signals, Digital signals and Organisational signals. Sum to a 0 to 9 score. Act on 5 and above, watch 3 to 4, ignore 0 to 2.' },
+
+      { type: 'h2', text: 'The Milo framework glossary', id: 'glossary' },
+      { type: 'p', text: 'This post introduces one framework. Two more show up across the Milo blog, and it helps to see all three in one place.' },
+      { type: 'definition', items: [
+        { term: 'Milo FTR Score', def: 'A per-signal quality score on three axes (Fit, Timing, Reachability), 1 to 3 each, 9 total. Anything under 6 goes to a nurture list. Introduced in the [buying-signal playbook for local B2B](/blog/buying-signal-playbook-local-b2b).' },
+        { term: 'Three-axis signal score', def: 'A per-account intent score across Local, Digital and Organisational axes, 0 to 3 each, 9 total. Act on 5 or more. Introduced in this post.' },
+        { term: 'Signal-first list build', def: 'A five-step framework for turning a raw local search into a working prospect list: pick market, pull public data, apply signals, qualify by fit, shape outreach. Introduced in [How to build a prospecting list from a Google Maps search](/blog/prospecting-list-from-google-maps).' },
+        { term: 'Stop-on-reply cadence', def: 'A four-message follow-up policy for cold email where the sequence terminates the moment a human replies. Introduced in [The stop-on-reply cadence](/blog/cold-email-follow-up-cadence).' },
+      ]},
 
       { type: 'h2', text: 'Axis 1: Local signals', id: 'local' },
       { type: 'p', text: 'Physical world evidence about a business. Anything you could in principle verify by walking past the shop, opening Google Maps or reading a local newspaper.' },
@@ -191,6 +204,8 @@ export const WAVE4A_POSTS: BlogPost[] = [
   {
     slug: 'cold-email-reply-rate-benchmarks-2026',
     title: 'Cold email reply rate benchmarks 2026',
+    description:
+      'Real cold email reply rate ranges from Woodpecker, Sendr, GMass, and Clay reports, broken down by daily volume and persona, with what counts as a red flag.',
     excerpt: 'Real reply rate benchmarks from primary source reports, broken down by volume and persona, with what counts as good, great and red-flag.',
     category: 'Cold email',
     cluster: 'Cold email',

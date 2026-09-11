@@ -9,6 +9,8 @@ export const WAVE4C_POSTS: BlogPost[] = [
     tags: ['google maps', 'prospecting', 'local sales', 'signals', 'list building'],
     datePublished: '2026-09-05',
     readMinutes: 10,
+    description:
+      'A five step method for turning a raw Google Maps search into a signal filtered prospecting list local sellers can actually work without burning a domain.',
     excerpt: 'A five step method for turning a Google Maps search into a prospecting list that is actually worth working.',
     related: [
       'buying-signal-playbook-local-b2b',
@@ -82,6 +84,8 @@ export const WAVE4C_POSTS: BlogPost[] = [
     tags: ['freelance', 'cold email', 'client acquisition', 'positioning', 'outbound'],
     datePublished: '2026-09-07',
     readMinutes: 11,
+    description:
+      'A concrete first 100 leads workflow for freelancers on cold email: pick a niche, build the list, send from your own inbox, and price the offer to close.',
     excerpt: 'A concrete first-100 leads workflow, a real cold email template, and how to price the offer so replies convert.',
     related: [
       'cold-email-first-line-signals',
@@ -155,6 +159,8 @@ export const WAVE4C_POSTS: BlogPost[] = [
     tags: ['bootstrapped', 'founder', 'prospecting', '90 day plan', 'outbound'],
     datePublished: '2026-09-09',
     readMinutes: 11,
+    description:
+      'The exact 90 day outbound plan a bootstrapped founder can run alone: month one discovery calls, month two signal outreach, month three iterate and narrow.',
     excerpt: 'What we would do in the first 90 days of outbound as a bootstrapped founder with no headcount and no ad budget.',
     related: [
       'freelance-clients-cold-email',

@@ -107,7 +107,7 @@ export const WAVE2_POSTS: BlogPost[] = [
     slug: 'get-web-design-clients-no-ads',
     title: 'How to get web design clients without ads',
     description:
-      'A playbook for freelance and agency web designers rooted in real website signals. Open the conversation with a fixable website problem, not a generic pitch.',
+      'A playbook for freelance and agency web designers rooted in real website signals. Open with a fixable problem on their site, not a generic pitch.',
     category: 'Verticals',
     cluster: 'Verticals',
     tags: ['web design', 'freelancing', 'client acquisition', 'cold email', 'agencies'],
@@ -172,7 +172,7 @@ export const WAVE2_POSTS: BlogPost[] = [
     slug: 'get-seo-clients-2026',
     title: 'How to get SEO clients in 2026',
     description:
-      'Signal-first client acquisition for SEO agencies and consultants. Find sites with fixable, quantifiable SEO problems and open with the audit, not the pitch.',
+      'SEO client acquisition rebuilt around real technical defects. Find sites with fixable CWV, schema, and content gaps, then open with the audit itself.',
     category: 'Verticals',
     cluster: 'Verticals',
     tags: ['seo', 'agency growth', 'cold email', 'lead generation', 'client acquisition'],
