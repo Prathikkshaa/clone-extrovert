@@ -43,7 +43,8 @@ function ClaudeMark({ className }: { className?: string }) {
 }
 
 function PerplexityMark({ className }: { className?: string }) {
-  // Perplexity 8-point compass: hex outline with cross + diagonal lines.
+  // Perplexity compass: four kite blades meeting at a central square, with the
+  // cardinal + diagonal spokes running through the middle.
   return (
     <svg
       viewBox="0 0 24 24"
@@ -57,12 +58,16 @@ function PerplexityMark({ className }: { className?: string }) {
       strokeLinecap="round"
       className={className}
     >
-      <path d="M12 2.5 L18.5 9 L18.5 15 L12 21.5 L5.5 15 L5.5 9 Z" />
-      <path d="M12 2.5 L12 21.5" />
-      <path d="M5.5 9 L18.5 9" />
-      <path d="M5.5 15 L18.5 15" />
-      <path d="M5.5 9 L18.5 15" />
-      <path d="M18.5 9 L5.5 15" />
+      {/* Top blade */}
+      <path d="M12 2 L16 8 L12 12 L8 8 Z" />
+      {/* Right blade */}
+      <path d="M22 12 L16 16 L12 12 L16 8 Z" />
+      {/* Bottom blade */}
+      <path d="M12 22 L8 16 L12 12 L16 16 Z" />
+      {/* Left blade */}
+      <path d="M2 12 L8 8 L12 12 L8 16 Z" />
+      {/* Central square */}
+      <path d="M8 8 L16 8 L16 16 L8 16 Z" />
     </svg>
   );
 }
