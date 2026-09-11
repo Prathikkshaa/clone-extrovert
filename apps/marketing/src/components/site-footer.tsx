@@ -12,40 +12,39 @@ const q = encodeURIComponent(AI_PROMPT);
  * Inline SVG marks per model. Monochrome-friendly (uses currentColor so
  * hover picks up the accent). Public brand marks reproduced at small size.
  */
+// Brand SVG paths sourced from Simple Icons (CC0). All marks use currentColor
+// so the hover state can swap to the brand tint via CSS.
 function ChatGptMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden fill="currentColor" className={className}>
-      <path d="M22.28 9.82a5.94 5.94 0 0 0-.51-4.88 6 6 0 0 0-6.47-2.88A6 6 0 0 0 4.98 4.18a5.94 5.94 0 0 0-3.98 2.88 6 6 0 0 0 .74 7.05 5.94 5.94 0 0 0 .51 4.88 6 6 0 0 0 6.47 2.88 5.98 5.98 0 0 0 4.5 2.02 6 6 0 0 0 5.83-4.4 5.94 5.94 0 0 0 3.98-2.88 6 6 0 0 0-.75-7.05Zm-9.02 12.53a4.45 4.45 0 0 1-2.86-1.03l.14-.08 4.75-2.73a.77.77 0 0 0 .39-.68v-6.68l2.01 1.16a.07.07 0 0 1 .04.05v5.53a4.5 4.5 0 0 1-4.47 4.46Zm-9.6-4.1a4.44 4.44 0 0 1-.53-2.98l.14.08 4.75 2.73c.24.14.53.14.77 0l5.8-3.34v2.32a.07.07 0 0 1-.03.06L9.77 20a4.5 4.5 0 0 1-6.11-1.65Zm-1.24-10.4a4.47 4.47 0 0 1 2.33-1.96V12a.77.77 0 0 0 .38.66l5.79 3.34-2 1.16a.07.07 0 0 1-.07 0L4.05 14.4A4.5 4.5 0 0 1 2.42 7.86Zm16.5 3.84L13.13 8.35l2-1.15a.07.07 0 0 1 .06 0l4.81 2.78a4.5 4.5 0 0 1-.68 8.11v-5.72a.77.77 0 0 0-.4-.66Zm2-3.01-.14-.08L15.98 5.87a.79.79 0 0 0-.78 0L9.4 9.22V6.9a.07.07 0 0 1 .03-.06l4.81-2.77a4.5 4.5 0 0 1 6.68 4.66Zm-12.55 4.13-2-1.16a.07.07 0 0 1-.04-.05V6.1a4.5 4.5 0 0 1 7.38-3.45l-.14.08L8.82 5.46a.77.77 0 0 0-.39.68l-.06 6.7Zm1.09-2.35 2.58-1.49 2.58 1.49v2.98l-2.58 1.49-2.58-1.49v-2.98Z" />
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="currentColor" className={className}>
+      <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729Zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944Zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464ZM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872Zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667Zm2.0107-3.0231-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66ZM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813Zm1.0976-2.3654 2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z" />
     </svg>
   );
 }
 
 function ClaudeMark({ className }: { className?: string }) {
-  // Anthropic mark: two mirrored ink strokes suggesting the wordmark 'A'.
+  // Anthropic wordmark A + I glyph (Simple Icons: anthropic).
   return (
     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="currentColor" className={className}>
-      <path d="M7.85 4.5h2.87l4.6 15h-2.85l-1.02-3.5H7.75l-1.02 3.5H3.88l3.97-15Zm.5 9.1h3.1l-1.53-5.3-1.57 5.3Zm7.28-9.1h2.86v15h-2.86v-15Z" />
+      <path d="M13.827 3.52h3.603L24 20.48h-3.603zm-7.258 0L0 20.48h3.603l1.319-3.535h6.223l1.319 3.535h3.603L9.402 3.52zM7.568 12.94l2.011-5.395 2.011 5.395z" />
     </svg>
   );
 }
 
 function PerplexityMark({ className }: { className?: string }) {
-  // Perplexity radial: text-mark 'p' inside a circle motif approximated by a
-  // 4-petal outline plus a small emphasis dot.
+  // Perplexity mark (Simple Icons: perplexity).
   return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" className={className}>
-      <path d="M12 3v18" />
-      <path d="M6 7l6-4 6 4v10l-6 4-6-4V7Z" />
-      <circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" />
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="currentColor" className={className}>
+      <path d="M22.3977 7.0896h-2.313V.7519L11.4485 7.0896H2.4023v9.821h2.9208v6.5985l6.2662-6.6547v6.4147l7.4593-6.4147v6.4708h2.9208v-9.821h2.313zm-4.6349 0h-3.0247l3.0247-2.6996zm-7.6113 0-3.0247 2.6996 3.0247-2.6996Z" />
     </svg>
   );
 }
 
 function GeminiMark({ className }: { className?: string }) {
-  // Gemini four-point star (concave-diamond shape).
+  // Gemini four-point sparkle (Simple Icons: googlegemini).
   return (
     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="currentColor" className={className}>
-      <path d="M12 1.6c.5 5 3.4 8 8.4 8.4-5 .5-7.9 3.4-8.4 8.4-.5-5-3.4-7.9-8.4-8.4 5-.5 7.9-3.4 8.4-8.4Z" />
+      <path d="M12 24A14.304 14.304 0 0 0 0 12 14.304 14.304 0 0 0 12 0a14.305 14.305 0 0 0 12 12 14.305 14.305 0 0 0-12 12" />
     </svg>
   );
 }
