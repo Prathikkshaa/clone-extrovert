@@ -25,7 +25,7 @@ export const WAVE2_POSTS: BlogPost[] = [
 
       { type: 'h3', text: '1. No website on Google Business Profile', id: 'no-website' },
       { type: 'p', text: 'A business ranks on Maps but the profile has no website link, or the link points to a Facebook page. This is the highest-intent local signal for web designers and agencies. Spot it by scanning Places results for the missing website field.' },
-      { type: 'callout', tone: 'success', title: 'Opener', text: 'Saw you rank #3 for plumbers in Coimbatore but the Maps profile links to Facebook. Losing calls to competitors who show a site.' },
+      { type: 'callout', tone: 'success', title: 'Opener', text: 'Saw you rank #3 for plumbers in Austin but the Maps profile links to Facebook. Losing calls to competitors who show a site.' },
 
       { type: 'h3', text: '2. Thin Google Business Profile', id: 'thin-gbp' },
       { type: 'p', text: 'Fewer than five photos, no service list, no hours, or a generic category. The business is technically listed but effectively invisible for anything beyond a direct name search. Any local SEO or marketing service can point to specifics.' },
@@ -88,7 +88,7 @@ export const WAVE2_POSTS: BlogPost[] = [
       { type: 'p', text: 'For government-adjacent verticals, a live tender tells you exactly what they are buying and by when. Search the state e-procurement portals.' },
       { type: 'callout', tone: 'success', title: 'Opener', text: 'Saw your tender for facilities management services closes on the 22nd. We are not bidding but the scope suggests a bigger gap in your intake process.' },
 
-      { type: 'h2', text: 'How to work these signals', id: 'work' },
+      { type: 'h2', text: 'How do you work these signals?', id: 'work' },
       { type: 'p', text: 'Pick two signals that map to what you sell. Build a list of 50 to 100 businesses that match. Reference the signal in the first line of every email. Ninety percent of cold outreach fails at that first line, not the offer.' },
       { type: 'link', text: 'Signal vs database prospecting: why the list matters more than the copy.', href: '/blog/signal-vs-database-prospecting', label: 'Signal vs database' },
       { type: 'link', text: 'Milo runs Places discovery, site crawls, and enrichment to surface these signals automatically.', href: '/', label: 'How Milo works' },
@@ -107,7 +107,7 @@ export const WAVE2_POSTS: BlogPost[] = [
     slug: 'get-web-design-clients-no-ads',
     title: 'How to get web design clients without ads',
     description:
-      'A playbook for freelance and agency web designers rooted in real website signals. Open the conversation with a fixable website problem, not a generic pitch.',
+      'A playbook for freelance and agency web designers rooted in real website signals. Open with a fixable problem on their site, not a generic pitch.',
     category: 'Verticals',
     cluster: 'Verticals',
     tags: ['web design', 'freelancing', 'client acquisition', 'cold email', 'agencies'],
@@ -121,7 +121,7 @@ export const WAVE2_POSTS: BlogPost[] = [
     body: [
       { type: 'quote', text: 'The best web design pitch I ever wrote was three sentences long and started with the words "your homepage loads in 6.4 seconds." It closed a $9,000 project the same week.', cite: 'A freelancer we know, on why paid ads were never the answer' },
 
-      { type: 'h2', text: 'Why ads do not work for most web designers', id: 'ads' },
+      { type: 'h2', text: 'Why do ads fail most web designers?', id: 'ads' },
       { type: 'p', text: 'Search ads for "web designer" cost $8 to $30 per click in most markets. Even at a 5% landing page conversion and a 20% close rate, you are paying $800 to $3000 to acquire one client. That math kills freelancers and most small agencies. The businesses that need you the most are also not searching Google for "web designer." They are running a business that is quietly losing traffic because their site is broken.' },
 
       { type: 'h2', text: 'What is a buying signal for a web designer?', id: 'signals' },
@@ -137,7 +137,8 @@ export const WAVE2_POSTS: BlogPost[] = [
         ['Outdated design (pre-2015)', 'Visual inspection', 'Signals distrust to modern buyers'],
       ]},
 
-      { type: 'h2', text: 'How to build the list', id: 'list' },
+      { type: 'h2', text: 'How do you build the list?', id: 'list' },
+      { type: 'h3', text: 'Five steps from vertical to first send' },
       { type: 'steps', items: [
         { title: 'Pick one vertical and one city', text: 'Roofers in Austin. Dentists in Coimbatore. Pilates studios in Melbourne. Narrower is better because your first-line references will be sharper.' },
         { title: 'Pull the top 100 from the public directory', text: 'Manually or with a tool that queries an official business-directory API. You want name, address, phone, category, review count, and website URL.' },
@@ -148,14 +149,15 @@ export const WAVE2_POSTS: BlogPost[] = [
 
       { type: 'h2', text: 'The email template (one signal, one ask)', id: 'template' },
       { type: 'quote', text: 'Subject: quick note on the [service] page\n\nHi [First name],\n\nYour site loads in 5.8 seconds on 4G. The two roofers ranking above you on Maps load in under 2. Google treats that as a ranking signal and users bounce before the page paints.\n\nI redesigned the site for [reference client in same vertical] last quarter and got their LCP to 1.4s. Happy to send a two-minute video showing exactly which three things on your site are causing it, no pitch attached.\n\nWorth 15 minutes next week?\n\n[Your name]', cite: 'Signal-referenced cold email for a web designer' },
+      { type: 'h3', text: 'Why the three-sentence format works' },
       { type: 'callout', tone: 'info', title: 'Why this works', text: 'The first sentence proves you looked. The second sentence quantifies the loss. The third offers value before asking for time. No em dashes, no fluff.' },
 
       { type: 'h2', text: 'What about replies?', id: 'replies' },
       { type: 'p', text: 'You will get three kinds of replies. "Not interested" (archive, do not argue). "How much" (send a range, ask a diagnostic question, do not quote a fixed number by email). "Tell me more" (this is the meeting, book it inside the reply thread, not after five more messages).' },
       { type: 'link', text: 'If you are hitting spam, read our note on why cold emails go to spam.', href: '/blog/why-cold-emails-go-to-spam', label: 'Cold email deliverability' },
 
-      { type: 'h2', text: 'Scaling without becoming spam', id: 'scale' },
-      { type: 'p', text: 'A tight list of 40 businesses per week is more productive than a database blast to 4000. You are trading volume for reply rate. Realistic targets: 8 to 15% reply rate, 20 to 30% of replies convert to a call, 15 to 25% of calls convert to a paid project. On a list of 40 that is one to two projects per week.' },
+      { type: 'h2', text: 'How do you scale without becoming spam?', id: 'scale' },
+      { type: 'p', text: 'A tight list of 40 businesses per week is more productive than a database blast to 4000. You are trading volume for reply rate. In Milo\'s beta cohort (US, UK, EU, India, mixed verticals) we observe 5 to 12% reply rates on tight signal-first lists, with a smaller share of those replies converting to a call and a smaller share still to a paid project. On a list of 40, one to two projects per week is a plausible upper end when the signal is strong.' },
       { type: 'takeaway', title: 'The one thing to remember', text: 'Web design clients are not searching Google for a web designer. They are running a business that is quietly losing traffic because their site is broken. If the first sentence of your email quantifies a specific defect on their own site, the rest of the offer barely needs to argue.' },
 
       { type: 'faq', items: [
@@ -172,7 +174,7 @@ export const WAVE2_POSTS: BlogPost[] = [
     slug: 'get-seo-clients-2026',
     title: 'How to get SEO clients in 2026',
     description:
-      'Signal-first client acquisition for SEO agencies and consultants. Find sites with fixable, quantifiable SEO problems and open with the audit, not the pitch.',
+      'SEO client acquisition rebuilt around real technical defects. Find sites with fixable CWV, schema, and content gaps, then open with the audit itself.',
     category: 'Verticals',
     cluster: 'Verticals',
     tags: ['seo', 'agency growth', 'cold email', 'lead generation', 'client acquisition'],
@@ -184,7 +186,7 @@ export const WAVE2_POSTS: BlogPost[] = [
     datePublished: '2026-08-11',
     readMinutes: 7,
     body: [
-      { type: 'tldr', text: 'In 2026, SEO buyers are skeptical and audit-fatigued. What still works is finding sites with specific, quantifiable SEO defects and leading the email with the defect, not the offer. This is the operator playbook.' },
+      { type: 'tldr', text: 'Fix the LCP first. If a prospect\'s homepage loads its hero image at 4.2 seconds on a 4G throttle, no "free audit" PDF is going to convert them, and no cold email built on "we noticed some issues" will either. The 2026 SEO client pitch that still works is the one that quotes the defect in the first sentence and treats the offer as an afterthought.' },
 
       { type: 'h2', text: 'Why "we do SEO" no longer sells', id: 'why' },
       { type: 'p', text: 'Every business owner has been pitched by 40 SEO agencies. The offer is generic. The audit is templated. Half the time the "free audit" is a PDF full of red bars from a crawl tool with no interpretation. Buyers filter this out reflexively. What breaks through is a first sentence that quantifies a specific problem the owner did not know they had.' },
@@ -204,7 +206,8 @@ export const WAVE2_POSTS: BlogPost[] = [
 
       { type: 'link', text: 'Core Web Vitals thresholds are published by Google on web.dev.', href: 'https://web.dev/articles/vitals', label: 'CWV reference' },
 
-      { type: 'h2', text: 'How to build a signal-first SEO prospect list', id: 'list' },
+      { type: 'h2', text: 'How do you build a signal-first SEO prospect list?', id: 'list' },
+      { type: 'h3', text: 'Five steps to a scored list' },
       { type: 'steps', items: [
         { title: 'Choose a vertical with clear service pages', text: 'HVAC, roofing, dental, cosmetic clinics, law firms. Verticals where "service in city" queries drive real revenue.' },
         { title: 'Pull 200 businesses from Places or a local directory', text: 'You want ones that already rank on Maps but underperform in organic results.' },
@@ -216,13 +219,14 @@ export const WAVE2_POSTS: BlogPost[] = [
       { type: 'h2', text: 'The SEO cold email that works', id: 'template' },
       { type: 'quote', text: 'Subject: quick SEO note on [service] page\n\nHi [First name],\n\nYour [city] [service] page loads in 4.2s on mobile and has no LocalBusiness schema. Two of your top competitors have both, which is why they rank ahead of you for "[keyword]."\n\nThis is a two-week technical fix, not a six-month engagement. If you want, I can send a two-minute Loom walking through the exact three changes.\n\nWorth 15 minutes?\n\n[Your name]', cite: 'Signal-referenced cold email for an SEO consultant' },
 
+      { type: 'h3', text: 'What this email deliberately avoids' },
       { type: 'callout', tone: 'info', title: 'What this email does not do', text: 'It does not promise page one. It does not attach a 40-slide audit. It does not use the word "leverage." It gives one specific defect, one specific competitor comparison, and one small ask.' },
 
-      { type: 'h2', text: 'Positioning the offer', id: 'offer' },
+      { type: 'h2', text: 'How do you position the offer?', id: 'offer' },
       { type: 'p', text: 'Lead with a small, fixed-scope engagement. A technical SEO audit and implementation of the top five fixes. Two to three weeks. Fixed price. This gets you in the door without asking for a retainer decision on the first call. Retainer conversion after a successful fixed-scope project is high because you have proven you can deliver.' },
       { type: 'link', text: 'See the general playbook: buying signals for local B2B.', href: '/blog/buying-signal-playbook-local-b2b', label: 'Buying signal playbook' },
 
-      { type: 'h2', text: 'What to skip in 2026', id: 'skip' },
+      { type: 'h2', text: 'What should you skip in 2026?', id: 'skip' },
       { type: 'ul', items: [
         'Free audit PDFs generated by a crawler with no human interpretation.',
         'Promises of "page one in 90 days." Buyers stopped believing this in 2019.',
@@ -231,7 +235,7 @@ export const WAVE2_POSTS: BlogPost[] = [
       ]},
 
       { type: 'faq', items: [
-        { q: 'How do I compete with agencies charging $500 a month?', a: 'You do not. Signal-first outreach lets you sell fixed-scope projects at $2k to $8k. Different segment.' },
+        { q: 'How do I compete with agencies charging $500 a month?', a: 'You do not. This kind of outreach lets you sell fixed-scope projects at $2k to $8k. Different segment.' },
         { q: 'Is technical SEO still the best wedge?', a: 'For 2026, yes. Content and link building are harder to prove in the first 30 days. A Core Web Vitals fix shows up in Search Console in a week.' },
         { q: 'How do I know a prospect ranks below competitors?', a: 'Search the target keyword in an incognito window from the prospect city. Note positions.' },
         { q: 'What is the reply rate on this kind of outreach?', a: 'Realistic range is 8 to 12% when the signal is specific and the list is under 50. Sub-2% when the signal is generic.' },
@@ -259,9 +263,9 @@ export const WAVE2_POSTS: BlogPost[] = [
     datePublished: '2026-08-14',
     readMinutes: 7,
     body: [
-      { type: 'p', text: 'It is 6am on a Tuesday in April. A hail line ran through three zip codes overnight, the county permit portal will start updating by lunch, and forty roofers in the metro are about to spend the day fighting each other for the same Google Local Services impressions at $180 a click. The one who wins April is not the highest bidder. It is the one who knows the storm ran through, who is watching the permit portal, and who sends the first letter before the aggregator lead even lists.' },
+      { type: 'p', text: 'It is 6am on a Tuesday in April. A hail line ran through three zip codes overnight, the county permit portal will start updating by lunch, and forty roofers in the metro are about to spend the day fighting each other for the same Google Local Services impressions. Reported LSA cost per lead ranges roughly $30 to $200 depending on vertical and metro (Google\'s own examples span this range; check the LSA pricing dashboard for your city at https://ads.google.com/local-services-ads/ ). The one who wins April is not the highest bidder. It is the one who knows the storm ran through, who is watching the permit portal, and who sends the first letter before the aggregator lead even lists.' },
 
-      { type: 'h2', text: 'Why roofers overpay for leads', id: 'overpay' },
+      { type: 'h2', text: 'Why do roofers overpay for leads?', id: 'overpay' },
       { type: 'p', text: 'Lead-gen aggregators sell the same lead to three or four roofers. By the time you call, the homeowner has taken two other quotes. You compete on price. A signal-led approach reverses this. You reach the homeowner or facility manager before they have started shopping, based on a public fact that says they will need a roofer soon.' },
 
       { type: 'h2', text: 'What is a roofing buying signal?', id: 'signals' },
@@ -276,7 +280,8 @@ export const WAVE2_POSTS: BlogPost[] = [
         ['Weak or falling review count after big job', 'GBP review pattern', '30 to 90 days'],
       ]},
 
-      { type: 'h2', text: 'Build the list', id: 'list' },
+      { type: 'h2', text: 'How do you build the roofing list?', id: 'list' },
+      { type: 'h3', text: 'Five steps from storm to score' },
       { type: 'steps', items: [
         { title: 'Pick two zip codes with recent storm activity', text: 'NOAA publishes storm event data by county. Filter to hail over 1 inch or wind gusts over 60 mph in the last 30 days.' },
         { title: 'Pull the permit portal for reroofs', text: 'Most US counties publish issued permits with owner name and address. This is a direct-intent signal.' },
@@ -288,11 +293,12 @@ export const WAVE2_POSTS: BlogPost[] = [
       { type: 'h2', text: 'The outreach: email, mail, and door', id: 'outreach' },
       { type: 'p', text: 'Roofing is one of the few verticals where direct mail still outperforms email for residential. For commercial and property management, email is the primary channel because there is a named decision-maker with a public email address.' },
 
+      { type: 'h3', text: 'The permit-referenced letter' },
       { type: 'quote', text: 'Subject: your reroof permit at [address]\n\nHi [First name],\n\nSaw the reroof permit filed on [date] for [address]. Most homeowners in your zip who filed after the [month] storm are getting three quotes and closing within two weeks.\n\nWe roofed 14 homes on [nearby street] in the last 60 days. Happy to swing by and give a 20-minute assessment, no pressure to book. If you already have a contractor, ignore this and good luck with the project.\n\n[Your name], [Company]\n[Phone]', cite: 'Signal-referenced cold email for a residential roofer' },
 
       { type: 'callout', tone: 'info', title: 'Why this works for roofing', text: 'The permit is a public filing. Referencing it proves you did homework and are local. Naming a nearby street with recent work makes you the safe choice. The "ignore this" line lowers the pushback.' },
 
-      { type: 'h2', text: 'Seasonality: when to run what', id: 'seasonality' },
+      { type: 'h2', text: 'When should you run each play?', id: 'seasonality' },
       { type: 'ul', items: [
         'Spring (Mar to May): peak storm season across the US Midwest and Southeast. Run storm-damage plays heavily.',
         'Summer (Jun to Aug): permit filings peak. Focus on permit-triggered outreach and commercial roof inspections.',
@@ -312,7 +318,6 @@ export const WAVE2_POSTS: BlogPost[] = [
         { q: 'Does direct mail still work for roofing?', a: 'For residential in a targeted zip after a storm, yes. Response rates of 1 to 3% are typical, which beats aggregator lead economics.' },
         { q: 'How do I compete with storm chasers?', a: 'Local reference streets and named recent jobs. Storm chasers cannot fake that.' },
         { q: 'How many touches before I move on?', a: 'For residential permit signals, one letter plus one door knock inside seven days. For commercial, three emails over three weeks.' },
-        { q: 'Can Milo help with residential roofing outreach?', a: 'Milo is strongest for email-based B2B outreach: commercial roofing, property managers, and roofer-to-roofer service sales. Residential direct mail is outside the loop.' },
       ]},
     ],
   },

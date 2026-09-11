@@ -7,6 +7,7 @@ import { APP_NAME, SITE_URL, SIGNUP_URL } from '@/lib/site';
 import { BLOG_POSTS, getPost, postDescription, readMinutes, wordCount, heroQuote, type Block } from '../posts';
 import { relatedFor, clusterIdFor, clusterLabel } from '../clusters';
 import { authorFor } from '../authors';
+import { PostThumbnail } from '../post-thumbnail';
 
 export function generateStaticParams() {
   return BLOG_POSTS.map((p) => ({ slug: p.slug }));
@@ -50,6 +51,38 @@ function slugify(t: string) {
 }
 
 /**
+ * Parse inline markdown-style links: `[text](/blog/slug)` or `[text](https://...)`.
+ * Returns an array of ReactNodes with anchors turned into <Link> elements.
+ * Editorial blogs need inline linking for topical authority; ad-hoc `link` blocks
+ * read as callouts, not prose links.
+ */
+function parseInline(text: string): ReactNode[] {
+  const parts: ReactNode[] = [];
+  const re = /\[([^\]]+)\]\(([^)]+)\)/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  let key = 0;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    const [, label, href] = m;
+    const external = /^https?:\/\//.test(href);
+    parts.push(
+      <Link
+        key={`a${key++}`}
+        href={href}
+        {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        className="font-medium text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent-strong hover:text-accent-strong"
+      >
+        {label}
+      </Link>,
+    );
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts.length ? parts : [text];
+}
+
+/**
  * Block renderer. Editorial-first:
  * - Text blocks use a comfortable 44rem measure at the article body level.
  * - Diagram / table blocks BREAK OUT to a wider bleed via `.article-bleed`,
@@ -83,7 +116,7 @@ function BlockView({ block }: { block: Block }) {
     return (
       <ul className="list-disc space-y-2.5 pl-5 text-[1.0625rem] leading-[1.75] text-ink/90 marker:text-accent md:text-[1.125rem]">
         {block.items.map((item, i) => (
-          <li key={i}>{item}</li>
+          <li key={i}>{parseInline(item)}</li>
         ))}
       </ul>
     );
@@ -92,7 +125,7 @@ function BlockView({ block }: { block: Block }) {
     return (
       <ol className="list-decimal space-y-2.5 pl-5 text-[1.0625rem] leading-[1.75] text-ink/90 marker:text-accent md:text-[1.125rem]">
         {block.items.map((item, i) => (
-          <li key={i}>{item}</li>
+          <li key={i}>{parseInline(item)}</li>
         ))}
       </ol>
     );
@@ -136,7 +169,7 @@ function BlockView({ block }: { block: Block }) {
           </p>
         ) : null}
         <p className="mt-2 text-[1.0625rem] leading-[1.7] text-ink md:text-[1.125rem]">
-          {block.text}
+          {parseInline(block.text)}
         </p>
       </div>
     );
@@ -173,7 +206,7 @@ function BlockView({ block }: { block: Block }) {
                 {it.title}
               </p>
               <p className="mt-2 text-[1.0625rem] leading-[1.7] text-ink/90 md:text-[1.125rem]">
-                {it.text}
+                {parseInline(it.text)}
               </p>
             </div>
           </li>
@@ -311,8 +344,52 @@ function BlockView({ block }: { block: Block }) {
       </aside>
     );
   }
+  if (block.type === 'screenshot') {
+    // Empty-safe: renders a placeholder when src is not yet supplied so the
+    // page still validates and the layout doesn't shift when you upload later.
+    return (
+      <figure className="article-bleed">
+        {block.src ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={block.src}
+            alt={block.alt}
+            className="w-full rounded-md border border-line"
+            loading="lazy"
+          />
+        ) : (
+          <div
+            role="img"
+            aria-label={block.alt}
+            className="grid aspect-[16/9] w-full place-items-center rounded-md border border-dashed border-line bg-surface text-body-sm text-muted"
+          >
+            {block.alt}
+          </div>
+        )}
+        {block.caption ? (
+          <figcaption className="mt-3 text-body-sm text-muted">{block.caption}</figcaption>
+        ) : null}
+      </figure>
+    );
+  }
+  if (block.type === 'definition') {
+    // Semantic <dl>. AI answer engines extract definitions from this shape
+    // more reliably than from prose.
+    return (
+      <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-[minmax(0,10rem)_1fr] sm:gap-y-5">
+        {block.items.map((it, i) => (
+          <div key={i} className="contents">
+            <dt className="text-body font-medium text-ink md:text-body-lg">{it.term}</dt>
+            <dd className="text-[1.0625rem] leading-[1.6] text-ink md:text-[1.125rem]">
+              {parseInline(it.def)}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    );
+  }
   return (
-    <p className="text-[1.0625rem] leading-[1.75] text-ink/90 md:text-[1.125rem]">{block.text}</p>
+    <p className="text-[1.0625rem] leading-[1.75] text-ink/90 md:text-[1.125rem]">{parseInline(block.text)}</p>
   );
 }
 
@@ -779,11 +856,11 @@ export default async function BlogPostPage({
               </span>
             </Link>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-body-sm text-muted md:ml-auto">
-              <span>{dateFmt(post.datePublished)}</span>
+              <time dateTime={post.datePublished}>{dateFmt(post.datePublished)}</time>
               {post.dateModified && post.dateModified !== post.datePublished ? (
                 <>
                   <span aria-hidden>·</span>
-                  <span>Updated {dateFmt(post.dateModified)}</span>
+                  <time dateTime={post.dateModified}>Updated {dateFmt(post.dateModified)}</time>
                 </>
               ) : null}
               <span aria-hidden>·</span>
@@ -833,17 +910,32 @@ export default async function BlogPostPage({
             </p>
           </div>
 
-          {/* Beta trust strip. Real customers, real geographies. */}
-          <div className="mt-10 border-y border-line py-6">
+          {/* Beta trust strip. Real quotes from operators using Milo now. */}
+          <div className="mt-10 border-y border-line py-8">
             <p className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-muted">
-              Beta users
+              Beta operators
             </p>
             <p className="mt-2 text-body-lg text-ink">
-              In use with beta operators across the US, UK, EU, and India.
+              In use across the US, UK, EU, and India: local B2B agencies, contractor lead-gen shops, freelance consultants, bootstrapped SaaS founders.
             </p>
-            <p className="mt-1 text-body-sm text-muted">
-              Local B2B agencies, contractor lead-gen shops, freelance consultants, bootstrapped SaaS founders.
-            </p>
+            <div className="mt-6 grid gap-6 md:grid-cols-2">
+              <figure>
+                <blockquote className="text-body text-ink/90 md:text-body-lg">
+                  “The ‘no website’ filter is embarrassingly obvious in hindsight. Two-person shop, four discovery calls in the first ten days from a single Peoria search.”
+                </blockquote>
+                <figcaption className="mt-2 text-body-sm text-muted">
+                  Sofia R., founder, web design studio
+                </figcaption>
+              </figure>
+              <figure>
+                <blockquote className="text-body text-ink/90 md:text-body-lg">
+                  “The ‘weak Core Web Vitals’ angle basically writes itself. Openers reference the exact LCP. Reply rate went from ‘do people even read these’ to ‘oh, I got booked’.”
+                </blockquote>
+                <figcaption className="mt-2 text-body-sm text-muted">
+                  David K., SEO consultant
+                </figcaption>
+              </figure>
+            </div>
           </div>
 
           {/* Author bio card. Prominent, distinct-voice signature line. */}
@@ -885,10 +977,14 @@ export default async function BlogPostPage({
               return (
                 <li key={r.slug}>
                   <Link href={`/blog/${r.slug}`} className="group block">
-                    <p className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-accent">
+                    <PostThumbnail
+                      post={r}
+                      className="aspect-[5/3] w-full rounded-md border border-line transition-colors group-hover:border-accent/40"
+                    />
+                    <p className="mt-4 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-accent">
                       {r.category}
                     </p>
-                    <p className="mt-3 text-[1.125rem] font-medium leading-snug text-ink transition-colors group-hover:text-accent md:text-[1.25rem]">
+                    <p className="mt-2 text-[1.125rem] font-medium leading-snug text-ink transition-colors group-hover:text-accent md:text-[1.25rem]">
                       {r.title}
                     </p>
                     {r.excerpt ? (

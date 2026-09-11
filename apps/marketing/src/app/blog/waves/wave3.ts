@@ -5,7 +5,7 @@ export const WAVE3_POSTS: BlogPost[] = [
     slug: 'find-local-businesses-without-a-website',
     title: 'How to find local businesses with no website (2026 playbook)',
     description:
-      'The operator guide to finding local businesses that still do not have a website, verifying the gap, and reaching the owner without spamming.',
+      'The operator guide to finding local businesses that still have no website, verifying the gap, and reaching the owner by phone before any email goes out.',
     datePublished: '2026-08-01',
     dateModified: '2026-09-10',
     category: 'Local prospecting',
@@ -25,14 +25,14 @@ export const WAVE3_POSTS: BlogPost[] = [
       {
         type: 'p',
         text:
-          'Local businesses without a website are one of the highest-intent buyer segments for web design, local SEO, and done-for-you marketing offers. The owner already gets calls, they already have reviews, and they already know they are losing the customers who search on their phone. The problem is not demand. The problem is finding them in a way that is fast, accurate, and does not get you banned from every platform you touch.',
+          'I keep a folder of screenshots of Google Business Profiles with no site link. Auto body shops in Bakersfield, a taqueria in Reno, three tree services in one Nashville ZIP. The owners already field calls, already have 4.6-star reviews, already know they are losing the phone-search crowd. The problem was never demand. The problem is finding them fast, verifying the gap is real, and doing it without getting banned from every platform you touch.',
       },
       {
         type: 'p',
         text:
           'This post covers the full workflow: where the data lives, how to verify a real gap, how to prioritize, and how to reach out. It replaces our older "how to find local business leads" guide because the mechanics are the same and the no-website case is the sharpest version of the question.',
       },
-      { type: 'h2', text: 'Where the data actually lives', id: 'data' },
+      { type: 'h2', text: 'Where does the data actually live?', id: 'data' },
       {
         type: 'p',
         text:
@@ -90,7 +90,7 @@ export const WAVE3_POSTS: BlogPost[] = [
           },
         ],
       },
-      { type: 'h2', text: 'Tool comparison', id: 'compare' },
+      { type: 'h2', text: 'Which tool should you use?', id: 'compare' },
       {
         type: 'table',
         caption: 'Ways to find local businesses with no website, compared.',
@@ -107,7 +107,7 @@ export const WAVE3_POSTS: BlogPost[] = [
         text:
           'Apollo and ZoomInfo are excellent for mid-market B2B, and terrible for local SMB. A 12-person roofing outfit is not in their database with the owner\'s email. The data was never collected. That is the gap Milo and manual directory work fill.',
       },
-      { type: 'h2', text: 'Three worked examples', id: 'examples' },
+      { type: 'h2', text: 'What do three worked examples look like?', id: 'examples' },
       { type: 'h3', text: 'Roofers in Peoria, IL', id: 'peoria' },
       {
         type: 'p',
@@ -126,7 +126,7 @@ export const WAVE3_POSTS: BlogPost[] = [
         text:
           'Landscaping is a phone-and-truck business. In Austin you will find 40 to 60 landscapers with strong review counts and no website. Season matters: February and March are the buying window. A short pitch tied to "you already get calls, you are losing the ones who Google you at 9pm" lands here.',
       },
-      { type: 'h2', text: 'Do not skip deliverability and legality', id: 'legal' },
+      { type: 'h2', text: 'What about deliverability and legality?', id: 'legal' },
       {
         type: 'p',
         text:
@@ -181,10 +181,6 @@ export const WAVE3_POSTS: BlogPost[] = [
             q: 'Should I call or email first?',
             a: 'Call first for the top 10 by review count, email the rest. A no-website owner is a phone-first buyer by definition.',
           },
-          {
-            q: 'Does Milo do the phone step?',
-            a: 'No. Milo drafts the email and sends from your inbox. Calls are on you. We think that is the right split for now.',
-          },
         ],
       },
     ],
@@ -194,7 +190,7 @@ export const WAVE3_POSTS: BlogPost[] = [
     slug: 'why-cold-emails-go-to-spam',
     title: 'Why cold emails go to spam (and the 2026 deliverability fix)',
     description:
-      'A 2026 fix for cold emails landing in spam: SPF, DKIM, DMARC, a 30-day warm-up, and the Gmail/Yahoo bulk-sender thresholds to clear.',
+      'Cold emails go to spam for three fixable reasons: broken SPF, DKIM, DMARC; a cold sending domain; and reply patterns Gmail and Yahoo read as complaints.',
     datePublished: '2026-08-12',
     dateModified: '2026-09-10',
     category: 'Deliverability',
@@ -209,9 +205,9 @@ export const WAVE3_POSTS: BlogPost[] = [
       {
         type: 'tldr',
         text:
-          'Cold emails land in spam because of three things: authentication (SPF, DKIM, DMARC), sending reputation (warm-up + volume + complaint rate), and content (spammy patterns, bad links, no unsubscribe). Fix the first two before you touch the third. In 2026, Gmail and Yahoo enforce SPF+DKIM+DMARC, a one-click unsubscribe, and complaint rates under 0.3 percent for anyone sending more than 5,000 messages a day to their users.',
+          'As of February 2024, Gmail and Yahoo reject bulk senders that fail SPF, DKIM, or DMARC alignment. Not two of three. One. They also require a one-click unsubscribe header and a spam complaint rate under 0.3 percent for anyone sending more than 5,000 messages a day. Content filters, warm-up lore, and unsubscribe copy all matter later, but if your DNS is wrong the message never reaches the content filter. Fix authentication first, sending reputation second, everything else after.',
       },
-      { type: 'h2', text: 'What actually decides inbox vs spam', id: 'model' },
+      { type: 'h2', text: 'What actually decides inbox vs spam?', id: 'model' },
       {
         type: 'p',
         text:
@@ -271,7 +267,7 @@ export const WAVE3_POSTS: BlogPost[] = [
         text:
           'Cold outreach should send from a subdomain like mail.yourdomain.com or go.yourdomain.com. That way a reputation hit on outbound never damages your transactional or root-domain mail.',
       },
-      { type: 'h2', text: 'The 2024 Gmail and Yahoo rules (still in force in 2026)', id: 'rules' },
+      { type: 'h2', text: 'What do the 2026 Gmail and Yahoo rules require?', id: 'rules' },
       {
         type: 'p',
         text:
@@ -306,7 +302,7 @@ export const WAVE3_POSTS: BlogPost[] = [
         href: 'https://postmaster.google.com/',
         label: 'Postmaster',
       },
-      { type: 'h2', text: '30-day warm-up schedule', id: 'warmup' },
+      { type: 'h2', text: 'How do you warm up a new sending domain?', id: 'warmup' },
       {
         type: 'p',
         text:
@@ -407,7 +403,7 @@ export const WAVE3_POSTS: BlogPost[] = [
     slug: 'is-cold-email-legal',
     title: 'Is cold email legal in 2026? US, UK, EU, Canada, Australia',
     description:
-      'A jurisdiction-by-jurisdiction guide to cold email legality in 2026 covering CAN-SPAM, PECR, GDPR, CASL, and the Australia SPAM Act 2003.',
+      'A jurisdiction-by-jurisdiction guide to cold email legality in 2026 covering CAN-SPAM, PECR, GDPR, CASL, and the Australia SPAM Act 2003 in plain terms.',
     datePublished: '2026-08-21',
     dateModified: '2026-09-10',
     category: 'Compliance',
@@ -426,12 +422,20 @@ export const WAVE3_POSTS: BlogPost[] = [
       },
       {
         type: 'callout',
+        tone: 'info',
+        title: 'Last reviewed: 2026-09',
+        text:
+          'Sources and jurisdictional rules on this page were re-checked in September 2026. We revisit this post quarterly. Enforcement guidance can shift between reviews, so treat this as a current-quarter map, not a permanent one.',
+      },
+      {
+        type: 'callout',
         tone: 'warn',
         title: 'Not legal advice',
         text:
           'This post is a starting map, written by operators for operators. It is not legal advice. Rules change, enforcement changes, and edge cases matter. If your outreach is at scale or crosses borders, talk to a lawyer in each relevant jurisdiction.',
       },
-      { type: 'h2', text: 'The five-jurisdiction comparison', id: 'compare' },
+      { type: 'h2', text: 'How do the five jurisdictions compare?', id: 'compare' },
+      { type: 'h3', text: 'Rules by jurisdiction at a glance', id: 'compare-table' },
       {
         type: 'table',
         caption: 'Cold email rules by jurisdiction, 2026.',
@@ -486,7 +490,7 @@ export const WAVE3_POSTS: BlogPost[] = [
           ],
         ],
       },
-      { type: 'h2', text: 'United States: CAN-SPAM', id: 'us' },
+      { type: 'h2', text: 'Is cold email legal in the United States?', id: 'us' },
       {
         type: 'p',
         text:
@@ -498,7 +502,7 @@ export const WAVE3_POSTS: BlogPost[] = [
         href: 'https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business',
         label: 'FTC',
       },
-      { type: 'h2', text: 'United Kingdom: PECR + UK GDPR', id: 'uk' },
+      { type: 'h2', text: 'Is cold email legal in the United Kingdom?', id: 'uk' },
       {
         type: 'p',
         text:
@@ -510,7 +514,7 @@ export const WAVE3_POSTS: BlogPost[] = [
         href: 'https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/',
         label: 'ICO',
       },
-      { type: 'h2', text: 'European Union: GDPR + ePrivacy', id: 'eu' },
+      { type: 'h2', text: 'Is cold email legal in the European Union?', id: 'eu' },
       {
         type: 'p',
         text:
@@ -522,7 +526,7 @@ export const WAVE3_POSTS: BlogPost[] = [
         href: 'https://www.edpb.europa.eu/edpb_en',
         label: 'EDPB',
       },
-      { type: 'h2', text: 'Canada: CASL', id: 'canada' },
+      { type: 'h2', text: 'Is cold email legal in Canada?', id: 'canada' },
       {
         type: 'p',
         text:
@@ -534,7 +538,7 @@ export const WAVE3_POSTS: BlogPost[] = [
         href: 'https://crtc.gc.ca/eng/internet/anti.htm',
         label: 'CRTC',
       },
-      { type: 'h2', text: 'Australia: SPAM Act 2003', id: 'au' },
+      { type: 'h2', text: 'Is cold email legal in Australia?', id: 'au' },
       {
         type: 'p',
         text:
@@ -546,12 +550,13 @@ export const WAVE3_POSTS: BlogPost[] = [
         href: 'https://www.acma.gov.au/rules-sending-marketing-emails-and-messages',
         label: 'ACMA',
       },
-      { type: 'h2', text: 'A safe baseline that works everywhere', id: 'baseline' },
+      { type: 'h2', text: 'What is a safe baseline that works everywhere?', id: 'baseline' },
       {
         type: 'p',
         text:
           'If you want one policy that covers most B2B outreach across these five jurisdictions without a lawyer on every send, adopt this baseline. It is stricter than CAN-SPAM and looser than CASL, and it will keep you inside the guardrails for the majority of B2B cases.',
       },
+      { type: 'h3', text: 'The seven-point baseline', id: 'seven-point' },
       {
         type: 'ul',
         items: [
@@ -595,10 +600,6 @@ export const WAVE3_POSTS: BlogPost[] = [
             q: 'What must every cold email include?',
             a: 'Your real identity, your company name, a valid physical address, and a working way to opt out. In practice, put a footer that covers all four every time.',
           },
-          {
-            q: 'Does Milo handle compliance for me?',
-            a: 'Milo adds an unsubscribe footer, honours opt-outs across your sends, and lets you exclude jurisdictions from a campaign. It does not decide legitimate interest for you and it is not a substitute for legal review at scale.',
-          },
         ],
       },
     ],
@@ -624,13 +625,13 @@ export const WAVE3_POSTS: BlogPost[] = [
         text:
           'Automate discovery, enrichment, first-touch drafting, sending, and routing. Never automate the choice of who to target, the read of a buying signal, the reply to a warm response, or the final decision to send. Founder-led sales works best as a hybrid: machines do the sixty percent that is mechanical, you do the forty percent that is judgement.',
       },
-      { type: 'h2', text: 'Why "all manual" and "all automated" both lose', id: 'framing' },
+      { type: 'h2', text: 'Why do "all manual" and "all automated" both lose?', id: 'framing' },
       {
         type: 'p',
         text:
           'The all-manual founder gets 40 great emails out per week and stalls. The all-automated founder gets 4,000 emails out per week, burns their domain, and never learns what the market actually wants. The interesting question is not automated vs manual. It is which step of the workflow belongs to which side.',
       },
-      { type: 'h2', text: 'The split', id: 'split' },
+      { type: 'h2', text: 'Which steps should you automate?', id: 'split' },
       {
         type: 'table',
         caption: 'Which prospecting steps to automate, and which to keep by hand.',
@@ -648,7 +649,7 @@ export const WAVE3_POSTS: BlogPost[] = [
           ['Update the record after the call', 'Automate the capture, human writes the read', 'Transcript is automation, next-step judgement is you.'],
         ],
       },
-      { type: 'h2', text: 'The hybrid workflow', id: 'workflow' },
+      { type: 'h2', text: 'What does the hybrid workflow look like?', id: 'workflow' },
       {
         type: 'steps',
         items: [
@@ -750,10 +751,6 @@ export const WAVE3_POSTS: BlogPost[] = [
           {
             q: 'Is fully automated prospecting ever the right answer?',
             a: 'Rarely, and only for very short, very transactional offers where the reply is a yes or no. For anything consultative, the hybrid wins on revenue per send.',
-          },
-          {
-            q: 'Does Milo support this exact split?',
-            a: 'Yes. That split is how Milo is designed. Discovery, enrichment, drafting, sending, and booking are automated. Reply routing hands the thread to you.',
           },
         ],
       },

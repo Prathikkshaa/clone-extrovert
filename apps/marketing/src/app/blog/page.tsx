@@ -3,13 +3,29 @@ import Link from 'next/link';
 import { BLOG_POSTS, readMinutes } from './posts';
 import { BLOG_CLUSTERS, clusterIdFor, clusterLabel } from './clusters';
 import { authorFor } from './authors';
+import { PostThumbnail } from './post-thumbnail';
 
-export const metadata: Metadata = {
-  title: 'Blog',
-  description:
-    'Practical playbooks on finding local business leads, buying signals, personalized cold email, deliverability, and compliance. Written by operators, not marketers.',
-  alternates: { canonical: '/blog' },
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ cluster?: string }>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const activeCluster = params.cluster && BLOG_CLUSTERS.some((c) => c.id === params.cluster)
+    ? params.cluster
+    : null;
+  const base: Metadata = {
+    title: activeCluster ? `${clusterLabel(activeCluster)} — Milo blog` : 'Blog',
+    description:
+      'Practical playbooks on finding local business leads, buying signals, personalized cold email, deliverability, and compliance. Written by operators, not marketers.',
+    alternates: { canonical: '/blog' },
+  };
+  if (activeCluster) {
+    // Filtered variants noindex; canonical points at /blog to consolidate PageRank.
+    base.robots = { index: false, follow: true };
+  }
+  return base;
+}
 
 const dateFmt = (iso: string) =>
   new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -114,24 +130,12 @@ export default async function BlogIndexPage({
                 <span>{readMinutes(featured)} min read</span>
               </div>
             </div>
-            {/* Right column: pull-quote card built from featured post's TL;DR/callout — signature editorial visual */}
+            {/* Right column: themed cover figure (image SEO surface) */}
             <div className="hidden md:block">
-              <figure className="border-y border-accent/40 bg-accent-soft/40 px-6 py-8">
-                <span aria-hidden className="block font-serif text-[3rem] leading-none text-accent">
-                  &ldquo;
-                </span>
-                <blockquote className="mt-2">
-                  <p className="text-[1.125rem] italic leading-[1.45] text-ink md:text-[1.25rem]">
-                    {(() => {
-                      const q = featured.excerpt ?? featured.description ?? featured.title;
-                      return q.length > 180 ? q.slice(0, 177).trimEnd() + '…' : q;
-                    })()}
-                  </p>
-                </blockquote>
-                <figcaption className="mt-4 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted">
-                  {featured.category}
-                </figcaption>
-              </figure>
+              <PostThumbnail
+                post={featured}
+                className="aspect-[5/3] w-full rounded-md border border-line"
+              />
             </div>
           </Link>
         </section>
@@ -146,10 +150,14 @@ export default async function BlogIndexPage({
               return (
                 <li key={post.slug}>
                   <Link href={`/blog/${post.slug}`} className="group block">
-                    <p className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-accent">
+                    <PostThumbnail
+                      post={post}
+                      className="aspect-[5/3] w-full rounded-md border border-line transition-colors group-hover:border-accent/40"
+                    />
+                    <p className="mt-4 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-accent">
                       {post.category}
                     </p>
-                    <h2 className="mt-3 text-[1.25rem] font-medium leading-[1.2] tracking-tight text-ink transition-colors group-hover:text-accent md:text-[1.375rem]">
+                    <h2 className="mt-2 text-[1.25rem] font-medium leading-[1.2] tracking-tight text-ink transition-colors group-hover:text-accent md:text-[1.375rem]">
                       {post.title}
                     </h2>
                     <p className="mt-3 line-clamp-3 text-body leading-[1.55] text-ink/80">
