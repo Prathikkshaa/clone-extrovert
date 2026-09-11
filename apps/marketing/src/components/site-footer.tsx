@@ -21,28 +21,31 @@ function ChatGptMark({ className }: { className?: string }) {
 }
 
 function ClaudeMark({ className }: { className?: string }) {
-  // Anthropic sunburst approximation.
+  // Anthropic mark: two mirrored ink strokes suggesting the wordmark 'A'.
   return (
-    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden fill="currentColor" className={className}>
-      <path d="M6.94 4.5h2.36l3.86 9.98h.06L17.08 4.5h2.36l-4.83 12h-2.58l-1.16-3.14H8.51l-1.16 3.14H4.77L6.94 4.5Zm4.12 7.8h1.77l-.87-2.37h-.05l-.85 2.37Z" />
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="currentColor" className={className}>
+      <path d="M7.85 4.5h2.87l4.6 15h-2.85l-1.02-3.5H7.75l-1.02 3.5H3.88l3.97-15Zm.5 9.1h3.1l-1.53-5.3-1.57 5.3Zm7.28-9.1h2.86v15h-2.86v-15Z" />
     </svg>
   );
 }
 
 function PerplexityMark({ className }: { className?: string }) {
+  // Perplexity radial: text-mark 'p' inside a circle motif approximated by a
+  // 4-petal outline plus a small emphasis dot.
   return (
-    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <path d="M12 3v18M3 12h18M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" className={className}>
+      <path d="M12 3v18" />
+      <path d="M6 7l6-4 6 4v10l-6 4-6-4V7Z" />
       <circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" />
     </svg>
   );
 }
 
 function GeminiMark({ className }: { className?: string }) {
-  // Four-pointed star.
+  // Gemini four-point star (concave-diamond shape).
   return (
-    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden fill="currentColor" className={className}>
-      <path d="M12 2c.7 4.1 3.9 7.3 8 8-4.1.7-7.3 3.9-8 8-.7-4.1-3.9-7.3-8-8 4.1-.7 7.3-3.9 8-8Z" />
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="currentColor" className={className}>
+      <path d="M12 1.6c.5 5 3.4 8 8.4 8.4-5 .5-7.9 3.4-8.4 8.4-.5-5-3.4-7.9-8.4-8.4 5-.5 7.9-3.4 8.4-8.4Z" />
     </svg>
   );
 }
@@ -82,7 +85,7 @@ export function SiteFooter() {
               <p className="mt-2 text-body-sm text-ink/80">
                 Do not take our word for it. See how the models describe {APP_NAME}.
               </p>
-              <ul className="mt-4 flex flex-wrap gap-2">
+              <ul className="mt-4 flex flex-wrap gap-2.5">
                 {AI_LINKS.map(({ Icon, ...it }) => (
                   <li key={it.label}>
                     <a
@@ -90,11 +93,11 @@ export function SiteFooter() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={it.hint}
+                      title={it.hint}
                       style={{ ['--ai-brand' as string]: it.brand }}
-                      className="group/ai inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-body-sm text-ink transition-all duration-200 hover:-translate-y-0.5 hover:border-[color:var(--ai-brand)] hover:text-[color:var(--ai-brand)] hover:shadow-sm"
+                      className="group/ai inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface text-muted transition-all duration-200 ease-soft hover:-translate-y-1 hover:border-[color:var(--ai-brand)] hover:bg-canvas hover:text-[color:var(--ai-brand)] hover:shadow-[0_6px_18px_-8px_rgba(0,0,0,0.18)]"
                     >
-                      <Icon className="text-muted transition-colors duration-200 group-hover/ai:text-[color:var(--ai-brand)]" />
-                      <span>{it.label}</span>
+                      <Icon />
                     </a>
                   </li>
                 ))}
