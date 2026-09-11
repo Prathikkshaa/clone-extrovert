@@ -824,6 +824,15 @@ export default async function BlogPostPage({
             {postDescription(post)}
           </p>
 
+          {/* Illustrative hero figure. Content-aware SVG mockup per category.
+              Sits above the pull-quote so the article opens with visual context. */}
+          <figure className="mt-10 overflow-hidden rounded-lg border border-line">
+            <PostThumbnail
+              post={post}
+              className="block h-auto w-full"
+            />
+          </figure>
+
           {/* Pull-quote hero. Signature visual anchor per article; auto-extracted. */}
           {heroPullQuote ? (
             <figure className="mt-12 border-y border-accent/40 bg-accent-soft/40 px-6 py-8 md:px-10 md:py-10">

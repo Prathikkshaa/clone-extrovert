@@ -34,11 +34,11 @@ export const AUTHORS: Record<AuthorId, Author> = {
   },
   tara: {
     id: 'tara',
-    name: 'Tara',
-    initials: 'T',
+    name: 'Prathikkshaa',
+    initials: 'P',
     role: 'Deliverability editor',
     bio:
-      'Spent six years running lifecycle at two Series B SaaS companies before the RFC rabbit hole ate her. Now she reads Postmaster Tools, SPF alignment specs, and the actual Google sender guidelines so you can send from your own domain without setting it on fire.',
+      'Spent six years running lifecycle at two Series B SaaS companies before the RFC rabbit hole took over. Now reads Postmaster Tools, SPF alignment specs, and the actual Google sender guidelines so you can send from your own domain without setting it on fire.',
     focus: ['Deliverability', 'Compliance', 'Cadence', 'Benchmarks'],
     signature: 'Cites the RFC. Shows the header. Never says "best practice" without a source.',
     sameAs: [],

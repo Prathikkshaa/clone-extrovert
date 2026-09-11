@@ -68,34 +68,45 @@ export default async function BlogIndexPage({
           </p>
         </div>
 
-        {/* Cluster filter. Editorial pill-row, not dashboard tags. */}
-        <nav aria-label="Filter posts by cluster" className="mt-12 flex flex-wrap gap-x-6 gap-y-3 border-b border-line pb-4">
-          <Link
-            href="/blog"
-            className={
-              'font-mono text-[0.75rem] uppercase tracking-[0.14em] transition-colors ' +
-              (!activeCluster
-                ? 'text-accent'
-                : 'text-muted hover:text-ink')
-            }
-          >
-            All posts
-          </Link>
-          {BLOG_CLUSTERS.map((c) => (
+        {/* Cluster filter. Labeled row of pills so the reader knows it filters. */}
+        <div className="mt-12 flex flex-wrap items-center gap-2 border-b border-line pb-4">
+          <p className="mr-3 font-mono text-[0.72rem] uppercase tracking-[0.18em] text-muted">
+            Filter by topic:
+          </p>
+          <nav aria-label="Filter posts by cluster" className="flex flex-wrap gap-2">
             <Link
-              key={c.id}
-              href={`/blog?cluster=${c.id}`}
+              href="/blog"
+              aria-current={!activeCluster ? 'page' : undefined}
               className={
-                'font-mono text-[0.75rem] uppercase tracking-[0.14em] transition-colors ' +
-                (activeCluster === c.id
-                  ? 'text-accent'
-                  : 'text-muted hover:text-ink')
+                'rounded-full border px-3.5 py-1.5 font-mono text-[0.7rem] uppercase tracking-[0.12em] transition-colors ' +
+                (!activeCluster
+                  ? 'border-accent bg-accent text-white'
+                  : 'border-line text-muted hover:border-accent hover:text-accent')
               }
             >
-              {c.label}
+              All ({BLOG_POSTS.length})
             </Link>
-          ))}
-        </nav>
+            {BLOG_CLUSTERS.map((c) => {
+              const count = BLOG_POSTS.filter((p) => clusterIdFor(p) === c.id).length;
+              const active = activeCluster === c.id;
+              return (
+                <Link
+                  key={c.id}
+                  href={`/blog?cluster=${c.id}`}
+                  aria-current={active ? 'page' : undefined}
+                  className={
+                    'rounded-full border px-3.5 py-1.5 font-mono text-[0.7rem] uppercase tracking-[0.12em] transition-colors ' +
+                    (active
+                      ? 'border-accent bg-accent text-white'
+                      : 'border-line text-muted hover:border-accent hover:text-accent')
+                  }
+                >
+                  {c.label} ({count})
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
       </section>
 
       {/* Featured piece. Editorial hero. No card frame; typography-forward. */}
