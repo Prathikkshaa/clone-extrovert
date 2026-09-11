@@ -99,6 +99,7 @@ import { WAVE3_POSTS } from './waves/wave3';
 import { WAVE4A_POSTS } from './waves/wave4a';
 import { WAVE4B_POSTS } from './waves/wave4b';
 import { WAVE4C_POSTS } from './waves/wave4c';
+import { WAVE5_POSTS } from './waves/wave5';
 
 /**
  * All published posts. Wave 3 goes first so its refreshed versions of the three
@@ -113,6 +114,7 @@ export const BLOG_POSTS: BlogPost[] = [
   ...WAVE4A_POSTS,
   ...WAVE4B_POSTS,
   ...WAVE4C_POSTS,
+  ...WAVE5_POSTS,
 ];
 
 export function getPost(slug: string): BlogPost | undefined {

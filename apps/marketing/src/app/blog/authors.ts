@@ -105,6 +105,13 @@ export const AUTHOR_BY_SLUG: Record<string, AuthorId> = {
   'prospecting-list-from-google-maps': 'abhimanyu',
   'freelance-clients-cold-email': 'arun',
   'prospecting-bootstrapped-founder': 'arun',
+
+  // Wave 5: anti-features, booking flow, comparison, reply playbook, deliverability
+  'what-milo-does-not-do': 'arun',
+  'cold-email-to-booked-call-with-cal-com': 'abhimanyu',
+  'milo-vs-clay-signal-first-prospecting': 'arun',
+  'what-to-say-when-they-reply-cold-email-response-playbook': 'tara',
+  'cold-email-deliverability-from-gmail-workspace-2026': 'tara',
 };
 
 export function authorFor(slug: string): Author {
