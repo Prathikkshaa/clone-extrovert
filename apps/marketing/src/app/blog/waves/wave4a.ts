@@ -20,11 +20,12 @@ export const WAVE4A_POSTS: BlogPost[] = [
     body: [
       { type: 'tldr', text: 'An AI SDR is software that automates parts of the outbound sales development role: prospecting, research, personalisation and email drafting, and sometimes reply handling and booking. It is not an autonomous salesperson. In 2026 the reliable use is as a drafting and prospecting layer with a human still approving the send.' },
 
-      { type: 'h2', text: 'Definition', id: 'definition' },
+      { type: 'h2', text: 'What is an AI SDR?', id: 'definition' },
       { type: 'p', text: 'An AI SDR is a software system that performs the mechanical parts of an outbound sales development representative. That set typically includes finding prospects, researching accounts, writing personalised opening emails, sending follow-ups on a cadence, and in some cases parsing replies and booking meetings.' },
+      { type: 'h3', text: 'What an AI SDR is not' },
       { type: 'p', text: 'It is not, in any current shipping product, a replacement for a competent human SDR on a complex sale. Anyone who tells you otherwise is selling a slide, not a shipped system.' },
 
-      { type: 'h2', text: 'What current AI SDR products actually do', id: 'capabilities' },
+      { type: 'h2', text: 'What do current AI SDR products actually do?', id: 'capabilities' },
       { type: 'p', text: 'The category clusters into two shapes. One shape is the drafting copilot that sits on top of an existing sales stack, exemplified by Autobound and Regie.ai. The other is the fuller autonomous positioning taken by 11x and Alta, which market a virtual worker persona.' },
       { type: 'link', text: 'Autobound', href: 'https://www.autobound.ai/', label: 'Vendor' },
       { type: 'link', text: 'Regie.ai', href: 'https://www.regie.ai/', label: 'Vendor' },
@@ -55,7 +56,7 @@ export const WAVE4A_POSTS: BlogPost[] = [
         ],
       },
 
-      { type: 'h2', text: 'Where the human still has to sit', id: 'human-loop' },
+      { type: 'h2', text: 'Where does the human still have to sit?', id: 'human-loop' },
       { type: 'ol', items: [
         'Final approval on send, so a bad draft never leaves the domain.',
         'Reply handling once a real conversation starts, because tone and commercial context matter.',
@@ -64,12 +65,13 @@ export const WAVE4A_POSTS: BlogPost[] = [
 
       { type: 'takeaway', title: 'The one thing to remember', text: 'An AI SDR is drafting and prospecting software, not a virtual worker. In current deliverability conditions the reliable configuration keeps a human on the send-approval step and on every reply. The failure mode is not a bad email, it is a bad email at scale from a domain you also use to talk to real customers.' },
 
-      { type: 'h2', text: 'Why the "autonomous SDR" framing is dangerous today', id: 'autonomous-risk' },
+      { type: 'h2', text: 'Why is the autonomous SDR framing dangerous today?', id: 'autonomous-risk' },
       { type: 'p', text: 'Autonomy means an agent that decides who to email, when, and with what, and executes without a human in the loop. In a world where Google Postmaster, Yahoo and Microsoft have tightened bulk sender rules, a fully autonomous mis-step burns the sending domain, not just the campaign.' },
       { type: 'link', text: 'Google email sender guidelines', href: 'https://support.google.com/mail/answer/81126', label: 'Reference' },
+      { type: 'h3', text: 'The domain reputation risk' },
       { type: 'p', text: 'The failure mode is not a bad email. It is a bad email at scale from a domain you also use to talk to customers.' },
 
-      { type: 'h2', text: 'How to evaluate an AI SDR product', id: 'evaluation' },
+      { type: 'h2', text: 'How do you evaluate an AI SDR product?', id: 'evaluation' },
       { type: 'steps', items: [
         { title: 'Ask where the data comes from', text: 'Resold static database, live web crawl, or your own CRM. Each has different failure modes.' },
         { title: 'Ask what the human approves', text: 'Per-send approval, per-batch approval, or nothing. Match this to your risk appetite.' },
@@ -109,12 +111,12 @@ export const WAVE4A_POSTS: BlogPost[] = [
     body: [
       { type: 'tldr', text: 'Buying signals split cleanly across three axes: local (physical world evidence), digital (web and ad footprint) and organisational (people and structure changes). Score each axis 0 to 3 and act on totals of 5 or more. This piece introduces that rubric as The three-axis signal score.' },
 
-      { type: 'h2', text: 'Why the category needs a taxonomy', id: 'why-taxonomy' },
+      { type: 'h2', text: 'Why does the category need a taxonomy?', id: 'why-taxonomy' },
       { type: 'p', text: 'Most "buying signal" content flattens the concept into a single list. That is why teams end up chasing a mix of weak digital breadcrumbs and strong organisational events with the same urgency. A taxonomy fixes that.' },
 
       { type: 'callout', tone: 'info', title: 'Framework', text: 'The three-axis signal score. Rate each prospect 0 to 3 on Local signals, Digital signals and Organisational signals. Sum to a 0 to 9 score. Act on 5 and above, watch 3 to 4, ignore 0 to 2.' },
 
-      { type: 'h2', text: 'The Milo framework glossary', id: 'glossary' },
+      { type: 'h2', text: 'Which frameworks does Milo use?', id: 'glossary' },
       { type: 'p', text: 'This post introduces one framework. Two more show up across the Milo blog, and it helps to see all three in one place.' },
       { type: 'definition', items: [
         { term: 'Milo FTR Score', def: 'A per-signal quality score on three axes (Fit, Timing, Reachability), 1 to 3 each, 9 total. Anything under 6 goes to a nurture list. Introduced in the [buying-signal playbook for local B2B](/blog/buying-signal-playbook-local-b2b).' },
@@ -153,7 +155,7 @@ export const WAVE4A_POSTS: BlogPost[] = [
         'A parent company or franchise relationship changes.',
       ]},
 
-      { type: 'h2', text: 'The three-axis signal score, in a table', id: 'rubric' },
+      { type: 'h2', text: 'How does the scoring rubric work?', id: 'rubric' },
       { type: 'table', caption: 'Scoring rubric per axis (0 to 3)', headers: ['Score', 'Local axis', 'Digital axis', 'Organisational axis'], rows: [
         ['0', 'No evidence', 'No evidence', 'No evidence'],
         ['1', 'Stable, minor change', 'Static site, no ads', 'No visible people change'],
@@ -161,6 +163,7 @@ export const WAVE4A_POSTS: BlogPost[] = [
         ['3', 'Multiple compounding events', 'Multiple compounding changes', 'Named role change plus one more'],
       ]},
 
+      { type: 'h3', text: 'The score, visualised' },
       { type: 'diagram', kind: 'matrix', title: 'The three-axis signal score', caption: 'Three axes, each 0 to 3. Act on totals of 5 or more.',
         nodes: [
           { id: 'l', label: 'Local', sub: 'Physical world evidence' },
@@ -180,13 +183,14 @@ export const WAVE4A_POSTS: BlogPost[] = [
         ],
       },
 
-      { type: 'h2', text: 'Worked example', id: 'example' },
+      { type: 'h2', text: 'What does the score look like on a real business?', id: 'example' },
       { type: 'p', text: 'A physiotherapy clinic in Bengaluru opens a second location (Local 2), starts running Google Ads on "sports injury" (Digital 2), and posts a job for a lead physio (Organisational 2). Total score: 6. That is an act-now record. The opener writes itself, because all three anchors are already in the record.' },
 
       { type: 'callout', tone: 'success', title: 'Why three axes matter', text: 'A single-axis signal is easy to fake to yourself. Three axes filter out coincidences. A business doing one visible thing might be noise. A business doing three at once is almost never noise.' },
 
-      { type: 'h2', text: 'How Milo produces these scores', id: 'milo-scoring' },
+      { type: 'h2', text: 'How does Milo produce these scores?', id: 'milo-scoring' },
       { type: 'p', text: 'Milo pulls Local signals from public map data and business listings, Digital from a public site reads and public ad footprints, and Organisational from public web pages and news. The three-axis score is computed per record before drafting begins.' },
+      { type: 'h3', text: 'Related reading' },
       { type: 'link', text: 'Buying signal examples', href: '/blog/buying-signal-examples', label: 'Internal' },
       { type: 'link', text: 'Buying signal playbook for local B2B', href: '/blog/buying-signal-playbook-local-b2b', label: 'Internal' },
       { type: 'link', text: 'High intent local leads', href: '/blog/high-intent-local-leads', label: 'Internal' },
@@ -196,7 +200,6 @@ export const WAVE4A_POSTS: BlogPost[] = [
       { type: 'faq', items: [
         { q: 'Is this the same as intent data?', a: 'No. Intent data usually means third-party topic surges from cookie networks. The three-axis signal score is built from first-party public evidence about the business itself, not about anonymous visitor cohorts.' },
         { q: 'Why 5 as the action threshold?', a: 'Because a total of 5 forces at least two axes to be non-trivial. Single-axis signals are too easy to over-index on.' },
-        { q: 'Can I use this without Milo?', a: 'Yes. Score manually per axis and write the opener from the highest scoring axis first. Milo just automates the scoring and drafting steps.' },
       ]},
     ],
   },
@@ -218,16 +221,17 @@ export const WAVE4A_POSTS: BlogPost[] = [
       'what-is-an-ai-sdr',
     ],
     body: [
-      { type: 'tldr', text: 'Across primary source reports from Woodpecker, Sendr, GMass and Clay, average cold email reply rates sit in the 1 to 5 percent band. Good campaigns run 5 to 10 percent. Great, tightly targeted campaigns run above 10 percent. Anything above 25 percent should be audited for tracking artefacts.' },
+      { type: 'tldr', text: 'Across the four vendor reports I pulled for this page (Woodpecker, Sendr, GMass, Clay), average cold email reply rates sit in the 1 to 5 percent band. Good campaigns run 5 to 10 percent. Great, tightly targeted ones sit above 10 percent. If a dashboard is showing you above 25 percent, audit the tracking pixel before you audit the copy.' },
 
-      { type: 'h2', text: 'How to read this page', id: 'how-to-read' },
+      { type: 'h2', text: 'How should you read this page?', id: 'how-to-read' },
       { type: 'p', text: 'Every number below links to the primary report it came from. Vendor reports carry their own selection bias, so we quote ranges rather than a single hero number. Where a report gives a median and an average, we use the median.' },
 
-      { type: 'h2', text: 'Headline benchmarks', id: 'headline' },
+      { type: 'h2', text: 'What are the headline benchmarks?', id: 'headline' },
       { type: 'stat', value: '1 to 5%', label: 'Average cold email reply rate across major vendor reports' },
       { type: 'stat', value: '5 to 10%', label: 'Good campaigns with tight targeting and personalisation' },
       { type: 'stat', value: '10%+', label: 'Great campaigns, usually narrow ICP and warm domain' },
 
+      { type: 'h3', text: 'Reply rate ranges by vendor source' },
       { type: 'table', caption: 'Cold email reply rate benchmarks by source', headers: ['Source', 'Segment', 'Average reply rate', 'Notes'], rows: [
         ['Woodpecker Cold Email Report', 'All B2B cold email in-platform', '~1 to 5%', 'Averaged across large customer cohort'],
         ['Sendr benchmark report', 'Agencies and lean outbound teams', '~2 to 8%', 'Skews toward smaller volume, tighter lists'],
@@ -274,18 +278,19 @@ export const WAVE4A_POSTS: BlogPost[] = [
 
       { type: 'callout', tone: 'warn', title: 'When a "great" number is a lie', text: 'Reply rates above 25 percent sustained across hundreds of sends usually mean bots, catch-all inboxes replying with auto-responders, or tracking pixels counting opens as replies. Audit the actual thread contents before you celebrate.' },
 
-      { type: 'h2', text: 'What actually moves the number', id: 'what-moves-it' },
+      { type: 'h2', text: 'What actually moves the number?', id: 'what-moves-it' },
       { type: 'ol', items: [
         'Narrower ICP. Halving the target list roughly doubles the reply rate in most reports.',
         'Signal-anchored opener. Reference something the business did in the last 30 days.',
         'One clear ask. A single low-friction question outperforms a pitch plus a calendar link.',
         'Domain health. A cold domain with weak SPF and DKIM will not reach the inbox, so the reply rate cannot start.',
       ]},
+      { type: 'h3', text: 'Further reading' },
       { type: 'link', text: 'Google email sender guidelines', href: 'https://support.google.com/mail/answer/81126', label: 'Reference' },
       { type: 'link', text: 'Why cold emails go to spam', href: '/blog/why-cold-emails-go-to-spam', label: 'Internal' },
       { type: 'link', text: 'Is cold email legal', href: '/blog/is-cold-email-legal', label: 'Internal' },
 
-      { type: 'h2', text: 'How Milo users tend to sit on this ladder', id: 'milo-position' },
+      { type: 'h2', text: 'Where do Milo users tend to sit on this ladder?', id: 'milo-position' },
       { type: 'p', text: 'Milo runs signal-led prospecting with sends from the operator own Gmail or Outlook inbox and per-send approval. Users typically sit in the 5 to 12 percent band on local and SMB motions, in line with the "good to great" range in the ladder above. That is a function of narrow lists and copy that names the specific trigger, not a magic number in the product.' },
 
       { type: 'h2', text: 'FAQ', id: 'faq' },

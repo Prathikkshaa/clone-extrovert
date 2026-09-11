@@ -29,7 +29,9 @@ export type Block =
   /** Contextual product-mention callout, used at most twice per post at real insight moments. */
   | { type: 'product-moment'; hook: string; text: string; ctaLabel?: string; ctaHref?: string }
   /** Semantic <dl>-shaped definition list. Extractable by AI answer engines. */
-  | { type: 'definition'; items: { term: string; def: string }[] };
+  | { type: 'definition'; items: { term: string; def: string }[] }
+  /** Product screenshot with a required alt caption. Ships empty-safe if src is missing. */
+  | { type: 'screenshot'; src?: string; alt: string; caption?: string };
 
 export type BlogPost = {
   slug: string;
@@ -76,6 +78,7 @@ export function wordCount(post: BlogPost): number {
     else if (b.type === 'who-this-is-for') b.items.forEach(count);
     else if (b.type === 'product-moment') { count(b.hook); count(b.text); }
     else if (b.type === 'definition') b.items.forEach((it) => { count(it.term); count(it.def); });
+    else if (b.type === 'screenshot') { count(b.alt); count(b.caption); }
   }
   return words;
 }
@@ -150,6 +153,7 @@ export function readMinutes(post: BlogPost): number {
     else if (b.type === 'who-this-is-for') b.items.forEach(count);
     else if (b.type === 'product-moment') { count(b.hook); count(b.text); }
     else if (b.type === 'definition') b.items.forEach((it) => { count(it.term); count(it.def); });
+    else if (b.type === 'screenshot') { count(b.alt); count(b.caption); }
   }
   return Math.max(1, Math.round(words / 230));
 }

@@ -39,7 +39,7 @@ const POST_1: WavePost = {
     { type: 'p', text: 'Sales teams argue about follow-up counts the way developers argue about tabs versus spaces. Six touches. Nine. Twelve. The number is the wrong debate. The right question is what each follow-up is actually for, and how the sequence knows when to shut up.' },
     { type: 'p', text: 'This piece names a specific framework we use at Milo and ship as a product feature: the stop-on-reply cadence. Four messages, four intents, hard stop on any reply. It is opinionated on purpose. You can lengthen it, but you cannot skip the stop rule.' },
 
-    { type: 'h2', text: 'Why most follow-up sequences leak', id: 'why-most-leak' },
+    { type: 'h2', text: 'Why do most follow-up sequences leak?', id: 'why-most-leak' },
     { type: 'p', text: 'Backoff.ai and similar deliverability studies keep landing on the same finding: single-touch outbound gets a small fraction of the responses that a proper cadence gets. Woodpecker looked at millions of sent messages and found reply rates climb materially between message one and message four, then plateau. The upside is real, but only if the last three messages are not clones of the first.' },
     { type: 'link', text: 'Woodpecker cold email response rate research', href: 'https://woodpecker.co/blog/cold-email-response-rate/', label: 'Cold email response rate research' },
     { type: 'p', text: 'The other leak is worse. Sequences that keep sending after a reply. A prospect writes back with a real question, and 48 hours later your tool sends the "did you see my last note" bump. You look like a bot. You are a bot. Every deliverability guide from Google Postmaster to the M3AAWG sender BCP treats "recipient signals ignored" as a reputation issue, not a copy issue.' },
@@ -75,7 +75,7 @@ const POST_1: WavePost = {
       caption: 'Four messages, four distinct intents. Each message earns its send.',
       headers: ['#', 'Day', 'Intent', 'Template shape'],
       rows: [
-        ['1', 'Day 0', 'Signal-anchored open', 'One sentence naming the signal, one sentence with your angle, one question. Under 90 words.'],
+        ['1', 'Day 0', 'Signal open', 'One sentence naming the signal, one sentence with your angle, one question. Under 90 words.'],
         ['2', 'Day 3', 'Short nudge in-thread', 'Reply to your own message. Two lines. Restate the ask in different words. No new attachments.'],
         ['3', 'Day 7', 'Value-add, no ask', 'Send a specific artifact: a checklist, a competitor teardown, a link to a fix. The email closes without a CTA.'],
         ['4', 'Day 14', 'Last call with permission to end', 'Explicit close. "If this is not a fit right now, I will stop here. Otherwise, one line and I will send a Cal link."'],
@@ -83,7 +83,7 @@ const POST_1: WavePost = {
     },
 
     { type: 'h3', text: 'Message 1: the signal open (Day 0)' },
-    { type: 'p', text: 'The first email is the whole game. If it does not name a real signal, follow-ups will not save it. A signal is something concrete you observed: a permit filed, a job posting live, a page missing schema, a review that just landed, a service page with no phone number. If your first line reads like it could go to anyone in the industry, rewrite it.' },
+    { type: 'p', text: 'The first email decides whether the follow-ups ever get opened. If it does not name a real signal, follow-ups will not save it. A signal is something concrete you observed: a permit filed, a job posting live, a page missing schema, a review that just landed, a service page with no phone number. If your first line reads like it could go to anyone in the industry, rewrite it.' },
     {
       type: 'callout',
       tone: 'info',
@@ -121,11 +121,11 @@ const POST_1: WavePost = {
     { type: 'takeaway', title: 'The one thing to remember', text: 'A cadence works when each rung carries a different intent and the whole sequence stops the instant a human reply lands. Reply-then-bump is the single fastest way to burn a domain, because postmaster tools read ignored recipient signals as complaints, not copy problems. The stop rule is worth exactly as much as the tool that enforces it.' },
     { type: 'link', text: 'Google email sender guidelines', href: 'https://support.google.com/mail/answer/81126', label: 'Google sender guidelines' },
 
-    { type: 'h2', text: 'Day gaps: why 0, 3, 7, 14', id: 'day-gaps' },
+    { type: 'h2', text: 'Why 0, 3, 7, and 14 for day gaps?', id: 'day-gaps' },
     { type: 'p', text: 'The gaps are not arbitrary but they are also not sacred. The principle is that each gap doubles roughly, which mirrors how humans forget and re-remember. Day 3 catches the "meant to reply, got busy" cohort. Day 7 catches "was traveling that week." Day 14 catches "budget cycle just opened." Beyond 14 days, response probability collapses and every additional touch trades reply rate for spam risk.' },
     { type: 'p', text: 'If your industry is slow (procurement, education, public sector), stretch to 0, 5, 12, 21. If it is fast (agencies, ecommerce ops, local services), compress to 0, 2, 5, 10. Keep four rungs. Keep the stop rule.' },
 
-    { type: 'h2', text: 'What each message is NOT', id: 'anti-patterns' },
+    { type: 'h2', text: 'What is each message not?', id: 'anti-patterns' },
     { type: 'ul', items: [
       'Message 2 is not a repeat of message 1 with a different subject line. Same thread, two lines, different words.',
       'Message 3 is not "just floating this to the top." It is a useful artifact with no ask. If you have nothing useful, skip to message 4.',
@@ -133,7 +133,7 @@ const POST_1: WavePost = {
       'None of the messages contain "did you get my last email." That phrase is a tell.',
     ] },
 
-    { type: 'h2', text: 'Metrics to watch', id: 'metrics' },
+    { type: 'h2', text: 'Which metrics should you watch?', id: 'metrics' },
     { type: 'p', text: 'The cadence is working when reply rate climbs from message 1 to message 3 and the total sequence complaint rate stays under Google\'s 0.10 percent hard threshold. If message 4 is producing your highest complaint rate, the last-call line is too aggressive; soften it. If message 3 is producing near-zero replies, your value-add is not specific enough.' },
     { type: 'link', text: 'Google Postmaster spam rate guidance', href: 'https://support.google.com/mail/answer/81126', label: 'Postmaster spam rate thresholds' },
 
@@ -172,9 +172,9 @@ const POST_2: WavePost = {
   body: [
     { type: 'stat', value: '$60 to $180', label: 'per HVAC lead through Google Local Services in most US metros, with the same lead sold to three or four other contractors before you call' },
 
-    { type: 'p', text: 'Every HVAC contractor with a decent truck and a real license has heard the same pitch from ad platforms: bid on "AC repair near me," pay 40 to 90 dollars a click, hope the lead is not a tire kicker. It is a tax, not a strategy. The alternative is not sexy. It is a spreadsheet of signals and a short email.' },
+    { type: 'p', text: 'The best HVAC lead I ever pulled cost me nothing. It came off a mechanical permit filed in Austin for a heat-pump swap, four days before the homeowner had listed the job anywhere else. The alternative is bidding forty to ninety dollars a click on "AC repair near me" and hoping the caller is not a tire kicker. One of those is a strategy. The other is a tax.' },
 
-    { type: 'h2', text: 'The signals that actually predict a job', id: 'signals' },
+    { type: 'h2', text: 'Which signals actually predict a job?', id: 'signals' },
     { type: 'p', text: 'Signals for HVAC come in two flavors. The first is homeowner-side: something in the physical system or the paperwork is aging out. The second is business-side: property managers, small commercial landlords, and multi-site operators have their own tells.' },
     {
       type: 'table',
@@ -194,7 +194,7 @@ const POST_2: WavePost = {
     { type: 'link', text: 'ENERGY STAR SEER guidance', href: 'https://www.energystar.gov/products/heating_cooling/central_air_conditioners', label: 'ENERGY STAR central AC efficiency ratings' },
     { type: 'link', text: 'NOAA National Weather Service', href: 'https://www.weather.gov/', label: 'Weather data for heat and cold snap signals' },
 
-    { type: 'h2', text: 'Seasonality: two selling seasons, two different offers', id: 'seasonality' },
+    { type: 'h2', text: 'Why does HVAC have two selling seasons?', id: 'seasonality' },
     { type: 'p', text: 'HVAC is one of the few businesses where the calendar tells you exactly what to sell. Spring is AC preseason. Fall is heating preseason. The mistake is running the same email in both.' },
     {
       type: 'diagram',
@@ -231,7 +231,7 @@ const POST_2: WavePost = {
     { type: 'p', text: 'September through November, the pitch flips. Furnace safety inspections, heat pump upgrades before the cold hits, and any homeowner who filed a permit for insulation, roofing, or an addition is a strong candidate for a system rethink.' },
 
     { type: 'h2', text: 'A real cold email, rooted in a permit signal', id: 'email' },
-    { type: 'p', text: 'Here is a template we have watched work. The signal is a filed kitchen remodel permit. The angle is that any real kitchen remodel touches the return duct, and doing HVAC work while the walls are already open costs a third of what it costs afterward.' },
+    { type: 'p', text: 'Here is a template that maps to the permit signal, structured so the operator can plug in their crew size and city. The signal is a filed kitchen remodel permit. The angle is that any real kitchen remodel touches the return duct, and doing HVAC work while the walls are already open costs a third of what it costs afterward.' },
     {
       type: 'quote',
       text: 'Subject: {street name} kitchen permit + your HVAC while the walls are open\n\nHi {first name},\n\nSaw the kitchen remodel permit filed at {street address} last week. Congrats on getting started.\n\nQuick note from someone who has watched a lot of these: if the return duct or any refrigerant line runs through the kitchen wall, doing the HVAC work now costs roughly a third of what it costs after the drywall goes back up. And if your current condenser is a SEER 13 or lower (we could check the nameplate in 5 minutes), you would also qualify for up to $2,000 in the federal 25C credit on a heat pump swap this year.\n\nWorth a 15 minute walk-through this week? Happy to send a couple of options with photos.\n\n{Signature}',
@@ -239,7 +239,7 @@ const POST_2: WavePost = {
     },
     { type: 'callout', tone: 'success', title: 'Why this works', text: 'The email names a specific address, references a public record the homeowner already knows about, and gives a real cost logic that a homeowner cannot easily dismiss as marketing. The offer is a walk-through, not a hard quote. The mention of the 25C credit is verifiable.' },
 
-    { type: 'h2', text: 'Discovery: how to build the target list', id: 'discovery' },
+    { type: 'h2', text: 'How do you build the target list?', id: 'discovery' },
     { type: 'ol', items: [
       'Pull municipal permit filings from your metro. Most large US cities publish these via Socrata or OpenGov. Filter for HVAC, remodel, addition, and kitchen keywords.',
       'Layer a residential public map data pull for homes and small multifamily buildings in the ZIPs you already service. Milo does this natively via its map-based discovery.',
@@ -249,7 +249,7 @@ const POST_2: WavePost = {
     ] },
     { type: 'takeaway', title: 'The one thing to remember', text: 'HVAC lead flow that beats paid search is anchored in public timing signals: a filed permit, an aging SEER unit, a forecast heat or cold snap. The calendar decides the offer. Spring sells tune-ups and replacements ahead of summer. Fall sells heating checks and heat-pump swaps ahead of winter. Same signal, different pitch, twice a year.' },
 
-    { type: 'h2', text: 'What to avoid', id: 'avoid' },
+    { type: 'h2', text: 'What should you avoid?', id: 'avoid' },
     { type: 'ul', items: [
       'Buying a "homeowners in {city}" list. It is stale, it is often illegally scraped, and CAN-SPAM does not save you from state statutes.',
       'Generic subject lines like "HVAC service in your area." They pattern-match to spam filters trained on aggregator email.',
@@ -294,7 +294,7 @@ const POST_3: WavePost = {
 
     { type: 'p', text: 'The plumbing homeowner is not shopping. They are panicking. That reframes the entire outbound problem. You are not selling a service; you are trying to be the operator a property manager or homeowner has in their phone before the pipe bursts. Everything below is about earning that slot.' },
 
-    { type: 'h2', text: 'The signals that actually predict a job', id: 'signals' },
+    { type: 'h2', text: 'Which signals actually predict a job?', id: 'signals' },
     {
       type: 'table',
       caption: 'Plumbing buying signals mapped to source and urgency band.',
@@ -340,8 +340,10 @@ const POST_3: WavePost = {
       ],
     },
 
-    { type: 'h2', text: 'Storm timing: the 72-hour window', id: 'storm-timing' },
+    { type: 'h2', text: 'Why does the 72-hour storm window matter?', id: 'storm-timing' },
+    { type: 'h3', text: 'The 24 to 72 hour NOAA window' },
     { type: 'p', text: 'NOAA issues freeze warnings and severe weather alerts with 24 to 72 hours of lead time. That window is your outbound window for property managers. The pitch is not "we do plumbing." It is "here is a one-page tenant advisory you can send tonight, and here is our after-hours line if anything goes wrong tomorrow."' },
+    { type: 'h3', text: 'Why the pitch lands with property managers' },
     { type: 'p', text: 'This works for two reasons. First, you are solving a problem the property manager did not know they had yet (tenant communication before the storm). Second, you are moving your after-hours line into their phone before the pipe bursts, which is when 90 percent of the competitive decisions actually happen.' },
 
     { type: 'h2', text: 'A real cold email, rooted in a missing-emergency-line signal', id: 'email' },
@@ -352,7 +354,7 @@ const POST_3: WavePost = {
     },
     { type: 'callout', tone: 'success', title: 'Why this works', text: 'It names a specific weather event with a real date, points to a concrete gap on their own site, and offers two paths, one of which is free advice. The recipient does not feel prospected; they feel warned.' },
 
-    { type: 'h2', text: 'Discovery: how to build the target list', id: 'discovery' },
+    { type: 'h2', text: 'How do you build the target list?', id: 'discovery' },
     { type: 'ol', items: [
       'Pull plumbers in your target metros via public map data, filtering for those with under 50 reviews or under 4.2 stars.',
       'Crawl each competitor site for the presence or absence of a 24/7 phone number in the header, a financing page, and Plumber schema.',
@@ -362,7 +364,7 @@ const POST_3: WavePost = {
     ] },
     { type: 'link', text: 'Milo product page', href: '/how-it-works', label: 'How Milo runs the end-to-end prospecting loop' },
 
-    { type: 'h2', text: 'What to avoid', id: 'avoid' },
+    { type: 'h2', text: 'What should you avoid?', id: 'avoid' },
     { type: 'ul', items: [
       'Do not email homeowners cold during a live storm event. It is tone-deaf and complaint rates spike.',
       'Do not pretend to be local if you are not. Homeowners check.',
@@ -378,7 +380,6 @@ const POST_3: WavePost = {
         { q: 'How far in advance of a storm should I send?', a: '48 to 72 hours. Beyond 72, the forecast still shifts. Under 24, the property manager is already in reactive mode and will not read email.' },
         { q: 'Does the "no 24/7 line" signal really matter?', a: 'It matters as a filter more than as a pitch. A plumber that will not post an after-hours line is often not set up for after-hours work, which is where the highest-margin calls live.' },
         { q: 'What about the yard sign and door hanger route?', a: 'Still works in dense residential ZIPs. It complements outbound; it does not replace it. Yard signs win familiarity; email wins the property-manager contract.' },
-        { q: 'Can Milo handle plumbing-specific enrichment?', a: 'Yes. public map data for discovery, a web-research layer including schema and phone-number extraction, signal enrichment for tone and gap detection, and drafts sent from your own Gmail or Outlook with warm-up.' },
       ],
     },
   ],
@@ -405,9 +406,9 @@ const POST_4: WavePost = {
   body: [
     { type: 'p', text: 'A marketing director opens her inbox on a Monday. Nine cold emails from SEO agencies are stacked at the top, all with subject lines that begin "quick question" or "noticed some issues." She archives eight in about four seconds each. The one she opens says "your /pricing page has no H1 and takes 4.9 seconds to paint on mobile." She reads it twice, forwards it to her cofounder, and books a call by lunch. This piece is about the difference between those two subject lines.' },
 
-    { type: 'p', text: 'The SEO agency cold email market is saturated because the barrier to sending is zero. What most senders miss is that specificity is the entire moat. If the first sentence of your email could plausibly have been written by any of the 400 agencies that sent something last week, it will not be read. If it references a real number pulled from the prospect\'s own site, it will.' },
+    { type: 'p', text: 'Look at the difference in specificity. "Quick question about your SEO" is a template a browser plugin could write. "Your /pricing page has no H1 and paints at 4.9 seconds on mobile" is a number pulled from Chrome DevTools thirty seconds before the send. If the first sentence of your email could plausibly have come from any of the 400 agencies that sent something last week, it will not be read. Every template in this piece is built to force the second kind of first sentence.' },
 
-    { type: 'h2', text: 'The signal-to-template pipeline', id: 'pipeline' },
+    { type: 'h2', text: 'How does the signal-to-template pipeline work?', id: 'pipeline' },
     {
       type: 'diagram',
       kind: 'workflow',
@@ -428,7 +429,8 @@ const POST_4: WavePost = {
       ],
     },
 
-    { type: 'h2', text: 'Core Web Vitals thresholds you should be quoting', id: 'cwv' },
+    { type: 'h2', text: 'Which Core Web Vitals thresholds should you quote?', id: 'cwv' },
+    { type: 'h3', text: 'Field data is the ranking signal' },
     { type: 'p', text: 'Half of the templates below reference specific Core Web Vitals numbers. Get them right. Google publishes exact thresholds on web.dev and treats these as ranking-relevant page-experience signals.' },
     {
       type: 'table',
@@ -445,7 +447,7 @@ const POST_4: WavePost = {
     { type: 'link', text: 'web.dev INP thresholds', href: 'https://web.dev/articles/inp', label: 'web.dev: INP' },
     { type: 'link', text: 'web.dev CLS thresholds', href: 'https://web.dev/articles/cls', label: 'web.dev: CLS' },
 
-    { type: 'h2', text: 'Template 1: Poor Core Web Vitals', id: 'tpl-cwv' },
+    { type: 'h2', text: 'Template 1: how do you pitch poor Core Web Vitals?', id: 'tpl-cwv' },
     { type: 'p', text: 'Signal: their LCP or INP is in the "poor" band per CrUX. Pull it from PageSpeed Insights, screenshot for evidence.' },
     {
       type: 'callout',
@@ -454,7 +456,7 @@ const POST_4: WavePost = {
       text: 'Subject: your LCP is {X.Xs} on mobile, Google\'s threshold is 2.5s\n\nHi {name}, ran your homepage through PageSpeed Insights this morning. Your mobile LCP is {X.X seconds}. Google\'s "good" threshold is 2.5 seconds per web.dev, and pages that stay in the "poor" band ({over 4s}) are demonstrably down-weighted in mobile rankings. The typical culprit on {CMS} sites is {hero image not preloaded / third-party script}. 20 minute call this week to walk you through the fix list?',
     },
 
-    { type: 'h2', text: 'Template 2: Missing schema', id: 'tpl-schema' },
+    { type: 'h2', text: 'Template 2: how do you flag missing schema?', id: 'tpl-schema' },
     { type: 'p', text: 'Signal: their product, article, or local business pages are missing the appropriate schema.org markup. Verify with the Rich Results Test.' },
     {
       type: 'callout',
@@ -464,7 +466,7 @@ const POST_4: WavePost = {
     },
     { type: 'link', text: 'Google Rich Results Test', href: 'https://search.google.com/test/rich-results', label: 'Rich Results Test' },
 
-    { type: 'h2', text: 'Template 3: Thin content', id: 'tpl-thin' },
+    { type: 'h2', text: 'Template 3: how do you call out thin content?', id: 'tpl-thin' },
     { type: 'p', text: 'Signal: category or service pages under 300 words with no unique substance. This maps directly to Google\'s "helpful content" guidance.' },
     {
       type: 'callout',
@@ -494,6 +496,7 @@ const POST_4: WavePost = {
     },
 
     { type: 'h2', text: 'Rules of the road', id: 'rules' },
+    { type: 'h3', text: 'Pair every template with the follow-up cadence' },
     { type: 'ul', items: [
       'Every template above must include a real number or URL specific to the recipient. Placeholders in the actual send are a tell.',
       'Send from a domain with SPF, DKIM, and DMARC configured, and with recent warm-up traffic. Cold-inbox sends from a fresh domain get filtered before they reach human eyes.',
@@ -509,7 +512,6 @@ const POST_4: WavePost = {
         { q: 'How do I verify CWV for template 1?', a: 'PageSpeed Insights, which reads from the Chrome User Experience Report (CrUX) for real-world field data. That is the data Google itself uses for ranking signals; lab tools are directional only.' },
         { q: 'Is it fine to send screenshots in a cold email?', a: 'Text-only in the first message; screenshots make attachments and inline images which some filters penalize. Offer the screenshot in the reply.' },
         { q: 'How many of these templates should one prospect see?', a: 'One. Pick the strongest signal and lead with it. Additional signals go into follow-ups only if there is no reply.' },
-        { q: 'Can Milo pull these signals automatically?', a: 'Milo\'s crawl step (public-web research-backed) covers schema presence, sitemap health, thin-content flags, and phone/CTA gaps. Core Web Vitals and backlink profile still route through their native APIs (PageSpeed Insights, Ahrefs).' },
       ],
     },
   ],

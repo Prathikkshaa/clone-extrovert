@@ -20,13 +20,13 @@ export const WAVE4C_POSTS: BlogPost[] = [
     body: [
       { type: 'p', text: 'A founder pulls 900 roofers out of Google Maps on a Sunday night, loads them into a sender, and by Wednesday the domain is on a warmup timeout and the reply folder is empty. The list was not the problem. Google Maps returned exactly what it was asked for. What the founder built was a phonebook, and phonebooks do not book meetings. This piece is about what has to happen between the export and the send to turn one into the other.' },
 
-      { type: 'h2', text: 'Why Google Maps is underrated for B2B' },
+      { type: 'h2', text: 'Why is Google Maps underrated for B2B?' },
       { type: 'p', text: 'For any business that serves a physical geography, Google Maps is the closest thing to a live directory of the real economy. Every listing has a name, category, address, phone, website, hours, review count, and often a photo of the storefront. That is more first party context than most paid databases will give you for a local operator.' },
       { type: 'p', text: 'The problem is that a raw export from Maps is a phonebook, not a prospect list. If you email 500 roofers with the same pitch you are doing telemarketing with extra steps. What turns a phonebook into a list is signal work.' },
 
       { type: 'callout', tone: 'info', title: 'The signal-first list build', text: 'A five step framework: (1) pick a tight market, (2) pull public data from Google Maps and the target websites, (3) apply buying signals so only businesses with a reason to buy stay in, (4) qualify by fit against your actual delivery capacity, (5) shape outreach around the specific signal you found. Skipping step 3 is why most Maps lists never convert.' },
 
-      { type: 'diagram', kind: 'workflow', title: 'The signal-first list build', caption: 'Five steps, in order. Steps 3 and 5 are the ones most teams skip.', nodes: [
+      { type: 'diagram', kind: 'workflow', title: 'The five-step list build', caption: 'Five steps, in order. Steps 3 and 5 are the ones most teams skip.', nodes: [
         { id: 'n1', label: '1. Pick market', sub: 'Vertical + geography' },
         { id: 'n2', label: '2. Pull public data', sub: 'Maps + website crawl' },
         { id: 'n3', label: '3. Apply signals', sub: 'Filter to reason-to-buy', emphasis: true },
@@ -40,8 +40,9 @@ export const WAVE4C_POSTS: BlogPost[] = [
       { type: 'p', text: 'A tight market is one vertical, one geography, one size band. Not "contractors in the Midwest". Something like "residential roofing companies in Peoria, Illinois with 5 to 40 employees". Tight enough that your email can reference something specific, wide enough that there are 60 to 200 companies to work.' },
       { type: 'p', text: 'For this article we will use residential roofing in Peoria as the running example.' },
 
-      { type: 'h2', text: 'Step 2: pull the public data' },
+      { type: 'h2', text: 'Step 2: how do you pull the public data?' },
       { type: 'p', text: 'Search Maps for the vertical and city. Capture: business name, category, website, phone, address, review count, average rating, hours, and the Place ID. The Place ID is the stable key you want to dedupe on later.' },
+      { type: 'h3', text: 'Enrich each site with a quick crawl' },
       { type: 'p', text: 'Then crawl each website for a few extra fields: services offered, service area pages, staff or team page, careers page, any mention of financing partners, and the CMS or website builder in use. Every one of those becomes a possible signal.' },
       { type: 'table', caption: 'Fields to pull for a local prospecting list', headers: ['Field', 'Source', 'Why it matters'], rows: [
         ['Business name, address, phone', 'Public map data', 'Basic identity, dedupe key'],
@@ -52,14 +53,15 @@ export const WAVE4C_POSTS: BlogPost[] = [
         ['Website CMS or age', 'Public site review', 'Buying window signal'],
       ] },
 
-      { type: 'h2', text: 'Step 3: apply signals' },
+      { type: 'h2', text: 'Step 3: how do you apply buying signals?' },
       { type: 'p', text: 'Signals are the reason a specific business would buy from you this quarter. For roofing in Peoria, three that work: (a) hiring for a project manager (growth stress on scheduling), (b) financing partner listed (they sell bigger tickets), (c) website last redesigned before 2020 (they are already in a refresh mindset).' },
+      { type: 'h3', text: 'Cut ruthlessly by signal' },
       { type: 'p', text: 'Drop everything that does not carry at least one signal. It feels wasteful and it is not. A 40 company signal list will beat a 400 company blast every time.' },
 
-      { type: 'h2', text: 'Step 4: qualify by fit' },
+      { type: 'h2', text: 'Step 4: do they actually fit your delivery?' },
       { type: 'p', text: 'Fit is about you, not them. Do you actually want to serve a five person roofer? Can your onboarding handle a shop that answers the phone by first name? If you sell software with a $12k floor, cut anything under about 15 crews. Better to have 30 qualified than 300 blurred.' },
 
-      { type: 'h2', text: 'Step 5: shape outreach around the signal' },
+      { type: 'h2', text: 'Step 5: how do you shape outreach around the signal?' },
       { type: 'p', text: 'One email, one signal, one ask. If the signal was the hiring page, the first line names it. If it was the financing partner, the first line names that. The pitch is the same but the entry point is not. This is where the work of curating a signal list finally pays off.' },
 
       { type: 'link', label: 'How Milo works', href: '/how-it-works', text: 'Milo runs this exact loop end to end: discover the businesses that match your signal, personalize the outreach, and send it from your own inbox.' },
@@ -95,7 +97,7 @@ export const WAVE4C_POSTS: BlogPost[] = [
     body: [
       { type: 'p', text: 'Every freelancer who has ever tried cold email has the same first instinct: build the biggest list possible, blast it, and hope the numbers do the work. It never does. What actually books the first ten clients is smaller than that, quieter than that, and more boring than that. A hundred prospects. One email. One offer someone can say yes to over lunch. This is the version of the playbook we would run tomorrow if we started over.' },
 
-      { type: 'h2', text: 'The math is friendlier than you think' },
+      { type: 'h2', text: 'Why is the math friendlier than you think?' },
       { type: 'p', text: 'Freelancers do not need enterprise pipelines. If you send 100 well targeted emails and get an honest 8 percent reply rate, that is 8 conversations. Convert one in four into paid work and you have two clients from one week of prospecting. That is a working freelance business.' },
 
       { type: 'h2', text: 'The first-100 leads workflow' },
@@ -110,21 +112,23 @@ export const WAVE4C_POSTS: BlogPost[] = [
         { from: 'a', to: 'b' }, { from: 'b', to: 'c' }, { from: 'c', to: 'd' }, { from: 'd', to: 'e' }, { from: 'e', to: 'f' },
       ] },
 
-      { type: 'h2', text: 'Pick a niche you can defend in one sentence' },
+      { type: 'h2', text: 'Can you defend your niche in one sentence?' },
       { type: 'p', text: 'Not "web developer". Something like "Webflow to Framer migrations for Series A SaaS marketing sites". If a stranger cannot repeat your niche back after one line, keep tightening. Freelancers underprice because their positioning is soft. Fix the words first.' },
 
-      { type: 'h2', text: 'Build 100 prospects' },
+      { type: 'h2', text: 'How do you build 100 prospects?' },
       { type: 'p', text: 'Sources: LinkedIn search, YC directory, Product Hunt weekly launches, Indie Hackers profiles, industry Slack member lists, funding announcements, Google Maps if your niche is local. Deliverable is a spreadsheet with company, first name, role, website, and one signal per row.' },
 
-      { type: 'h2', text: 'The signal is the whole email' },
+      { type: 'h2', text: 'Why is the signal the whole email?' },
       { type: 'p', text: 'A signal is a specific observable fact about that company: a recent hire, a stack change, a broken page, a launched product, a job post, a podcast mention. If your email would still make sense sent to a competitor, it has no signal. Rewrite it.' },
 
-      { type: 'h2', text: 'A cold email template that actually works' },
+      { type: 'h2', text: 'What does a working cold email look like?' },
       { type: 'callout', tone: 'info', title: 'Template · signal: slow LCP on new pricing page', text: 'Subject: your new pricing page. Hi Priya, saw you shipped the new pricing page last week and it now loads in 4.1s on mobile (mostly the hero video). For a Framer site that number usually lives under 1.5s. I do Webflow to Framer performance passes as a fixed 2 week engagement. Two recent ones: cut LCP from 3.8s to 1.2s for Rally, and from 5.1s to 1.6s for Kestrel. Worth a 15 minute look next week? Happy to send a Loom teardown either way. Arun' },
+      { type: 'h3', text: 'Why this email works' },
       { type: 'p', text: 'What is doing the work here: a real observation, a specific metric, two named references, a small ask, and a fallback (the Loom) so a no still ends warm. No em dashes, no hype, no calendar link in the first message.' },
 
       { type: 'h2', text: 'Positioning the offer: fixed-scope beats hourly' },
       { type: 'p', text: 'Hourly pricing forces the buyer to underwrite your speed. Fixed-scope pricing forces you to underwrite it, which is the trade the buyer wants. For your first 20 clients, package the work as a two week or four week engagement with one clear deliverable and one clear price.' },
+      { type: 'h3', text: 'Compare the two side by side' },
       { type: 'table', caption: 'Fixed-scope vs hourly for new freelancers', headers: ['Dimension', 'Hourly', 'Fixed-scope'], rows: [
         ['Buyer decision', 'Slow, needs approvals', 'Fast, single price'],
         ['Your incentive', 'Slow down', 'Ship faster'],
@@ -139,7 +143,7 @@ export const WAVE4C_POSTS: BlogPost[] = [
 
       { type: 'callout', tone: 'success', title: 'One rule that saved us a year', text: 'Never send an email you would not be proud to have a friend forward. Cold does not mean careless. If the observation is real and the offer is real, the email will feel human even at volume.' },
 
-      { type: 'h2', text: 'What to expect in weeks one to four' },
+      { type: 'h2', text: 'What should you expect in weeks one to four?' },
       { type: 'p', text: 'Week 1: build list, warm inboxes, write template. Week 2: send 100 emails at 20 per day. Week 3: run replies, book 4 to 8 calls. Week 4: close 1 to 3 clients, ask each for one intro. Iterate the template based on what actually got replies.' },
 
       { type: 'faq', items: [
@@ -170,7 +174,7 @@ export const WAVE4C_POSTS: BlogPost[] = [
     body: [
       { type: 'quote', text: 'We built Milo because the advice we kept hearing as bootstrapped founders was some version of "hire an agency." We could not, and honestly we did not want to. What worked was 90 days of outbound we ran ourselves, out of our own inbox, in a rhythm that survived the rest of the job.', cite: 'Arun, co-founder, Milo' },
 
-      { type: 'h2', text: 'The premise' },
+      { type: 'h2', text: 'What is the premise?' },
       { type: 'p', text: 'A VC backed startup can afford to spend to learn. A bootstrapped founder cannot. Every outbound hour has to either produce a conversation or produce a lesson that changes the next batch. That constraint is a gift. It forces you to write better emails, pick tighter markets, and cut activity that does not pay.' },
 
       { type: 'h2', text: 'The 90 day plan' },
@@ -190,19 +194,21 @@ export const WAVE4C_POSTS: BlogPost[] = [
 
       { type: 'h2', text: 'Month 1: discovery, not selling' },
       { type: 'p', text: 'We book 30 discovery calls with people who look like our ICP. No demo, no pitch, no calendar link labeled "sales call". We ask about the last time they tried to solve this problem, what they used, why they stopped, and what the workaround costs them a month. We take notes and we tag every pattern.' },
+      { type: 'h3', text: 'What we write down at month end' },
       { type: 'p', text: 'At the end of the month we can write our ICP in one sentence, our top three buying signals as observable facts, and our pitch as a paragraph that names a specific pain in the buyer\'s own words. Without that paragraph, month 2 is a coin flip.' },
 
       { type: 'h2', text: 'Month 2: outbound with a rhythm you can hold' },
       { type: 'p', text: 'We pick one niche and we run outbound anchored in real signals. 100 emails a week, sent from our own domain, one signal per email. We send Tuesday and Thursday, we read replies at 4pm, and we do not touch the sequence during the day. Everything else in the business has to fit around this because a bootstrapped founder does not have an SDR to cover the gap.' },
+      { type: 'h3', text: 'One niche, not three' },
       { type: 'callout', tone: 'info', title: 'One niche at a time', text: 'The pull to run three niches in parallel is strong and almost always wrong at this stage. Depth beats spread when you are the one doing the work. Prove you can close in one niche before you fork.' },
 
-      { type: 'h2', text: 'Month 3: iterate, do not re-plan' },
+      { type: 'h2', text: 'Month 3: how do you iterate without re-planning?' },
       { type: 'p', text: 'By month three we have data. We know which signals produced replies and which produced silence. We double down on the top two signals, we rewrite the template based on the actual language buyers used on calls, and we push volume to 150 a week. We do not add a new channel. We do not "start LinkedIn". We finish the loop we started.' },
 
-      { type: 'h2', text: 'What we do not do' },
+      { type: 'h2', text: 'What do we not do?' },
       { type: 'p', text: 'We do not buy a database. We do not hire an agency. We do not run paid ads before we know the message works cold. We do not add a second product wedge in month two because a customer asked. All of these look like progress and none of them are.' },
 
-      { type: 'h2', text: 'What tools we would use' },
+      { type: 'h2', text: 'What tools would we use?' },
       { type: 'p', text: 'A live way to discover businesses in your ICP, a way to read their public profile, a way to draft in your voice, your own Gmail or Outlook for sending, and a spreadsheet for tracking. That is enough. Milo bundles the first four so you can spend the founder hour writing and reading replies instead of stitching tools.' },
       { type: 'link', label: 'How Milo works', href: '/how-it-works', text: 'The tool we built for exactly this loop.' },
 

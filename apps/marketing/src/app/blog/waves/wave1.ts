@@ -21,7 +21,7 @@ export const WAVE1_POSTS: BlogPost[] = [
       },
       {
         type: 'p',
-        text: 'Most outbound advice was written for SaaS teams selling into F1000 logos. The signals they chase (funding rounds, exec hires, tech stack changes) barely apply to the plumber, dental office, or accounting firm on Main Street. But local B2B has its own signal layer, and it is louder and cheaper to access than most sellers realize.',
+        text: 'Most "local prospecting" advice is written by people who have never sold anything to a plumber. They lift a SaaS playbook, swap the logos for a ZIP code, and act surprised when funding-round triggers do not fire on a family-owned dental office. Local B2B has its own signal layer. It is louder and cheaper than anything Apollo will ever sell you, but you have to stop pretending Main Street runs on Crunchbase.',
       },
       {
         type: 'p',
@@ -30,7 +30,7 @@ export const WAVE1_POSTS: BlogPost[] = [
       { type: 'h2', text: 'What counts as a buying signal?', id: 'definition' },
       {
         type: 'p',
-        text: 'The clearest working definition comes from the intent-data teams that pioneered this vocabulary. UserGems calls a signal "an observable event that indicates a prospect is a good fit and likely to buy soon." Outreach frames signals as "trigger events that reveal timing." Artisan\'s primer puts it more plainly: signals answer the question "why now?" for a given account.',
+        text: 'The clearest working definition comes from the intent-data teams that pioneered this vocabulary. UserGems calls a signal "an observable event that indicates a prospect is a good fit and likely to buy soon." Outreach frames signals as "trigger events that reveal timing." Put more plainly, signals answer the question "why now?" for a given account.',
       },
       {
         type: 'link',
@@ -38,6 +38,7 @@ export const WAVE1_POSTS: BlogPost[] = [
         href: 'https://www.usergems.com/blog/buying-signals',
         label: 'Read the UserGems primer',
       },
+      { type: 'h3', text: 'The three local why-nows' },
       {
         type: 'p',
         text: 'For local B2B the "why now?" is usually one of three things: a visible operational gap, a growth move, or an environmental trigger. The trick is knowing which specific artifacts each of those produces on the public internet.',
@@ -84,6 +85,7 @@ export const WAVE1_POSTS: BlogPost[] = [
           'Reachability (1 to 3): can you contact the decision maker, or does the signal only touch a proxy?',
         ],
       },
+      { type: 'h3', text: 'A worked score: clinic hire vs weak reviews' },
       {
         type: 'p',
         text: 'A hiring signal for a "Marketing Director" at a 30-person clinic is a strong fit if you sell fractional marketing, a strong timing signal (they will pick a partner in 6 weeks), and moderately reachable (the CEO usually approves). A weak-reviews signal for the same clinic scores lower on timing and often lower on reachability if the front-desk manager is the reader.',
@@ -194,6 +196,7 @@ export const WAVE1_POSTS: BlogPost[] = [
         type: 'p',
         text: 'A search like "dentists in Austin" on Google Maps returns hundreds of businesses with names, addresses, phone numbers, websites, ratings, and review counts. That is a lead list sitting in plain sight, so it is easy to see why tools like Apify actors and Outscraper get pitched as the shortcut. Copy the results into a CSV, upload to your sender of choice, done.',
       },
+      { type: 'h3', text: 'Three hidden costs behind the shortcut' },
       {
         type: 'p',
         text: 'The problem is that the shortcut has three costs that only show up later: legal, technical, and quality.',
@@ -275,6 +278,7 @@ export const WAVE1_POSTS: BlogPost[] = [
         type: 'p',
         text: 'Both are real products with legitimate use cases. Apify runs a marketplace of actors, some of which are Maps scrapers and some of which use official APIs cleanly. Outscraper offers a hosted Maps extraction service and is transparent about its methods. If your only requirement is a raw list of businesses with phone numbers, they work.',
       },
+      { type: 'h3', text: 'What they leave undone' },
       {
         type: 'p',
         text: 'What they do not do is enrichment, signal tagging, drafting, or sending. You still need three more tools, three more subscriptions, and a way to keep them from stepping on each other. That is the gap Milo fills.',
@@ -337,19 +341,20 @@ export const WAVE1_POSTS: BlogPost[] = [
     cluster: 'Prospecting',
     tags: ['prospecting', 'apollo', 'zoominfo', 'cognism', 'sales tools'],
     excerpt:
-      'A fair comparison of database-first tools like Apollo and ZoomInfo against signal-first tools like Milo, with a clear guide to when each one wins.',
+      'A fair comparison of database-first tools like Apollo and ZoomInfo against tools like Milo that trigger on live signals, with a clear guide to when each one wins.',
     datePublished: '2026-07-24',
     readMinutes: 10,
     body: [
       {
         type: 'tldr',
-        text: 'Lead databases and signal-first prospecting are different products for different jobs. Databases (Apollo, ZoomInfo, Cognism) sell breadth of contacts on a seat license. Signal-first tools (Milo) sell timing and context on a pay-as-you-go credit. If you already know exactly who to email, buy a database. If you want to know who is likely to buy right now, buy signals.',
+        text: 'Half the people arguing about Apollo versus timing tools online have never run a real outbound month. Databases sell you breadth on a seat license. Tools like Milo sell you a why-now on credits. If you already know exactly who to email, a database is the right tool and I am not going to talk you out of it. If you keep hearing "good list, wrong week" from your reps, buy timing instead.',
       },
       { type: 'h2', text: 'What does each category actually sell?', id: 'categories' },
       {
         type: 'p',
         text: 'A lead database is a large, structured contact set: emails, phone numbers, titles, and firmographics for tens or hundreds of millions of people. ZoomInfo pioneered the category at the enterprise tier. Apollo brought a self-serve version to mid-market. Cognism focused on EU coverage and GDPR compliance. All three price on annual seats and gate premium data behind higher tiers.',
       },
+      { type: 'h3', text: 'The Milo product shape' },
       {
         type: 'p',
         text: 'A signal tool is a smaller, denser workflow: discover accounts that just did something relevant, enrich the trigger, personalize the outreach, and send it. The database is a byproduct of the workflow, not the product.',
@@ -361,7 +366,7 @@ export const WAVE1_POSTS: BlogPost[] = [
       { type: 'h2', text: 'The comparison, honestly', id: 'table' },
       {
         type: 'table',
-        headers: ['Dimension', 'Apollo / ZoomInfo / Cognism', 'Milo (signal-first)'],
+        headers: ['Dimension', 'Apollo / ZoomInfo / Cognism', 'Milo'],
         rows: [
           ['Core promise', 'Every contact you might want', 'Contacts likely to buy now'],
           ['Pricing model', 'Annual seats, data-tier gates', 'PAYG credits, no seats'],
@@ -379,6 +384,7 @@ export const WAVE1_POSTS: BlogPost[] = [
         type: 'p',
         text: 'If you sell into a well-mapped market (say, VP-level buyers at 500-to-5000 employee SaaS companies in North America), a database is the correct tool. The universe is finite, the personas are stable, and the value of exhaustively listing every account outweighs the value of timing. A ZoomInfo seat pays for itself the first quarter you use it correctly.',
       },
+      { type: 'h3', text: 'When team size flips the math' },
       {
         type: 'p',
         text: 'Databases also win when you have a large SDR team. Seat pricing looks bad in a spreadsheet, but pooled licenses distribute the fixed cost. If you have twenty SDRs each dialing 80 accounts a day, the per-contact math flips in your favor.',
@@ -405,11 +411,11 @@ export const WAVE1_POSTS: BlogPost[] = [
       { type: 'h2', text: 'Where does signal-first win?', id: 'signal-wins' },
       {
         type: 'p',
-        text: 'Signal-first tools win when the timing dimension matters more than the coverage dimension. That is almost always true in local B2B, and often true in SMB SaaS. A local roofing company that just weathered a hailstorm is worth ten roofing companies picked at random. A dental practice hiring their first office manager is a better lead than a matched-ICP practice you cold-mailed last quarter.',
+        text: 'These tools win when the timing dimension matters more than the coverage dimension. That is almost always true in local B2B, and often true in SMB SaaS. A local roofing company that just weathered a hailstorm is worth ten roofing companies picked at random. A dental practice hiring their first office manager is a better lead than a matched-ICP practice you cold-mailed last quarter.',
       },
       {
         type: 'p',
-        text: 'Signal-first also wins on total cost of ownership for small teams. There are no seats to buy for the intern who occasionally helps, no annual commitment, no data-tier upsell. You pay per lead you actually work.',
+        text: 'They also win on total cost of ownership for small teams. There are no seats to buy for the intern who occasionally helps, no annual commitment, no data-tier upsell. You pay per lead you actually work.',
       },
       { type: 'h2', text: 'How do you choose between them?', id: 'choose' },
       {
@@ -447,7 +453,7 @@ export const WAVE1_POSTS: BlogPost[] = [
       { type: 'h2', text: 'Where does Milo fit?', id: 'milo' },
       {
         type: 'p',
-        text: 'Milo is the signal-first side of this comparison. Discovery, crawl, enrichment, draft, send from your inbox, reply routing, and booking, priced per credit. The first 100 credits are free, and there is no seat cost.',
+        text: 'Milo sits on the timing side of this comparison. Discovery, crawl, enrichment, draft, send from your inbox, reply routing, and booking, priced per credit. The first 100 credits are free, and there is no seat cost.',
       },
       {
         type: 'link',
@@ -515,6 +521,7 @@ export const WAVE1_POSTS: BlogPost[] = [
         type: 'p',
         text: 'The mid-market intent vendors define intent as "topic-level content consumption above a baseline." That definition does not travel to local. A plumber does not read G2 reviews before buying software. High intent for a local business is a change in their operational reality that makes buying now more likely than buying next quarter.',
       },
+      { type: 'h3', text: 'Why the change is observable' },
       {
         type: 'p',
         text: 'That change is almost always visible. The job is to see it, weight it correctly, and reach the person who can decide.',
@@ -576,6 +583,7 @@ export const WAVE1_POSTS: BlogPost[] = [
           'Total: 13 to 15. Every business in this list gets worked.',
         ],
       },
+      { type: 'h3', text: 'The opener that writes itself' },
       {
         type: 'p',
         text: 'Personalization line writes itself: "Noticed [Business] does not have a site linked on Google. Happy to send a two-page draft so you can decide if it is worth doing."',
